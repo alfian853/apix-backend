@@ -1,21 +1,26 @@
 package com.future.apix.entity.apidetail;
 
 import java.io.Serializable;
-import java.util.HashMap;
 
 public class BodyData implements Serializable {
 
     String name;
 
-    String type;
+    DataType type;
 
     //examples value
-    /*isi object values [
+    /*isi object value [
     *   primitive data type : {int,string,date} ||
-    *   object : {BodyData.class}
+    *   object : {BodyData.class,CustomDataType}
     * ]
+    *
+    * support body untuk : [
+    *   application/json,
+    *   multipart/form-data,
+    *   application/x-www-form-urlencoded
+    *   ]
     * */
-    HashMap<String, Object> values;
+    Object value;
 
     boolean required;
 

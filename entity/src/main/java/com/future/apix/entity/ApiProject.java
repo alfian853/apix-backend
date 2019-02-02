@@ -9,5 +9,7 @@ import java.util.List;
 @Data
 @Document("ApiProjects")
 public class ApiProject implements Serializable {
+
+    String id;
     List<ApiSection> sections;
 }

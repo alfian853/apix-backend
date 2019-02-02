@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Data
-@Document("ApiDatas")
+@Document("ApiProjects")
 public class ApiProject implements Serializable {
     List<ApiSection> sections;
 }

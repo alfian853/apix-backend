@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.http.HttpMethod;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 @Data
 public class ApiData implements Serializable {
@@ -15,6 +16,7 @@ public class ApiData implements Serializable {
 
     HttpMethod method;
 
+    HashMap<String, String> queryParams;
     RequestBody request;
     ResponseBody responses;
 }

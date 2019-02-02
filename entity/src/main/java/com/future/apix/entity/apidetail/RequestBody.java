@@ -1,8 +1,8 @@
 package com.future.apix.entity.apidetail;
 
 import org.springframework.http.MediaType;
-
 import java.io.Serializable;
+import java.util.HashMap;
 
 public class RequestBody implements Serializable {
 
@@ -10,7 +10,8 @@ public class RequestBody implements Serializable {
 
     String description;
 
-    BodyData data;
+    HashMap<String,String> header;
 
+    BodyData data;
 
 }

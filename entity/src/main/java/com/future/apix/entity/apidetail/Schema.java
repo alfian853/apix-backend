@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.HashMap;
+
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Schema {
 
-    DataType type;
+    String type;
 
     boolean required;
 
@@ -24,7 +26,7 @@ public class Schema {
     *   object : {Schema.class,CustomDataType}
     * ]
     * */
-    Schema properties;
+    HashMap<String,Schema> properties;
 
 
     /** if datatype = Array
@@ -42,6 +44,6 @@ public class Schema {
     String pattern;
 
     /**if datatype = {Integer,Number}**/
-    NumberFormat format;
+    String format;
 
 }

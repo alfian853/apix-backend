@@ -7,5 +7,5 @@ import java.util.HashMap;
 
 @Data
 public class ApiSection{
-    HashMap<String, HashMap<HttpMethod,ApiData> > paths;
+    HashMap<String, HashMap<HttpMethod, ApiMethodData> > paths = new HashMap<>();
 }

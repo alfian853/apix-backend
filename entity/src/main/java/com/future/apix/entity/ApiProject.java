@@ -4,12 +4,14 @@ import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashMap;
 
 @Data
 @Document("ApiProjects")
 public class ApiProject implements Serializable {
 
     String id;
-    List<ApiSection> sections;
+    String basePath;
+    HashMap<String, ApiSection> sections;
+
 }

@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +35,10 @@ public class ApiMethodData {
 
     //requestHeader
     HashMap<String, Parameter> headers = new HashMap<>();
+
     //requestBody
-    RequestBody body = new RequestBody();
+    @Valid
+    RequestBody body;
 
     //responseBody sama seperti requestBody
     HashMap<HttpStatus, RequestBody> responses = new HashMap<>();

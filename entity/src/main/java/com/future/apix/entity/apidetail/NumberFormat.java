@@ -1,5 +1,5 @@
 package com.future.apix.entity.apidetail;
 
 public enum NumberFormat {
-    Int64, Int32, Int16, Int8;
+    INT64, INT32, INT16, INT8;
 }

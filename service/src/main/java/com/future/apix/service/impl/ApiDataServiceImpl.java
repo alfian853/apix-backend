@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiMethodData;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ApiSection;
+import com.future.apix.util.validator.BodyValidator;
+import com.future.apix.util.validator.ParameterValidator;
+import com.future.apix.util.validator.SchemaValidator;
 import com.future.apix.entity.apidetail.Definition;
 import com.future.apix.entity.apidetail.Parameter;
 import com.future.apix.entity.apidetail.ProjectInfo;
@@ -18,6 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,8 +36,26 @@ public class ApiDataServiceImpl implements ApiDataService {
     @Autowired
     ApiRepository apiRepository;
 
+
     private ObjectMapper oMapper = new ObjectMapper();
 
+    private static Validator validator;
+
+    static {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    private <T> T convertAndValidate(HashMap<String, Object> data,Class<T> toClass){
+        T result = oMapper.convertValue(data,toClass);
+
+        if(!validator.validate(result).isEmpty()){
+            System.out.println("error");
+            validator.validate(result).forEach(x -> System.out.println(x.getMessage()));
+            throw new InvalidRequestException("The json file contain invalid data!");
+        }
+        return result;
+    }
 
     /**
      * return : data dari method api{post,get,put,delete}.
@@ -51,7 +75,6 @@ public class ApiDataServiceImpl implements ApiDataService {
         methodData.setConsumes((List<String>) data.get("consumes"));
         methodData.setProduces((List<String>) data.get("produces"));
         methodData.setDeprecated((Boolean) data.get("deprecated"));
-
         if(data.get("parameters") != null){
 
             List<Object> parameters = (List<Object>) data.get("parameters");
@@ -69,7 +92,8 @@ public class ApiDataServiceImpl implements ApiDataService {
                     );
                 }
                 else if(parameter.get("in").equals("body")){
-                    methodData.setBody(oMapper.convertValue(parameter, RequestBody.class));
+                    RequestBody body = oMapper.convertValue(parameter, RequestBody.class);
+                    methodData.setBody(body);
                 }
                 else if(parameter.get("in").equals("path")){
                     methodData.getPathVariables().put(
@@ -92,7 +116,6 @@ public class ApiDataServiceImpl implements ApiDataService {
         return methodData;
     }
 
-
     /**
      * return : data dari link(sudah include semua http method dari link tersebut).
      * contoh :
@@ -101,15 +124,28 @@ public class ApiDataServiceImpl implements ApiDataService {
      *     "get" : {object}
      * }
      * **/
-    private HashMap<HttpMethod, ApiMethodData> getLinkData(HashMap<String, Object> data){
+    private HashMap<String, ApiMethodData> getLinkData(HashMap<String, Object> data){
         Iterator iterator = data.entrySet().iterator();
-        HashMap<HttpMethod, ApiMethodData> result = new HashMap<>();
+        HashMap<String, ApiMethodData> result = new HashMap<>();
         while(iterator.hasNext()) {
             Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-            result.put(
-                HttpMethod.valueOf(pair.getKey().toUpperCase()),
-                getApiMethodData((HashMap<String, Object>) pair.getValue())
-            );
+            ApiMethodData methodData = getApiMethodData((HashMap<String, Object>) pair.getValue());
+
+            HttpMethod method = HttpMethod.valueOf(pair.getKey().toUpperCase());
+            // validating content
+            if(
+                    ParameterValidator.isValid(methodData.getHeaders()) &&
+                            ParameterValidator.isValid(methodData.getPathVariables()) &&
+                            ParameterValidator.isValid(methodData.getQueryParams()) &&
+                            ((method == HttpMethod.GET) || (methodData.getBody() == null ||
+                            BodyValidator.isValid(methodData.getBody())))
+
+            ){
+                result.put(pair.getKey().toLowerCase(),methodData);
+            }
+            else{
+                throw new InvalidRequestException("Json OAS is not valid!");
+            }
         }
         return result;
     }
@@ -125,7 +161,7 @@ public class ApiDataServiceImpl implements ApiDataService {
             project.setInfo(oMapper.convertValue(json.get("info"),ProjectInfo.class));
             project.setHost((String) json.get("host"));
 
-            /* Copy to Paths Operation */
+            /* Copy Paths Operation */
             //     link, listOfMethod
             HashMap<String,Object> paths = (HashMap<String, Object>) json.get("paths");
             Iterator iterator = paths.entrySet().iterator();
@@ -142,15 +178,25 @@ public class ApiDataServiceImpl implements ApiDataService {
                 //           sectionName             link
                 sections.get(section).getPaths().put(pair.getKey(), getLinkData((HashMap<String, Object>) pair.getValue()));
             }
-            /* End of Copy to Paths Operation**/
+            /* End of Copy Paths Operation**/
 
+
+            /* Copy Definitions Operation*/
             HashMap<String,Object> definitionsJson = (HashMap<String, Object>) json.get("definitions");
             HashMap<String, Definition> definitions = project.getDefinitions();
             iterator = definitionsJson.entrySet().iterator();
 
             while(iterator.hasNext()){
                 Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-                definitions.put(pair.getKey(), oMapper.convertValue(pair.getValue(),Definition.class));
+                Definition definition = oMapper.convertValue(pair.getValue(),Definition.class);
+
+                // validate content
+                if(SchemaValidator.isValid(definition.getProperties())){
+                    definitions.put(pair.getKey(), definition);
+                }
+                else{
+                    throw new InvalidRequestException("Json OAS is not valid!");
+                }
             }
 
             apiRepository.save(project);

@@ -4,26 +4,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiMethodData;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ApiSection;
-import com.future.apix.util.validator.BodyValidator;
-import com.future.apix.util.validator.ParameterValidator;
-import com.future.apix.util.validator.SchemaValidator;
 import com.future.apix.entity.apidetail.Definition;
 import com.future.apix.entity.apidetail.Parameter;
 import com.future.apix.entity.apidetail.ProjectInfo;
 import com.future.apix.entity.apidetail.RequestBody;
+import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
+import com.future.apix.util.JsonQueryExecutor;
+import com.future.apix.util.validator.BodyValidator;
+import com.future.apix.util.validator.ParameterValidator;
+import com.future.apix.util.validator.SchemaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,24 +37,7 @@ public class ApiDataServiceImpl implements ApiDataService {
 
 
     private ObjectMapper oMapper = new ObjectMapper();
-
-    private static Validator validator;
-
-    static {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
-
-    private <T> T convertAndValidate(HashMap<String, Object> data,Class<T> toClass){
-        T result = oMapper.convertValue(data,toClass);
-
-        if(!validator.validate(result).isEmpty()){
-            System.out.println("error");
-            validator.validate(result).forEach(x -> System.out.println(x.getMessage()));
-            throw new InvalidRequestException("The json file contain invalid data!");
-        }
-        return result;
-    }
+    private JsonQueryExecutor queryExecutor = new JsonQueryExecutor();
 
     /**
      * return : data dari method api{post,get,put,delete}.
@@ -208,6 +190,23 @@ public class ApiDataServiceImpl implements ApiDataService {
             throw new InvalidRequestException("Failed to import data : "+e.getMessage());
         }
 
+    }
+
+
+    @Override
+    public RequestResponse doQuery(HashMap<String, Object> query) {
+
+        String id = (String) query.get("id");
+
+        if(id == null)throw new InvalidRequestException("json doesn't contain 'id' field");
+
+        ApiProject project = apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
+
+        apiRepository.save(
+                queryExecutor.executeQuery(project, query)
+        );
+
+        return RequestResponse.success();
     }
 
 

@@ -92,7 +92,7 @@ public class ApiDataServiceImpl implements ApiDataService {
 
         }
 
-        HashMap<HttpStatus, RequestBody> responses = (HashMap<HttpStatus, RequestBody>) data.get("responses");
+        HashMap<String, RequestBody> responses = (HashMap<String, RequestBody>) data.get("responses");
         methodData.setResponses(responses);
 
         return methodData;
@@ -207,6 +207,11 @@ public class ApiDataServiceImpl implements ApiDataService {
         );
 
         return RequestResponse.success();
+    }
+
+    @Override
+    public ApiProject findById(String id) {
+        return apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
     }
 
 

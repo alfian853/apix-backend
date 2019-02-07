@@ -1,17 +1,16 @@
 package com.future.apix.controller;
 
+import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/project")
+@CrossOrigin
 public class ApiController {
 
     @Autowired
@@ -25,6 +24,11 @@ public class ApiController {
         else{
             throw new InvalidRequestException("oas format is not supported");
         }
+    }
+
+    @GetMapping("/{id}")
+    public ApiProject getById(@PathVariable("id") String id){
+        return apiDataService.findById(id);
     }
 
 }

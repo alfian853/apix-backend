@@ -41,5 +41,5 @@ public class ApiMethodData {
     RequestBody body;
 
     //responseBody sama seperti requestBody
-    HashMap<HttpStatus, RequestBody> responses = new HashMap<>();
+    HashMap<String, RequestBody> responses = new HashMap<>();
 }

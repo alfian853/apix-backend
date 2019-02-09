@@ -10,7 +10,7 @@ public class Items {
     String type;
 
     @JsonProperty("default")
-    String itemDefault;
+    Object itemDefault;
 
     @JsonProperty("enum")
     List<String> itemEnum;

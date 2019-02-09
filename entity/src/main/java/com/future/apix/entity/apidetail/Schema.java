@@ -54,5 +54,5 @@ public class Schema {
     Xml xml;
 
     @JsonProperty("default")
-    boolean defaults;
+    Object defaults;
 }

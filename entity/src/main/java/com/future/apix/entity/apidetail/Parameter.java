@@ -9,10 +9,13 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Parameter{
-    String name,in,type,description;
+    String name,in,type,description,collectionFormat;
     boolean required;
     String pattern;
     String format;
     @JsonProperty("enum")
     List<String> enums;
+
+    Items items;
+    Integer maximum, minimum;
 }

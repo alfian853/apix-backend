@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -46,4 +47,12 @@ public class Schema {
     /**if datatype = {Integer,Number}**/
     String format;
 
+    /** if enum in List **/
+    @JsonProperty("enum")
+    List<String> enums;
+
+    Xml xml;
+
+    @JsonProperty("default")
+    boolean defaults;
 }

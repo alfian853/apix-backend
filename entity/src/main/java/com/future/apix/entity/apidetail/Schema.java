@@ -3,6 +3,8 @@ package com.future.apix.entity.apidetail;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,11 +50,13 @@ public class Schema {
     String format;
 
     /** if enum in List **/
+    @Field("enum")
     @JsonProperty("enum")
     List<String> enums;
 
     Xml xml;
 
+    @Field("default")
     @JsonProperty("default")
     Object defaults;
 }

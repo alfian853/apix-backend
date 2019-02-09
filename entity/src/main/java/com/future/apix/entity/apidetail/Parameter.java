@@ -3,6 +3,7 @@ package com.future.apix.entity.apidetail;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
@@ -13,6 +14,8 @@ public class Parameter{
     boolean required;
     String pattern;
     String format;
+
+    @Field("enum")
     @JsonProperty("enum")
     List<String> enums;
 

@@ -1,9 +1,11 @@
 package com.future.apix.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.future.apix.entity.apidetail.Parameter;
 import com.future.apix.entity.apidetail.RequestBody;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -18,6 +20,10 @@ public class ApiMethodData {
 
     String summary,description,operationId;
     Boolean deprecated;
+
+    @Field("_signature")
+    @JsonProperty("_signature")
+    String signature;
 
     List<String> consumes = Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);
     List<String> produces = Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);

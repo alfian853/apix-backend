@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class ApiDataUpdateImpl implements ApiDataUpdateService {
@@ -63,28 +64,30 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
         String id = (String) query.get("id");
 
         if(id == null)throw new InvalidRequestException("json doesn't contain 'id' field");
-        System.out.println("Search id: "+id);
+
         ApiProject project = apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
 
         HashMap<String, Object> target = mapper.convertValue(project, HashMap.class);
 
+        //validasi signature
         SignaturePointer pointer = getSignaturePointer(target, query);
-        if(pointer.getQueryField().get("_signature").equals(
+        if(!pointer.getQueryField().get("_signature").equals(
                 pointer.getMethodField().get("_signature"))){
             throw new ConflictException("Edition Conflict!, Please refresh the tab");
         }
 
-        queryExecutor.executeQuery(pointer.getMethodField(), pointer.getQueryField());
+        if( queryExecutor.executeQuery(pointer.getMethodField(), pointer.getQueryField()) ){
+            //generate signature baru setelah kontennya berhasil diupdate
+            pointer.getMethodField().put("_signature", UUID.randomUUID().toString());
+        }
 
         /** karna pointer.getMethodField() me-return object yang didalam @target(bukan hasil clone),
-         * maka tidak perlu di set lagi hasil query kedalam @target
+         * maka tidak perlu di menge-set hasil query kedalam @target
          **/
-        System.out.println(project.getSections().get("lendment").getPaths().get("/lendment/create").get("post"));
-
         project = mapper.convertValue(target, ApiProject.class);
 
-        System.out.println(project.getSections().get("lendment").getPaths().get("/lendment/create").get("post"));
         apiRepository.save(project);
+
         return RequestResponse.success();
     }
 }

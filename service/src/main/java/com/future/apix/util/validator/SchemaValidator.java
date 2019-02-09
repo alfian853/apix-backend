@@ -28,7 +28,11 @@ public class SchemaValidator {
 
         if(type == null)return false;
 
-        if(type == DataType.INTEGER || type == DataType.NUMBER){
+        if( type == DataType.INTEGER){
+            return schema.getFormat() != null && !schema.getFormat().equals("double") &&
+                    NumberFormatValidator.isValid(schema.getFormat());
+        }
+        else if( type == DataType.NUMBER){
             return !formatIsNull && NumberFormatValidator.isValid(schema.getFormat())
                     && propertiesIsEmpty && itemsIsEmpty;
         }

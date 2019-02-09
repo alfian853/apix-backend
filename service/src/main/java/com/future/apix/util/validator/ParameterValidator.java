@@ -3,6 +3,7 @@ package com.future.apix.util.validator;
 import com.future.apix.entity.apidetail.DataType;
 import com.future.apix.entity.apidetail.Parameter;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,9 +25,13 @@ public class ParameterValidator {
         if(type == null)return false;
 
         if(type == DataType.STRING){
-            return parameter.getFormat() == null;
+            return (parameter.getFormat() == null || parameter.getFormat().equals("date-time"));
         }
-        else if(type == DataType.INTEGER || type == DataType.NUMBER){
+        else if(type == DataType.INTEGER){
+            return parameter.getFormat() != null && !parameter.getFormat().equals("double") &&
+                    NumberFormatValidator.isValid(parameter.getFormat());
+        }
+        else if(type == DataType.NUMBER){
             return NumberFormatValidator.isValid(parameter.getFormat()) && (parameter.getPattern() == null);
         }
         else{

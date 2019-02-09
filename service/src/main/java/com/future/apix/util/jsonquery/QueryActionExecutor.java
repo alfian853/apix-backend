@@ -2,15 +2,15 @@ package com.future.apix.util.jsonquery;
 
 import java.util.HashMap;
 
-public class ActionExecutor {
+public class QueryActionExecutor {
 
-    private static ActionExecutor factory;
+    private static QueryActionExecutor executor;
 
-    public synchronized static ActionExecutor getInstance(){
-        if(factory == null){
-            factory = new ActionExecutor();
+    public synchronized static QueryActionExecutor getInstance(){
+        if(executor == null){
+            executor = new QueryActionExecutor();
         }
-        return factory;
+        return executor;
     }
 
     public void execute(HashMap<String,Object> target, HashMap<String,Object> query) {
@@ -31,7 +31,7 @@ public class ActionExecutor {
 
     }
 
-    private void doRename(HashMap<String, Object> target, HashMap<String, Object> query) {
+    protected void doRename(HashMap<String, Object> target, HashMap<String, Object> query) {
         String key = (String) query.get("key");
         Object temp = target.get(key);
         target.remove(key);
@@ -39,12 +39,12 @@ public class ActionExecutor {
         System.out.println("rename success : "+query.toString());
     }
 
-    private void doInsert(HashMap<String, Object> target, HashMap<String, Object> query) {
+    protected void doInsert(HashMap<String, Object> target, HashMap<String, Object> query) {
         target.put((String) query.get("key"), query.get("value"));
         System.out.println("insert success : "+query.toString());
     }
 
-    private void doDelete(HashMap<String, Object> target, HashMap<String, Object> query) {
+    protected void doDelete(HashMap<String, Object> target, HashMap<String, Object> query) {
         target.remove(query.get("key"));
         System.out.println("delete success : "+query.toString());
     }

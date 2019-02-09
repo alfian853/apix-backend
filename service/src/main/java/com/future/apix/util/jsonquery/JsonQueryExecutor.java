@@ -9,11 +9,11 @@ import java.util.Map;
 public class JsonQueryExecutor {
 
     private ObjectMapper mapper = new ObjectMapper();
-    private static ActionExecutor actionExecutor = ActionExecutor.getInstance();
+    private static QueryActionExecutor actionExecutor = QueryActionExecutor.getInstance();
 
-    private boolean checkAndExecuteActions(HashMap<String,Object> target,HashMap<String,Object> data){
-        if(data.containsKey("_hasActions")){
-            List<HashMap<String,Object> > actions = (List<HashMap<String, Object>>) data.get("_actions");
+    private boolean checkAndExecuteActions(HashMap<String,Object> target,HashMap<String,Object> query){
+        if(query.containsKey("_hasActions")){
+            List<HashMap<String,Object> > actions = (List<HashMap<String, Object>>) query.get("_actions");
 
             for (HashMap<String,Object> action : actions) {
                 actionExecutor.execute(target, action);
@@ -64,14 +64,16 @@ public class JsonQueryExecutor {
         return hasUpdate;
     }
 
+    //return hasil update
     public <T> T  executeQuery(T target, HashMap<String, Object> query){
         HashMap<String,Object> json = mapper.convertValue(target, HashMap.class);
         update(json, query);
         return (T) mapper.convertValue(json,target.getClass());
     }
 
-    public void executeQuery(HashMap<String,Object> target, HashMap<String, Object> query){
-        update(target, query);
+    //return : apakah terjadi update?
+    public boolean executeQuery(HashMap<String,Object> target, HashMap<String, Object> query){
+        return update(target, query);
     }
 
 }

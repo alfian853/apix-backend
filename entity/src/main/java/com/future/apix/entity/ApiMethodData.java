@@ -13,17 +13,19 @@ import javax.validation.Valid;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiMethodData {
 
-    String summary,description,operationId;
-    Boolean deprecated;
-
+    //for validation of edition
     @Field("_signature")
     @JsonProperty("_signature")
-    String signature;
+    String signature = UUID.randomUUID().toString();
+
+    String summary,description,operationId;
+    Boolean deprecated;
 
     List<String> consumes = Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);
     List<String> produces = Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);
@@ -48,4 +50,5 @@ public class ApiMethodData {
 
     //responseBody sama seperti requestBody
     HashMap<String, RequestBody> responses = new HashMap<>();
+
 }

@@ -1,4 +1,4 @@
-package com.future.apix.util;
+package com.future.apix.util.jsonquery;
 
 import java.util.HashMap;
 

@@ -1,9 +1,6 @@
 package com.future.apix.controller;
 
-import com.future.apix.exception.DataNotFoundException;
-import com.future.apix.exception.DefaultRuntimeException;
-import com.future.apix.exception.DuplicateEntryException;
-import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.exception.*;
 import com.future.apix.response.RequestResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -67,6 +64,18 @@ public class DefaultControllerAdvice {
         HttpHeaders headers = new HttpHeaders();
         HttpStatus status = HttpStatus.BAD_REQUEST;
         return new ResponseEntity<>(response, headers,status);
+    }
+
+    @ExceptionHandler(value = {ConflictException.class})
+    @RequestMapping(produces = "application/vnd.error+json")
+    public ResponseEntity<RequestResponse> conflictExceptionHandler(ConflictException exception){
+        exception.printStackTrace();
+
+        return new ResponseEntity<>(
+                RequestResponse.failed(exception.getMessage()),
+                new HttpHeaders(),
+                HttpStatus.CONFLICT
+        );
     }
 
 

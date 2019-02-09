@@ -4,14 +4,9 @@ import com.future.apix.entity.ApiProject;
 import com.future.apix.response.RequestResponse;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-
 public interface ApiDataService {
 
     RequestResponse importFromFile(MultipartFile file);
-
-    //object query must contain id
-    RequestResponse doQuery(HashMap<String, Object> query);
 
     ApiProject findById(String id);
 }

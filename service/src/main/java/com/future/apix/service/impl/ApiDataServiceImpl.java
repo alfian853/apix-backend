@@ -13,21 +13,17 @@ import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
-import com.future.apix.util.JsonQueryExecutor;
+import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import com.future.apix.util.validator.BodyValidator;
 import com.future.apix.util.validator.ParameterValidator;
 import com.future.apix.util.validator.SchemaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ApiDataServiceImpl implements ApiDataService {
@@ -190,23 +186,6 @@ public class ApiDataServiceImpl implements ApiDataService {
             throw new InvalidRequestException("Failed to import data : "+e.getMessage());
         }
 
-    }
-
-
-    @Override
-    public RequestResponse doQuery(HashMap<String, Object> query) {
-
-        String id = (String) query.get("id");
-
-        if(id == null)throw new InvalidRequestException("json doesn't contain 'id' field");
-
-        ApiProject project = apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
-
-        apiRepository.save(
-                queryExecutor.executeQuery(project, query)
-        );
-
-        return RequestResponse.success();
     }
 
     @Override

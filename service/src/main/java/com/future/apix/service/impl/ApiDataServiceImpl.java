@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiMethodData;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ApiSection;
-import com.future.apix.entity.apidetail.Definition;
-import com.future.apix.entity.apidetail.Parameter;
-import com.future.apix.entity.apidetail.ProjectInfo;
-import com.future.apix.entity.apidetail.RequestBody;
+import com.future.apix.entity.apidetail.*;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
@@ -24,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ApiDataServiceImpl implements ApiDataService {
@@ -155,8 +153,21 @@ public class ApiDataServiceImpl implements ApiDataService {
                 }
                 //           sectionName             link
                 sections.get(section).getPaths().put(pair.getKey(), getLinkData((HashMap<String, Object>) pair.getValue()));
+
+
             }
             /* End of Copy Paths Operation**/
+
+            /* Append Description of Sections from Tags */
+            List<Object> tags = (List<Object>) json.get("tags");
+//            HashMap<String, String> tagName = tags.stream().collect(Collectors.toMap(tags.get("name")))
+            HashMap<String, Tag> tagDescription = new HashMap<>();
+            for (Object tagObj : tags) {
+                HashMap<String, Object> tag = (HashMap<String, Object>) tagObj;
+                ApiSection section = sections.get(tag.get("name"));
+                section.setTag(oMapper.convertValue(tag, Tag.class));
+            }
+            /* End of Append Tags */
 
 
             /* Copy Definitions Operation*/

@@ -1,6 +1,7 @@
 package com.future.apix.entity;
 
 import com.future.apix.entity.apidetail.Contact;
+import com.future.apix.entity.apidetail.Tag;
 import lombok.Data;
 import org.springframework.http.HttpMethod;
 
@@ -14,6 +15,5 @@ public class ApiSection{
     //simpan data type
 
     // simpan sesuai dengan Tags di swagger OAS
-    String name, description;
-    Contact externalDocs;
+    Tag tag;
 }

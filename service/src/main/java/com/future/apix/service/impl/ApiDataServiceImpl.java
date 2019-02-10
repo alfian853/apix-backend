@@ -193,5 +193,10 @@ public class ApiDataServiceImpl implements ApiDataService {
         return apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
     }
 
+    @Override
+    public List<ApiProject> findAll() {
+        return apiRepository.findAll();
+    }
+
 
 }

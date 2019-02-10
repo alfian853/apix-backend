@@ -1,5 +1,6 @@
 package com.future.apix.entity;
 
+import com.future.apix.entity.apidetail.Contact;
 import lombok.Data;
 import org.springframework.http.HttpMethod;
 
@@ -11,4 +12,8 @@ public class ApiSection{
     HashMap<String, HashMap<String, ApiMethodData> > paths = new HashMap<>();
 
     //simpan data type
+
+    // simpan sesuai dengan Tags di swagger OAS
+    String name, description;
+    Contact externalDocs;
 }

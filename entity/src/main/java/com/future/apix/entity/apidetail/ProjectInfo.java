@@ -19,8 +19,8 @@ public class ProjectInfo {
             title,
             termsOfService;
 
-    Object contact;
-    License license;
+    Contact contact;
+    Contact license;
 
 }
 

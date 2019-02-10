@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/project")
@@ -40,5 +41,11 @@ public class ApiController {
     @PutMapping
     public RequestResponse doApiDataQuery(@RequestBody HashMap<String,Object> query){
         return updateService.doQuery(query);
+    }
+
+    // digunakan untuk mendapatkan semua apiProject (sementara)
+    @GetMapping("/all")
+    public List<ApiProject> findAll(){
+        return apiDataService.findAll();
     }
 }

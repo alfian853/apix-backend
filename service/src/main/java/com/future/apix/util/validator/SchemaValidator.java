@@ -23,10 +23,11 @@ public class SchemaValidator {
         boolean itemsIsEmpty = schema.getItems() == null;
         boolean propertiesIsEmpty = schema.getProperties() == null || schema.getProperties().isEmpty();
         boolean formatIsNull = schema.getFormat() == null;
+        boolean defaultIsNull = schema.getDefaults() == null;
 
         DataType type = getType(schema.getType());
 
-        if(type == null)return false;
+        if(type == null) return false;
 
         if( type == DataType.INTEGER){
             return schema.getFormat() != null && !schema.getFormat().equals("double") &&
@@ -41,7 +42,7 @@ public class SchemaValidator {
             && formatIsNull && propertiesIsEmpty;
         }
         else if(type == DataType.OBJECT){
-            return !propertiesIsEmpty && formatIsNull && itemsIsEmpty && isValid(schema.getProperties());
+            return !propertiesIsEmpty && formatIsNull && itemsIsEmpty && isValid(schema.getProperties()) && defaultIsNull;
         }
 
         return true;

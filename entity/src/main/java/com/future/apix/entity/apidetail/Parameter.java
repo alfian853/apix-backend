@@ -19,6 +19,7 @@ public class Parameter{
     @JsonProperty("enum")
     List<String> enums;
 
-    Items items;
+//    Items items;
+    Schema items;
     Integer maximum, minimum;
 }

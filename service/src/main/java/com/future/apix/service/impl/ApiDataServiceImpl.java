@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ApiDataServiceImpl implements ApiDataService {
@@ -100,7 +99,7 @@ public class ApiDataServiceImpl implements ApiDataService {
      *     "get" : {object}
      * }
      * **/
-    private HashMap<String, ApiMethodData> getLinkData(HashMap<String, Object> data){
+    private Path getLinkData(HashMap<String, Object> data){
         Iterator iterator = data.entrySet().iterator();
         HashMap<String, ApiMethodData> result = new HashMap<>();
         while(iterator.hasNext()) {
@@ -123,7 +122,9 @@ public class ApiDataServiceImpl implements ApiDataService {
                 throw new InvalidRequestException("Json OAS is not valid!");
             }
         }
-        return result;
+        Path path = new Path();
+        path.setMethods(result);
+        return path;
     }
 
     private HashMap<String, ApiSection> getSections(List<HashMap<String,String>> tags){
@@ -181,6 +182,8 @@ public class ApiDataServiceImpl implements ApiDataService {
 
 
             }
+            project.setSections(sections);
+
             /* End of Copy Paths Operation**/
 
             /* Append Description of Sections from Tags */
@@ -193,7 +196,7 @@ public class ApiDataServiceImpl implements ApiDataService {
                     tag.put("externalDocs",new Contact());
                 }
                 ApiSection section = sections.get(tag.get("name"));
-                section.setTag(oMapper.convertValue(tag, Tag.class));
+                section.setInfo(oMapper.convertValue(tag, Tag.class));
             }
             /* End of Append Tags */
 

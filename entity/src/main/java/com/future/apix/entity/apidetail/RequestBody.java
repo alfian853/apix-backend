@@ -13,7 +13,7 @@ public class RequestBody {
     boolean required;
 
     // Isi dari Header Object hampir sama dengan Parameter Object
-    HashMap<String, Parameter> headers;
+    HashMap<String, Schema> headers;
 
     Schema schema;
 

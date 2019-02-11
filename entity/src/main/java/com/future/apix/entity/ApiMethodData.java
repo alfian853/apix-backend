@@ -2,11 +2,10 @@ package com.future.apix.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.future.apix.entity.apidetail.Parameter;
 import com.future.apix.entity.apidetail.RequestBody;
+import com.future.apix.entity.apidetail.Schema;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import javax.validation.Valid;
@@ -38,12 +37,12 @@ public class ApiMethodData {
 
 
     //HashMap<nama param, isiparam>
-    HashMap<String, Parameter> queryParams = new HashMap<>();
+    HashMap<String, Schema> queryParams = new HashMap<>();
 
-    HashMap<String, Parameter> pathVariables = new HashMap<>();
+    HashMap<String, Schema> pathVariables = new HashMap<>();
 
     //requestHeader
-    HashMap<String, Parameter> headers = new HashMap<>();
+    HashMap<String, Schema> headers = new HashMap<>();
 
     //requestBody
     @Valid

@@ -19,6 +19,10 @@ public class Schema {
 
     String description;
 
+    String name,in;
+
+    String collectionFormat;
+
     //untuk custom dataType, isi schema = isi custom dataType
     @JsonProperty("$ref")
     String ref;
@@ -60,4 +64,7 @@ public class Schema {
     @Field("default")
     @JsonProperty("default")
     Object defaults;
+
+    Integer maximum, minimum, maxLength, minLength, maxItems, minItems, multipleOf;
+//    boolean exclusiveMaximum, exclusiveMinimum, uniqueItems;
 }

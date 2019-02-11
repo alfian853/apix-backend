@@ -12,7 +12,6 @@ import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import com.future.apix.util.validator.BodyValidator;
-import com.future.apix.util.validator.ParameterValidator;
 import com.future.apix.util.validator.SchemaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -58,12 +57,12 @@ public class ApiDataServiceImpl implements ApiDataService {
                 HashMap<String, Object> parameter = (HashMap<String, Object>) paramObj;
                 if(parameter.get("in").equals("query")){
                     methodData.getQueryParams().put(
-                            (String) parameter.get("name"),oMapper.convertValue(parameter, Parameter.class)
+                            (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
                     );
                 }
                 else if(parameter.get("in").equals("header")){
                     methodData.getHeaders().put(
-                            (String) parameter.get("name"),oMapper.convertValue(parameter, Parameter.class)
+                            (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
                     );
                 }
                 else if(parameter.get("in").equals("body")){
@@ -72,7 +71,7 @@ public class ApiDataServiceImpl implements ApiDataService {
                 }
                 else if(parameter.get("in").equals("path")){
                     methodData.getPathVariables().put(
-                            (String) parameter.get("name"),oMapper.convertValue(parameter, Parameter.class)
+                            (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
                     );
                 }
                 else if(parameter.get("in").equals("formData")){
@@ -109,9 +108,9 @@ public class ApiDataServiceImpl implements ApiDataService {
             HttpMethod method = HttpMethod.valueOf(pair.getKey().toUpperCase());
             // validating content
             if(
-                    ParameterValidator.isValid(methodData.getHeaders()) &&
-                            ParameterValidator.isValid(methodData.getPathVariables()) &&
-                            ParameterValidator.isValid(methodData.getQueryParams()) &&
+                    SchemaValidator.isValid(methodData.getHeaders()) &&
+                            SchemaValidator.isValid(methodData.getPathVariables()) &&
+                            SchemaValidator.isValid(methodData.getQueryParams()) &&
                             ((method == HttpMethod.GET) || (methodData.getBody() == null ||
                             BodyValidator.isValid(methodData.getBody())))
 

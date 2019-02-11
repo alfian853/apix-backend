@@ -28,7 +28,6 @@ public class SchemaValidator {
         DataType type = getType(schema.getType());
 
         if(type == null) return false || (!formatIsNull && schema.getFormat().equals("date-time"));
-        System.out.println(schema);
         if( type == DataType.INTEGER){
             return schema.getFormat() != null && !schema.getFormat().equals("double") &&
                     NumberFormatValidator.isValid(schema.getFormat());

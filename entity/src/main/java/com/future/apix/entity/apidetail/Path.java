@@ -9,4 +9,5 @@ import java.util.HashMap;
 public class Path {
     HashMap<String, ApiMethodData> methods;
     String description="";
+    HashMap<String, Schema> pathVariables;
 }

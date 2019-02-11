@@ -31,6 +31,7 @@ public class Schema {
     * */
     HashMap<String,Schema> properties;
 
+    Object additionalProperties;
 
     /** if datatype = Array
      *      array of string = {type:String,pattern:"[A-Z]+"}

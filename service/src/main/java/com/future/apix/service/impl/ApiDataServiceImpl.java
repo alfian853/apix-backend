@@ -10,7 +10,6 @@ import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
-import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import com.future.apix.util.validator.BodyValidator;
 import com.future.apix.util.validator.SchemaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 @Service
 public class ApiDataServiceImpl implements ApiDataService {
@@ -29,7 +32,6 @@ public class ApiDataServiceImpl implements ApiDataService {
 
 
     private ObjectMapper oMapper = new ObjectMapper();
-    private JsonQueryExecutor queryExecutor = new JsonQueryExecutor();
 
     /**
      * return : data dari method api{post,get,put,delete}.
@@ -54,30 +56,26 @@ public class ApiDataServiceImpl implements ApiDataService {
             List<Object> parameters = (List<Object>) data.get("parameters");
 
             for (Object paramObj : parameters) {
-                HashMap<String, Object> parameter = (HashMap<String, Object>) paramObj;
-                if(parameter.get("in").equals("query")){
+                HashMap<String, Object> parameter = toStrObjMap(paramObj);
+                String input = (String) parameter.get("in");
+                if(input.equals("query")){
                     methodData.getQueryParams().put(
                             (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
                     );
                 }
-                else if(parameter.get("in").equals("header")){
+                else if(input.equals("header")){
                     methodData.getHeaders().put(
                             (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
                     );
                 }
-                else if(parameter.get("in").equals("body")){
+                else if(input.equals("body")){
                     RequestBody body = oMapper.convertValue(parameter, RequestBody.class);
                     methodData.setBody(body);
                 }
-                else if(parameter.get("in").equals("path")){
-                    methodData.getPathVariables().put(
-                            (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
-                    );
-                }
-                else if(parameter.get("in").equals("formData")){
+                else if(input.equals("formData")){
                     methodData.setBody(oMapper.convertValue(parameter, RequestBody.class));
                 }
-                else{
+                else if(!input.equals("path")){
                     throw new InvalidRequestException("can't process parameter[in] = "+parameter.get("in"));
                 }
             }
@@ -103,13 +101,12 @@ public class ApiDataServiceImpl implements ApiDataService {
         HashMap<String, ApiMethodData> result = new HashMap<>();
         while(iterator.hasNext()) {
             Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-            ApiMethodData methodData = getApiMethodData((HashMap<String, Object>) pair.getValue());
+            ApiMethodData methodData = getApiMethodData( toStrObjMap(pair.getValue()) );
 
             HttpMethod method = HttpMethod.valueOf(pair.getKey().toUpperCase());
             // validating content
             if(
                     SchemaValidator.isValid(methodData.getHeaders()) &&
-                            SchemaValidator.isValid(methodData.getPathVariables()) &&
                             SchemaValidator.isValid(methodData.getQueryParams()) &&
                             ((method == HttpMethod.GET) || (methodData.getBody() == null ||
                             BodyValidator.isValid(methodData.getBody())))
@@ -123,6 +120,7 @@ public class ApiDataServiceImpl implements ApiDataService {
         }
         Path path = new Path();
         path.setMethods(result);
+        path.setPathVariables(this.getPathVariables(data));
         return path;
     }
 
@@ -140,13 +138,46 @@ public class ApiDataServiceImpl implements ApiDataService {
         return sections;
     }
 
+    //input : <Http Method,Method Data> path
+    //output : pathVariables
+    HashMap<String, Schema> getPathVariables(HashMap<String,Object> path){
+        String firstKey = path.keySet().iterator().next();
+        List<HashMap<String,String>> parameters
+                = (List<HashMap<String,String>>) toStrObjMap(path.get(firstKey)).get("parameters");
+
+        if(parameters == null){
+            return null;
+        }
+        HashMap<String, Schema> res = new HashMap<>();
+        for(HashMap<String,String> param : parameters){
+            if(param.get("in").equals("path")){
+
+                Schema pathValue = oMapper.convertValue(param,Schema.class);
+
+                if(!SchemaValidator.isValid(pathValue)){
+                    throw new InvalidRequestException("Json OAS is not valid!");
+                }
+
+                res.put(pathValue.getName(), pathValue);
+            }
+        }
+
+        return res;
+
+    }
+
+
     //input : object list of method = [@get,@post,@put....]
-    //return : section name
+    //output : section name
     private String getSectionName(Object methodsObj){
-        HashMap<String,Object> methods = (HashMap<String, Object>) methodsObj;
+        HashMap<String,Object> methods = toStrObjMap(methodsObj);
         String httpMethod = methods.keySet().iterator().next();
-        HashMap<String, Object> methodObj = (HashMap<String, Object>) methods.get(httpMethod);
+        HashMap<String, Object> methodObj = toStrObjMap(methods.get(httpMethod));
         return ((List<String>)methodObj.get("tags")).get(0);
+    }
+
+    private HashMap<String,Object> toStrObjMap(Object object){
+        return (HashMap<String,Object>) object;
     }
 
     @Override
@@ -164,7 +195,7 @@ public class ApiDataServiceImpl implements ApiDataService {
 
             /* Copy Paths Operation */
             //     link, listOfMethod
-            HashMap<String,Object> paths = (HashMap<String, Object>) json.get("paths");
+            HashMap<String,Object> paths = toStrObjMap(json.get("paths"));
             Iterator iterator = paths.entrySet().iterator();
 
             //     section,<link, HashMapOfMethod>
@@ -177,7 +208,7 @@ public class ApiDataServiceImpl implements ApiDataService {
                 String sectionName = this.getSectionName(pair.getValue());
 
                 //           sectionName             link
-                sections.get(sectionName).getPaths().put(pair.getKey(), getLinkData((HashMap<String, Object>) pair.getValue()));
+                sections.get(sectionName).getPaths().put(pair.getKey(), getLinkData(toStrObjMap(pair.getValue())));
 
 
             }
@@ -190,7 +221,7 @@ public class ApiDataServiceImpl implements ApiDataService {
 //            HashMap<String, String> tagName = tags.stream().collect(Collectors.toMap(tags.get("name")))
             HashMap<String, Tag> tagDescription = new HashMap<>();
             for (Object tagObj : tags) {
-                HashMap<String, Object> tag = (HashMap<String, Object>) tagObj;
+                HashMap<String, Object> tag = toStrObjMap(tagObj);
                 if(!tag.containsKey("externalDocs")){
                     tag.put("externalDocs",new Contact());
                 }
@@ -201,7 +232,7 @@ public class ApiDataServiceImpl implements ApiDataService {
 
 
             /* Copy Definitions Operation*/
-            HashMap<String,Object> definitionsJson = (HashMap<String, Object>) json.get("definitions");
+            HashMap<String,Object> definitionsJson = toStrObjMap(json.get("definitions"));
             HashMap<String, Definition> definitions = project.getDefinitions();
             iterator = definitionsJson.entrySet().iterator();
 

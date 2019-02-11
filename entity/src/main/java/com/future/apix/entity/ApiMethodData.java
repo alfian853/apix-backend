@@ -39,8 +39,6 @@ public class ApiMethodData {
     //HashMap<nama param, isiparam>
     HashMap<String, Schema> queryParams = new HashMap<>();
 
-    HashMap<String, Schema> pathVariables = new HashMap<>();
-
     //requestHeader
     HashMap<String, Schema> headers = new HashMap<>();
 

@@ -48,4 +48,10 @@ public class ApiController {
     public List<ApiProject> findAll(){
         return apiDataService.findAll();
     }
+
+    // digunakan untuk delete by Id (sementara)
+    @DeleteMapping("/{id}")
+    public RequestResponse deleteById(@PathVariable("id") String id){
+        return apiDataService.deleteById(id);
+    }
 }

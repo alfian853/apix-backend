@@ -12,6 +12,9 @@ public interface ApiDataService {
 
     ApiProject findById(String id);
 
-    //digunakan untuk mendapatkan semua project dari mongo (sementara saja)
+    // digunakan untuk mendapatkan semua project dari mongo (sementara saja)
     List<ApiProject> findAll();
+
+    // delete by id (sementara)
+    RequestResponse deleteById(String id);
 }

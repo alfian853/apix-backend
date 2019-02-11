@@ -30,5 +30,5 @@ public class Parameter{
 
     Schema items;
     Integer maximum, minimum, maxLength, minLength, maxItems, minItems, multipleOf;
-    boolean exclusiveMaximum, exclusiveMinimum, uniqueItems;
+//    boolean exclusiveMaximum, exclusiveMinimum, uniqueItems;
 }

@@ -136,6 +136,10 @@ public class ApiDataServiceImpl implements ApiDataService {
             project.setBasePath((String) json.get("basePath"));
             project.setInfo(oMapper.convertValue(json.get("info"),ProjectInfo.class));
             project.setHost((String) json.get("host"));
+//            project.setSwagger((String) json.get("swagger"));
+//            project.setOpenapi((String) json.get("openapi"));
+            project.setSchemes((List<String>) json.get("schemes"));
+            project.setExternalDocs(oMapper.convertValue(json.get("externalDocs"), Contact.class));
 
             /* Copy Paths Operation */
             //     link, listOfMethod
@@ -188,6 +192,18 @@ public class ApiDataServiceImpl implements ApiDataService {
                 }
             }
 
+            /* Security Definitions Operation */
+            HashMap<String, Object> securityDefinitionJson = (HashMap<String, Object>) json.get("securityDefinitions");
+            HashMap<String, SecurityScheme> securityScheme = project.getSecurityDefinitions();
+            iterator = securityDefinitionJson.entrySet().iterator();
+
+            while(iterator.hasNext()) {
+                Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
+                SecurityScheme scheme = oMapper.convertValue(pair.getValue(), SecurityScheme.class);
+                securityScheme.put(pair.getKey(), scheme);
+            }
+
+
             apiRepository.save(project);
 
             return RequestResponse.success("Data Imported");
@@ -207,6 +223,13 @@ public class ApiDataServiceImpl implements ApiDataService {
     @Override
     public List<ApiProject> findAll() {
         return apiRepository.findAll();
+    }
+
+    @Override
+    public RequestResponse deleteById(String id){
+        ApiProject project = apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
+        apiRepository.deleteById(id);
+        return RequestResponse.success("Project has been deleted!");
     }
 
 

@@ -27,7 +27,7 @@ public class ApiProject implements Serializable {
     String signature = UUID.randomUUID().toString();
 
     String basePath,host;
-    String swagger, openapi; // swagger for version 2.0 and openapi for version 3.0
+    // String swagger, openapi; // swagger for version 2.0 and openapi for version 3.0
     ProjectInfo info;
     HashMap<String, ApiSection> sections = new HashMap<>();
     HashMap<String, Definition> definitions = new HashMap<>();

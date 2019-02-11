@@ -126,6 +126,29 @@ public class ApiDataServiceImpl implements ApiDataService {
         return result;
     }
 
+    private HashMap<String, ApiSection> getSections(List<HashMap<String,String>> tags){
+
+        HashMap<String, ApiSection> sections = new HashMap<>();
+
+        for(HashMap<String,String> tag : tags){
+            String tagName = tag.get("name");
+            if(!sections.containsKey(tagName)){
+                sections.put(tagName,new ApiSection());
+            }
+        }
+
+        return sections;
+    }
+
+    //input : object list of method = [@get,@post,@put....]
+    //return : section name
+    private String getSectionName(Object methodsObj){
+        HashMap<String,Object> methods = (HashMap<String, Object>) methodsObj;
+        String httpMethod = methods.keySet().iterator().next();
+        HashMap<String, Object> methodObj = (HashMap<String, Object>) methods.get(httpMethod);
+        return ((List<String>)methodObj.get("tags")).get(0);
+    }
+
     @Override
     public RequestResponse importFromFile(MultipartFile file) {
 
@@ -136,8 +159,6 @@ public class ApiDataServiceImpl implements ApiDataService {
             project.setBasePath((String) json.get("basePath"));
             project.setInfo(oMapper.convertValue(json.get("info"),ProjectInfo.class));
             project.setHost((String) json.get("host"));
-//            project.setSwagger((String) json.get("swagger"));
-//            project.setOpenapi((String) json.get("openapi"));
             project.setSchemes((List<String>) json.get("schemes"));
             project.setExternalDocs(oMapper.convertValue(json.get("externalDocs"), Contact.class));
 
@@ -145,18 +166,18 @@ public class ApiDataServiceImpl implements ApiDataService {
             //     link, listOfMethod
             HashMap<String,Object> paths = (HashMap<String, Object>) json.get("paths");
             Iterator iterator = paths.entrySet().iterator();
+
             //     section,<link, HashMapOfMethod>
-            HashMap<String, ApiSection> sections = project.getSections();
+            HashMap<String, ApiSection> sections = this.getSections((List<HashMap<String, String>>) json.get("tags"));
 
             while(iterator.hasNext()){
                 //        link,ListOfMethod
                 Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-                String section = pair.getKey().split("/",3)[1];
-                if(!sections.containsKey(section)){
-                    sections.put(section, new ApiSection());
-                }
+
+                String sectionName = this.getSectionName(pair.getValue());
+
                 //           sectionName             link
-                sections.get(section).getPaths().put(pair.getKey(), getLinkData((HashMap<String, Object>) pair.getValue()));
+                sections.get(sectionName).getPaths().put(pair.getKey(), getLinkData((HashMap<String, Object>) pair.getValue()));
 
 
             }
@@ -168,6 +189,9 @@ public class ApiDataServiceImpl implements ApiDataService {
             HashMap<String, Tag> tagDescription = new HashMap<>();
             for (Object tagObj : tags) {
                 HashMap<String, Object> tag = (HashMap<String, Object>) tagObj;
+                if(!tag.containsKey("externalDocs")){
+                    tag.put("externalDocs",new Contact());
+                }
                 ApiSection section = sections.get(tag.get("name"));
                 section.setTag(oMapper.convertValue(tag, Tag.class));
             }
@@ -194,15 +218,16 @@ public class ApiDataServiceImpl implements ApiDataService {
 
             /* Security Definitions Operation */
             HashMap<String, Object> securityDefinitionJson = (HashMap<String, Object>) json.get("securityDefinitions");
-            HashMap<String, SecurityScheme> securityScheme = project.getSecurityDefinitions();
-            iterator = securityDefinitionJson.entrySet().iterator();
+            if(securityDefinitionJson != null){
+                HashMap<String, SecurityScheme> securityScheme = project.getSecurityDefinitions();
+                iterator = securityDefinitionJson.entrySet().iterator();
 
-            while(iterator.hasNext()) {
-                Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-                SecurityScheme scheme = oMapper.convertValue(pair.getValue(), SecurityScheme.class);
-                securityScheme.put(pair.getKey(), scheme);
+                while(iterator.hasNext()) {
+                    Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
+                    SecurityScheme scheme = oMapper.convertValue(pair.getValue(), SecurityScheme.class);
+                    securityScheme.put(pair.getKey(), scheme);
+                }
             }
-
 
             apiRepository.save(project);
 

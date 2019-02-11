@@ -12,8 +12,8 @@ public class RequestBody {
     String name,in,description,type;
     boolean required;
 
-    //ga perlu?
-    HashMap<String,String> headers;
+    // Isi dari Header Object hampir sama dengan Parameter Object
+    HashMap<String, Parameter> headers;
 
     Schema schema;
 

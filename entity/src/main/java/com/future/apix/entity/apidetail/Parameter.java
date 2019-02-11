@@ -10,16 +10,25 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Parameter{
-    String name,in,type,description,collectionFormat;
+    // In Swagger 2.0 called Parameter Object
+
+    // Fixed Fields
+    String name,in,type,description;
     boolean required;
+
+
     String pattern;
-    String format;
+    String format, collectionFormat;
+
+    @Field("default")
+    @JsonProperty("default")
+    Object defaults;
 
     @Field("enum")
     @JsonProperty("enum")
-    List<String> enums;
+    List<Object> enums;
 
-//    Items items;
     Schema items;
-    Integer maximum, minimum;
+    Integer maximum, minimum, maxLength, minLength, maxItems, minItems, multipleOf;
+    boolean exclusiveMaximum, exclusiveMinimum, uniqueItems;
 }

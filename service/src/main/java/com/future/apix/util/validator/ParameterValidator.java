@@ -34,6 +34,9 @@ public class ParameterValidator {
         else if(type == DataType.NUMBER){
             return NumberFormatValidator.isValid(parameter.getFormat()) && (parameter.getPattern() == null);
         }
+        else if (type == DataType.ARRAY) { // Required if type is "array"
+            return parameter.getItems() != null;
+        }
         else{
             return parameter.getFormat() == null && parameter.getPattern() == null;
         }

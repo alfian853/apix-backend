@@ -16,6 +16,8 @@ import java.util.UUID;
 @Document("ApiProjects")
 public class ApiProject implements Serializable {
 
+//    https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
+
     @Id
     String id;
 
@@ -24,13 +26,14 @@ public class ApiProject implements Serializable {
     @JsonProperty("_signature")
     String signature = UUID.randomUUID().toString();
 
-    String basePath,host, swagger;
+    String basePath,host;
+    String swagger, openapi; // swagger for version 2.0 and openapi for version 3.0
     ProjectInfo info;
     HashMap<String, ApiSection> sections = new HashMap<>();
     HashMap<String, Definition> definitions = new HashMap<>();
 
     List<String> schemes;
-    SecurityDefinition securityDefinitions;
+    HashMap<String, SecurityScheme> securityDefinitions = new HashMap<>();
     Contact externalDocs;
 
 //    List<Tag> tags;

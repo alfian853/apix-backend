@@ -18,6 +18,7 @@ import java.util.UUID;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiMethodData {
+    // In Swagger 2.0 called Operation Object
 
     //for validation of edition
     @Field("_signature")

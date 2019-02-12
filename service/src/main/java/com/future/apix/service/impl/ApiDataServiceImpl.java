@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 @Service
 public class ApiDataServiceImpl implements ApiDataService {
@@ -41,19 +40,25 @@ public class ApiDataServiceImpl implements ApiDataService {
      *     "description" : "",
      *     ............
      * }
-     * **/
-    private ApiMethodData getApiMethodData(HashMap<String,Object> data){
+     * **/                                                      //path             method,methodData
+    private void setApiMethodData(ApiProject project, String path, Map.Entry<String,Object> data){
 
         ApiMethodData methodData = new ApiMethodData();
-        methodData.setOperationId((String) data.get("operationId"));
-        methodData.setSummary((String) data.get("summary"));
-        methodData.setDescription((String) data.get("description"));
-        methodData.setConsumes((List<String>) data.get("consumes"));
-        methodData.setProduces((List<String>) data.get("produces"));
-        methodData.setDeprecated((Boolean) data.get("deprecated"));
-        if(data.get("parameters") != null){
+        HashMap<String,Object> dataMap = toStrObjMap(data.getValue());
+        methodData.setOperationId((String) dataMap.get("operationId"));
+        methodData.setSummary((String) dataMap.get("summary"));
+        methodData.setDescription((String) dataMap.get("description"));
+        methodData.setConsumes((List<String>) dataMap.get("consumes"));
+        methodData.setProduces((List<String>) dataMap.get("produces"));
+        methodData.setDeprecated((Boolean) dataMap.get("deprecated"));
+        String section = ((List<String>)dataMap.get("tags")).get(0);
+        Path pathOfMethod = project.getSections()
+                .computeIfAbsent(section, v -> new ApiSection()).getPaths()
+                .computeIfAbsent(path, v -> new Path());
 
-            List<Object> parameters = (List<Object>) data.get("parameters");
+        if(dataMap.get("parameters") != null){
+
+            List<Object> parameters = (List<Object>) dataMap.get("parameters");
 
             for (Object paramObj : parameters) {
                 HashMap<String, Object> parameter = toStrObjMap(paramObj);
@@ -75,17 +80,39 @@ public class ApiDataServiceImpl implements ApiDataService {
                 else if(input.equals("formData")){
                     methodData.setBody(oMapper.convertValue(parameter, RequestBody.class));
                 }
-                else if(!input.equals("path")){
+                else if(input.equals("path")){
+                    if(pathOfMethod.getPathVariables().containsKey(parameter.get("name"))){
+                        continue;
+                    }
+                    Schema pathVariable = oMapper.convertValue(parameter, Schema.class);
+                    pathOfMethod.getPathVariables().put(pathVariable.getName(),pathVariable);
+                }
+                else{
                     throw new InvalidRequestException("can't process parameter[in] = "+parameter.get("in"));
                 }
             }
 
         }
 
-        HashMap<String, RequestBody> responses = (HashMap<String, RequestBody>) data.get("responses");
+        HashMap<String, RequestBody> responses = (HashMap<String, RequestBody>) dataMap.get("responses");
         methodData.setResponses(responses);
 
-        return methodData;
+        HttpMethod method = HttpMethod.valueOf(data.getKey().toUpperCase());
+        if(
+                SchemaValidator.isValid(methodData.getHeaders()) &&
+                        SchemaValidator.isValid(methodData.getQueryParams()) &&
+                        ((method == HttpMethod.GET) || (methodData.getBody() == null ||
+                                BodyValidator.isValid(methodData.getBody())))
+
+        ){
+        }
+        else{
+            throw new InvalidRequestException("Json OAS is not valid!");
+        }
+        project.getSections().get(section).getPaths()
+                .computeIfAbsent(path,v -> new Path())
+                .getMethods().put(data.getKey(),methodData);
+
     }
 
     /**
@@ -96,84 +123,17 @@ public class ApiDataServiceImpl implements ApiDataService {
      *     "get" : {object}
      * }
      * **/
-    private Path getLinkData(HashMap<String, Object> data){
-        Iterator iterator = data.entrySet().iterator();
+    //                                                    Path,DataPath
+    private void setLinkData(ApiProject project, Map.Entry<String,Object> pathsData){
+        Iterator iterator = toStrObjMap(pathsData.getValue()).entrySet().iterator();
+        //<http method, operation data>
         HashMap<String, ApiMethodData> result = new HashMap<>();
         while(iterator.hasNext()) {
+            //httpMethod,operationData
             Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-            ApiMethodData methodData = getApiMethodData( toStrObjMap(pair.getValue()) );
-
-            HttpMethod method = HttpMethod.valueOf(pair.getKey().toUpperCase());
-            // validating content
-            if(
-                    SchemaValidator.isValid(methodData.getHeaders()) &&
-                            SchemaValidator.isValid(methodData.getQueryParams()) &&
-                            ((method == HttpMethod.GET) || (methodData.getBody() == null ||
-                            BodyValidator.isValid(methodData.getBody())))
-
-            ){
-                result.put(pair.getKey().toLowerCase(),methodData);
-            }
-            else{
-                throw new InvalidRequestException("Json OAS is not valid!");
-            }
-        }
-        Path path = new Path();
-        path.setMethods(result);
-        path.setPathVariables(this.getPathVariables(data));
-        return path;
-    }
-
-    private HashMap<String, ApiSection> getSections(List<HashMap<String,String>> tags){
-
-        HashMap<String, ApiSection> sections = new HashMap<>();
-
-        for(HashMap<String,String> tag : tags){
-            String tagName = tag.get("name");
-            if(!sections.containsKey(tagName)){
-                sections.put(tagName,new ApiSection());
-            }
+            setApiMethodData(project,pathsData.getKey(),pair);
         }
 
-        return sections;
-    }
-
-    //input : <Http Method,Method Data> path
-    //output : pathVariables
-    HashMap<String, Schema> getPathVariables(HashMap<String,Object> path){
-        String firstKey = path.keySet().iterator().next();
-        List<HashMap<String,String>> parameters
-                = (List<HashMap<String,String>>) toStrObjMap(path.get(firstKey)).get("parameters");
-
-        if(parameters == null){
-            return null;
-        }
-        HashMap<String, Schema> res = new HashMap<>();
-        for(HashMap<String,String> param : parameters){
-            if(param.get("in").equals("path")){
-
-                Schema pathValue = oMapper.convertValue(param,Schema.class);
-
-                if(!SchemaValidator.isValid(pathValue)){
-                    throw new InvalidRequestException("Json OAS is not valid!");
-                }
-
-                res.put(pathValue.getName(), pathValue);
-            }
-        }
-
-        return res;
-
-    }
-
-
-    //input : object list of method = [@get,@post,@put....]
-    //output : section name
-    private String getSectionName(Object methodsObj){
-        HashMap<String,Object> methods = toStrObjMap(methodsObj);
-        String httpMethod = methods.keySet().iterator().next();
-        HashMap<String, Object> methodObj = toStrObjMap(methods.get(httpMethod));
-        return ((List<String>)methodObj.get("tags")).get(0);
     }
 
     private HashMap<String,Object> toStrObjMap(Object object){
@@ -198,34 +158,26 @@ public class ApiDataServiceImpl implements ApiDataService {
             HashMap<String,Object> paths = toStrObjMap(json.get("paths"));
             Iterator iterator = paths.entrySet().iterator();
 
-            //     section,<link, HashMapOfMethod>
-            HashMap<String, ApiSection> sections = this.getSections((List<HashMap<String, String>>) json.get("tags"));
-
             while(iterator.hasNext()){
-                //        link,ListOfMethod
+                //       link,ListOfMethod
                 Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
 
-                String sectionName = this.getSectionName(pair.getValue());
-
                 //           sectionName             link
-                sections.get(sectionName).getPaths().put(pair.getKey(), getLinkData(toStrObjMap(pair.getValue())));
-
+                this.setLinkData(project, pair);
 
             }
-            project.setSections(sections);
 
             /* End of Copy Paths Operation**/
 
             /* Append Description of Sections from Tags */
             List<Object> tags = (List<Object>) json.get("tags");
-//            HashMap<String, String> tagName = tags.stream().collect(Collectors.toMap(tags.get("name")))
             HashMap<String, Tag> tagDescription = new HashMap<>();
             for (Object tagObj : tags) {
                 HashMap<String, Object> tag = toStrObjMap(tagObj);
                 if(!tag.containsKey("externalDocs")){
                     tag.put("externalDocs",new Contact());
                 }
-                ApiSection section = sections.get(tag.get("name"));
+                ApiSection section = project.getSections().get(tag.get("name"));
                 section.setInfo(oMapper.convertValue(tag, Tag.class));
             }
             /* End of Append Tags */

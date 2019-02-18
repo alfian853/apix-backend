@@ -2,7 +2,6 @@ package com.future.apix.entity.apidetail;
 
 import com.future.apix.entity.ApiMethodData;
 import lombok.Data;
-import lombok.Getter;
 
 import java.util.HashMap;
 
@@ -14,6 +13,6 @@ public class Path {
     HashMap<String, Schema> pathVariables;
 
     public HashMap<String, Schema> getPathVariables(){
-        return (pathVariables == null)?new HashMap<>():this.pathVariables;
+        return (pathVariables == null)?pathVariables = new HashMap<>():this.pathVariables;
     }
 }

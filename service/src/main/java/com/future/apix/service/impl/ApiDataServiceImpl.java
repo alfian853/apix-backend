@@ -32,6 +32,21 @@ public class ApiDataServiceImpl implements ApiDataService {
 
     private ObjectMapper oMapper = new ObjectMapper();
 
+
+    private void setApiLinkPathVariable(ApiProject project,String section, String path, Map.Entry<String,Object> data) {
+        List<HashMap<String, Object>> pathVariables = (List<HashMap<String, Object>>) data.getValue();
+        for (HashMap<String, Object> variable : pathVariables) {
+            Schema pathVariable = oMapper.convertValue(variable, Schema.class);
+            project.getSections().get(section).getPaths().computeIfAbsent(path, k -> new Path())
+                    .getPathVariables()
+                    .put(pathVariable.getName(), pathVariable);
+        }
+    }
+
+    private String getSection(HashMap<String,Object> methodData){
+        return ((List<String>)methodData.get("tags")).get(0);
+    }
+
     /**
      * return : data dari method api{post,get,put,delete}.
      * contoh :
@@ -41,7 +56,7 @@ public class ApiDataServiceImpl implements ApiDataService {
      *     ............
      * }
      * **/                                                      //path             method,methodData
-    private void setApiMethodData(ApiProject project, String path, Map.Entry<String,Object> data){
+    private void setApiMethodData(ApiProject project,String section, String path, Map.Entry<String,Object> data){
 
         ApiMethodData methodData = new ApiMethodData();
         HashMap<String,Object> dataMap = toStrObjMap(data.getValue());
@@ -51,7 +66,6 @@ public class ApiDataServiceImpl implements ApiDataService {
         methodData.setConsumes((List<String>) dataMap.get("consumes"));
         methodData.setProduces((List<String>) dataMap.get("produces"));
         methodData.setDeprecated((Boolean) dataMap.get("deprecated"));
-        String section = ((List<String>)dataMap.get("tags")).get(0);
         Path pathOfMethod = project.getSections()
                 .computeIfAbsent(section, v -> new ApiSection()).getPaths()
                 .computeIfAbsent(path, v -> new Path());
@@ -128,10 +142,20 @@ public class ApiDataServiceImpl implements ApiDataService {
         Iterator iterator = toStrObjMap(pathsData.getValue()).entrySet().iterator();
         //<http method, operation data>
         HashMap<String, ApiMethodData> result = new HashMap<>();
+        String section=null;
         while(iterator.hasNext()) {
             //httpMethod,operationData
             Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-            setApiMethodData(project,pathsData.getKey(),pair);
+            if(section == null){
+                section = this.getSection(toStrObjMap(pair.getValue()));
+            }
+            switch (pair.getKey()){
+                case "parameters":
+                    setApiLinkPathVariable(project,section, pathsData.getKey(), pair);
+                    break;
+                default:
+                    setApiMethodData(project, section, pathsData.getKey(), pair);
+            }
         }
 
     }
@@ -171,14 +195,15 @@ public class ApiDataServiceImpl implements ApiDataService {
 
             /* Append Description of Sections from Tags */
             List<Object> tags = (List<Object>) json.get("tags");
-            HashMap<String, Tag> tagDescription = new HashMap<>();
-            for (Object tagObj : tags) {
-                HashMap<String, Object> tag = toStrObjMap(tagObj);
-                if(!tag.containsKey("externalDocs")){
-                    tag.put("externalDocs",new Contact());
+            if(tags != null){
+                for (Object tagObj : tags) {
+                    HashMap<String, Object> tag = toStrObjMap(tagObj);
+                    if(!tag.containsKey("externalDocs")){
+                        tag.put("externalDocs",new Contact());
+                    }
+                    ApiSection section = project.getSections().get(tag.get("name"));
+                    section.setInfo(oMapper.convertValue(tag, Tag.class));
                 }
-                ApiSection section = project.getSections().get(tag.get("name"));
-                section.setInfo(oMapper.convertValue(tag, Tag.class));
             }
             /* End of Append Tags */
 

@@ -4,6 +4,7 @@ import com.future.apix.entity.apidetail.DataType;
 import com.future.apix.entity.apidetail.Schema;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SchemaValidator {
@@ -27,24 +28,64 @@ public class SchemaValidator {
         boolean patternIsNull = schema.getPattern() == null;
         DataType type = getType(schema.getType());
 
-        if(type == null) return false || (!formatIsNull && schema.getFormat().equals("date-time"));
+        if(schema.getRequired() instanceof List == schema.getRequired() instanceof Boolean){
+            System.out.println("invalid required field!");
+            System.out.println(schema.getRequired()+" "+ (schema.getRequired() instanceof Boolean));
+            return false;
+        }
+
+        if(type == null) return (!formatIsNull && schema.getFormat().equals("date-time"));
+        
         if( type == DataType.INTEGER){
-            return schema.getFormat() != null && !schema.getFormat().equals("double") &&
-                    NumberFormatValidator.isValid(schema.getFormat());
+            boolean res;
+            //optimasi pengecekan, jadi pake switch case
+            switch (schema.getFormat()){
+                case "double":
+                case "float":
+                    res = false;
+                    break;
+                default:
+                    res = schema.getFormat() != null && NumberFormatValidator.isValid(schema.getFormat());
+            }
+            if(!res){
+                System.out.println("invalid integer");
+                System.out.println(schema);
+            }
+            return res;
         }
         else if( type == DataType.NUMBER){
-            return !formatIsNull && NumberFormatValidator.isValid(schema.getFormat())
+            boolean res =!formatIsNull && NumberFormatValidator.isValid(schema.getFormat())
                     && propertiesIsEmpty && itemsIsEmpty && patternIsNull;
+            if(!res){
+                System.out.println("invalid number");
+                System.out.println(schema);
+            }
+            return res;
         }
         else if(type == DataType.ARRAY){
-            return !itemsIsEmpty && (schema.getItems().getType() != null || schema.getItems().getRef() != null)
-            && formatIsNull && propertiesIsEmpty;
+            boolean res = !itemsIsEmpty && (schema.getItems().getType() != null || schema.getItems().getRef() != null)
+                    && formatIsNull && propertiesIsEmpty;
+            if(!res){
+                System.out.println("invalid array");
+                System.out.println(schema);
+            }
+            return res;
         }
         else if(type == DataType.OBJECT){
-            return !propertiesIsEmpty && formatIsNull && itemsIsEmpty && isValid(schema.getProperties()) && defaultIsNull;
+            boolean res = !propertiesIsEmpty && formatIsNull && itemsIsEmpty && isValid(schema.getProperties()) && defaultIsNull;
+            if(!res){
+                System.out.println("invalid object");
+                System.out.println(schema);
+            }
+            return res;
         }
         else if(type == DataType.STRING){
-            return itemsIsEmpty && propertiesIsEmpty;
+            boolean res = itemsIsEmpty && propertiesIsEmpty;
+            if(!res){
+                System.out.println("invalid string");
+                System.out.println(schema);
+            }
+            return res;
         }
 
         return true;

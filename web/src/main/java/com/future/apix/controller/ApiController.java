@@ -49,6 +49,10 @@ public class ApiController {
         return apiDataService.findAll();
     }
 
+    // digunakan untuk mendapatkan apiProject (filter by host, basePath, dan info)
+    @GetMapping("/all/info")
+    public List<ApiProject> findAllProjects() {return apiDataService.findAllProjects(); }
+
     // digunakan untuk delete by Id (sementara)
     @DeleteMapping("/{id}")
     public RequestResponse deleteById(@PathVariable("id") String id){

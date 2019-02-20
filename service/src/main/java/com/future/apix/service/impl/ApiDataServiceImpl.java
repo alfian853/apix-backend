@@ -261,6 +261,11 @@ public class ApiDataServiceImpl implements ApiDataService {
     }
 
     @Override
+    public List<ApiProject> findAllProjects() {
+        return apiRepository.findAllProjects();
+    }
+
+    @Override
     public RequestResponse deleteById(String id){
         ApiProject project = apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
         apiRepository.deleteById(id);

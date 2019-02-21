@@ -78,21 +78,31 @@ public class ApiDataServiceImpl implements ApiDataService {
                 HashMap<String, Object> parameter = toStrObjMap(paramObj);
                 String input = (String) parameter.get("in");
                 if(input.equals("query")){
-                    methodData.getQueryParams().put(
+                    methodData.getRequestBody().getQueryParams().put(
                             (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
                     );
                 }
                 else if(input.equals("header")){
-                    methodData.getHeaders().put(
+                    methodData.getRequestBody().getHeaders().put(
                             (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
                     );
                 }
                 else if(input.equals("body")){
-                    RequestBody body = oMapper.convertValue(parameter, RequestBody.class);
-                    methodData.setBody(body);
+                    RequestBody body = methodData.getRequestBody();
+                    body.setIn("body");
+                    body.setName("body");
+                    body.setSchema(oMapper.convertValue(parameter.get("schema"), Schema.class));
                 }
                 else if(input.equals("formData")){
-                    methodData.setBody(oMapper.convertValue(parameter, RequestBody.class));
+                    RequestBody body = methodData.getRequestBody();
+                    body.setIn("formData");
+                    body.setName("formData");
+                    body.getSchema().setType("object");
+                    body.getSchema().getProperties().put(
+                            parameter.get("name").toString(),
+                            oMapper.convertValue(parameter, Schema.class)
+                    );
+
                 }
                 else if(input.equals("path")){
                     if(pathOfMethod.getPathVariables().containsKey(parameter.get("name"))){
@@ -108,15 +118,17 @@ public class ApiDataServiceImpl implements ApiDataService {
 
         }
 
+//#debug        System.out.println("Tes : "+path+" "+data.getKey());
+
         HashMap<String, RequestBody> responses = (HashMap<String, RequestBody>) dataMap.get("responses");
         methodData.setResponses(responses);
 
         HttpMethod method = HttpMethod.valueOf(data.getKey().toUpperCase());
         if(
-                SchemaValidator.isValid(methodData.getHeaders()) &&
-                        SchemaValidator.isValid(methodData.getQueryParams()) &&
-                        ((method == HttpMethod.GET) || (methodData.getBody() == null ||
-                                BodyValidator.isValid(methodData.getBody())))
+                SchemaValidator.isValid(methodData.getRequestBody().getHeaders()) &&
+                        SchemaValidator.isValid(methodData.getRequestBody().getQueryParams()) &&
+                        ((method == HttpMethod.GET) || (methodData.getRequestBody() == null ||
+                                BodyValidator.isValid(methodData.getRequestBody())))
 
         ){
         }

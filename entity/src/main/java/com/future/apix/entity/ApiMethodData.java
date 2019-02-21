@@ -30,21 +30,8 @@ public class ApiMethodData {
     List<String> consumes = Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);
     List<String> produces = Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);
 
-    /**
-     * query param dan body param dipisah tapi di OAS swagger digabung
-     * di OAS param : [], disini param : {} agar lebih mudah diakses
-    **/
-
-
-    //HashMap<nama param, isiparam>
-    HashMap<String, Schema> queryParams = new HashMap<>();
-
-    //requestHeader
-    HashMap<String, Schema> headers = new HashMap<>();
-
-    //requestBody
     @Valid
-    RequestBody body;
+    RequestBody requestBody = new RequestBody();
 
     //responseBody sama seperti requestBody
     HashMap<String, RequestBody> responses = new HashMap<>();

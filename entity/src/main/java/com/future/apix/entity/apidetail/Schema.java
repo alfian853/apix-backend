@@ -1,5 +1,6 @@
 package com.future.apix.entity.apidetail;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Schema {
 
     String type;
@@ -33,6 +35,11 @@ public class Schema {
     * ]
     * */
     HashMap<String,Schema> properties;
+
+    public HashMap<String,Schema> getProperties(){
+        return (properties == null)?properties = new HashMap<>() : properties;
+    }
+
 
     Object additionalProperties;
 
@@ -65,5 +72,5 @@ public class Schema {
     Object defaults;
 
     Integer maximum, minimum, maxLength, minLength, maxItems, minItems, multipleOf;
-//    boolean exclusiveMaximum, exclusiveMinimum, uniqueItems;
+    Boolean exclusiveMaximum, exclusiveMinimum, uniqueItems;
 }

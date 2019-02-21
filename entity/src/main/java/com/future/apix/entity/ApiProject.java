@@ -30,7 +30,7 @@ public class ApiProject implements Serializable {
     // String swagger, openapi; // swagger for version 2.0 and openapi for version 3.0
     ProjectInfo info;
     HashMap<String, ApiSection> sections = new HashMap<>();
-    HashMap<String, Definition> definitions = new HashMap<>();
+    HashMap<String, Schema> definitions = new HashMap<>();
 
     List<String> schemes;
     HashMap<String, SecurityScheme> securityDefinitions = new HashMap<>();

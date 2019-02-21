@@ -222,12 +222,12 @@ public class ApiDataServiceImpl implements ApiDataService {
 
             /* Copy Definitions Operation*/
             HashMap<String,Object> definitionsJson = toStrObjMap(json.get("definitions"));
-            HashMap<String, Definition> definitions = project.getDefinitions();
+            HashMap<String, Schema> definitions = project.getDefinitions();
             iterator = definitionsJson.entrySet().iterator();
 
             while(iterator.hasNext()){
                 Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-                Definition definition = oMapper.convertValue(pair.getValue(),Definition.class);
+                Schema definition = oMapper.convertValue(pair.getValue(),Schema.class);
 
                 // validate content
                 if(SchemaValidator.isValid(definition.getProperties())){

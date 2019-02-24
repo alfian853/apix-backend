@@ -1,5 +1,6 @@
 package com.future.apix.service.impl;
 
+import com.future.apix.response.RequestResponse;
 import com.future.apix.service.command.Command;
 import com.future.apix.service.CommandExecutorService;
 import org.springframework.beans.BeansException;
@@ -18,7 +19,7 @@ public class CommandExecutorImpl implements CommandExecutorService, ApplicationC
     }
 
     @Override
-    public <T, R> T execute(Class<? extends Command<T, R>> commandClass, R request) {
+    public <T extends RequestResponse, R> T execute(Class<? extends Command<T, R>> commandClass, R request) {
         return this.context.getBean(commandClass).executeCommand(request);
     }
 }

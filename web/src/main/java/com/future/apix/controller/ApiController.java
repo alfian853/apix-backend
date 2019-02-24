@@ -1,5 +1,7 @@
 package com.future.apix.controller;
 
+import com.future.apix.service.CommandExecutorService;
+import com.future.apix.service.command.Swagger2ImportCommand;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.response.RequestResponse;
@@ -21,12 +23,15 @@ public class ApiController {
     ApiDataService apiDataService;
 
     @Autowired
+    CommandExecutorService commandExecutor;
+
+    @Autowired
     ApiDataUpdateService updateService;
 
     @PostMapping("/import")
     public RequestResponse importFromFile(@RequestParam("file")MultipartFile file, @RequestParam("type") String type){
         if(type.equals("oas-swagger2")){
-            return apiDataService.importFromFile(file);
+            return commandExecutor.execute(Swagger2ImportCommand.class, file);
         }
         else{
             throw new InvalidRequestException("oas format is not supported");

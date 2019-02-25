@@ -36,6 +36,8 @@ public class ApiProject implements Serializable {
     HashMap<String, SecurityScheme> securityDefinitions = new HashMap<>();
     Contact externalDocs;
 
+    List<String> users;
+
 //    List<Tag> tags;
 //    HashMap<String, Tag> tags = new HashMap<>();
 

@@ -39,7 +39,7 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/{id}/export")
+    @GetMapping("/export/{id}")
     public RequestResponse exportToOas(@PathVariable("id")String id, @RequestParam("type") String type){
         if(type.equals("oas-swagger2")){
             return commandExecutor.execute(Swagger2ExportCommand.class,id);
@@ -74,4 +74,10 @@ public class ApiController {
     public RequestResponse deleteById(@PathVariable("id") String id){
         return apiDataService.deleteById(id);
     }
+
+    //
+    @GetMapping(value = "/bebek",
+                params = {"name"}
+    )
+    public List<ApiProject> findByUser(@RequestParam("name") String username) {return apiDataService.findByUser(username); }
 }

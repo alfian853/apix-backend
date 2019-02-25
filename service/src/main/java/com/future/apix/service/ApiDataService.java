@@ -17,4 +17,6 @@ public interface ApiDataService {
 
     // delete by id (sementara)
     RequestResponse deleteById(String id);
+
+    List<ApiProject> findByUser(String username);
 }

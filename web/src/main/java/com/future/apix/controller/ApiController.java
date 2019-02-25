@@ -1,6 +1,7 @@
 package com.future.apix.controller;
 
 import com.future.apix.service.CommandExecutorService;
+import com.future.apix.service.command.Swagger2ExportCommand;
 import com.future.apix.service.command.Swagger2ImportCommand;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
@@ -32,6 +33,16 @@ public class ApiController {
     public RequestResponse importFromFile(@RequestParam("file")MultipartFile file, @RequestParam("type") String type){
         if(type.equals("oas-swagger2")){
             return commandExecutor.execute(Swagger2ImportCommand.class, file);
+        }
+        else{
+            throw new InvalidRequestException("oas format is not supported");
+        }
+    }
+
+    @GetMapping("/{id}/export")
+    public RequestResponse exportToOas(@PathVariable("id")String id, @RequestParam("type") String type){
+        if(type.equals("oas-swagger2")){
+            return commandExecutor.execute(Swagger2ExportCommand.class,id);
         }
         else{
             throw new InvalidRequestException("oas format is not supported");

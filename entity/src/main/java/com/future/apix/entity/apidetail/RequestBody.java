@@ -1,5 +1,6 @@
 package com.future.apix.entity.apidetail;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -24,15 +25,18 @@ public class RequestBody {
 
     Schema schema;
 
-    public HashMap<String, Schema> getQueryParams(){
+    @JsonIgnore
+    public HashMap<String, Schema> getQueryParamsLazily(){
         return (this.queryParams == null)?this.queryParams = new HashMap<>() : this.queryParams;
     }
 
-    public HashMap<String, Schema> getHeaders(){
+    @JsonIgnore
+    public HashMap<String, Schema> getHeadersLazily(){
         return (this.headers == null)?this.headers = new HashMap<>() : this.headers;
     }
 
-    public Schema getSchema(){
+    @JsonIgnore
+    public Schema getSchemaLazily(){
         return (this.schema == null)?this.schema = new Schema() : this.schema;
     }
 }

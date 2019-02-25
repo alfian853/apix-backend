@@ -1,5 +1,6 @@
 package com.future.apix.entity.apidetail;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -37,7 +38,8 @@ public class Schema {
     * */
     HashMap<String,Schema> properties;
 
-    public HashMap<String,Schema> getProperties(){
+    @JsonIgnore
+    public HashMap<String,Schema> getPropertiesLazily(){
         return (properties == null)?properties = new HashMap<>() : properties;
     }
 

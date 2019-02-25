@@ -92,7 +92,7 @@ public class SchemaValidator {
     }
 
     public static boolean isValid(HashMap<String,Schema> schemas){
-
+        if(schemas == null)return true;
         for (Map.Entry<String,Schema> pair : schemas.entrySet()) {
             if (!isValid(pair.getValue())) {
                 return false;

@@ -29,7 +29,8 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
     ApiRepository apiRepository;
 
 
-    private ObjectMapper oMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper oMapper;
 
 
     private void setApiLinkPathVariable(ApiProject project, String section, String path, Map.Entry<String,Object> data) {
@@ -77,12 +78,12 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                 HashMap<String, Object> parameter = toStrObjMap(paramObj);
                 String input = (String) parameter.get("in");
                 if(input.equals("query")){
-                    methodData.getRequestBody().getQueryParams().put(
+                    methodData.getRequestBody().getQueryParamsLazily().put(
                             (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
                     );
                 }
                 else if(input.equals("header")){
-                    methodData.getRequestBody().getHeaders().put(
+                    methodData.getRequestBody().getHeadersLazily().put(
                             (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
                     );
                 }
@@ -96,8 +97,8 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                     RequestBody body = methodData.getRequestBody();
                     body.setIn("formData");
                     body.setName("formData");
-                    body.getSchema().setType("object");
-                    body.getSchema().getProperties().put(
+                    body.getSchemaLazily().setType("object");
+                    body.getSchemaLazily().getPropertiesLazily().put(
                             parameter.get("name").toString(),
                             oMapper.convertValue(parameter, Schema.class)
                     );
@@ -124,8 +125,8 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
 
         HttpMethod method = HttpMethod.valueOf(data.getKey().toUpperCase());
         if(
-                SchemaValidator.isValid(methodData.getRequestBody().getHeaders()) &&
-                        SchemaValidator.isValid(methodData.getRequestBody().getQueryParams()) &&
+                SchemaValidator.isValid(methodData.getRequestBody().getHeadersLazily()) &&
+                        SchemaValidator.isValid(methodData.getRequestBody().getQueryParamsLazily()) &&
                         ((method == HttpMethod.GET) || (methodData.getRequestBody() == null ||
                                 BodyValidator.isValid(methodData.getRequestBody())))
 
@@ -157,11 +158,13 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
         while(iterator.hasNext()) {
             //httpMethod,operationData
             Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-            if(section == null){
+            if(section == null && !pair.getKey().equals("parameters")){
+                System.out.println(pair.getKey());
                 section = this.getSection(toStrObjMap(pair.getValue()));
             }
             switch (pair.getKey()){
                 case "parameters":
+                    System.out.println(pathsData.getKey());
                     setApiLinkPathVariable(project,section, pathsData.getKey(), pair);
                     break;
                 default:
@@ -229,7 +232,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                 Schema definition = oMapper.convertValue(pair.getValue(),Schema.class);
 
                 // validate content
-                if(SchemaValidator.isValid(definition.getProperties())){
+                if(SchemaValidator.isValid(definition.getPropertiesLazily())){
                     definitions.put(pair.getKey(), definition);
                 }
                 else{

@@ -15,7 +15,10 @@ public class BodyValidator {
     }
 
     public static boolean isValid(RequestBody requestBody) {
+        if(requestBody.getIn() == null){
+            System.out.println(requestBody);
+        }
         return requestBody.getIn().equals("formData") ||
-                (requestBody.getSchema() != null && SchemaValidator.isValid(requestBody.getSchema()));
+                (requestBody.getSchemaLazily() != null && SchemaValidator.isValid(requestBody.getSchemaLazily()));
     }
 }

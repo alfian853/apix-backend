@@ -39,7 +39,7 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/export/{id}")
+    @GetMapping("/{id}/export")
     public RequestResponse exportToOas(@PathVariable("id")String id, @RequestParam("type") String type){
         if(type.equals("oas-swagger2")){
             return commandExecutor.execute(Swagger2ExportCommand.class,id);

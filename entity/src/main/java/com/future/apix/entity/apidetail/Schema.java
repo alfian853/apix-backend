@@ -27,7 +27,6 @@ public class Schema {
 
     //untuk custom dataType, isi schema = isi custom dataType
     @JsonProperty("$ref")
-    @Field("$ref")
     String ref;
 
     /** if datatype = Object

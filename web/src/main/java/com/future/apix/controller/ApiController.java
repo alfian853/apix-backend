@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class ApiController {
 
     @Autowired
@@ -54,9 +54,9 @@ public class ApiController {
         return apiDataService.findById(id);
     }
 
-    @PutMapping
-    public RequestResponse doApiDataQuery(@RequestBody HashMap<String,Object> query){
-        return updateService.doQuery(query);
+    @PutMapping("/{id}")
+    public RequestResponse doApiDataQuery(@PathVariable("id")String id,@RequestBody HashMap<String,Object> query){
+        return updateService.doQuery(id, query);
     }
 
     // digunakan untuk mendapatkan semua apiProject (sementara)

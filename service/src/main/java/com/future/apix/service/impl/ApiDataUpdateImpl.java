@@ -60,10 +60,7 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
     }
 
     @Override
-    public RequestResponse doQuery(HashMap<String, Object> query) {
-        String id = (String) query.get("id");
-
-        if(id == null)throw new InvalidRequestException("json doesn't contain 'id' field");
+    public RequestResponse doQuery(String id, HashMap<String, Object> query) {
 
         ApiProject project = apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
 

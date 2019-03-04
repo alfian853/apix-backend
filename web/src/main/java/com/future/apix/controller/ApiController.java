@@ -1,5 +1,8 @@
 package com.future.apix.controller;
 
+import com.future.apix.entity.apidetail.ProjectInfo;
+import com.future.apix.request.ProjectCreateRequest;
+import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.service.CommandExecutorService;
 import com.future.apix.service.command.Swagger2ExportCommand;
 import com.future.apix.service.command.Swagger2ImportCommand;
@@ -9,9 +12,11 @@ import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiDataUpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 
@@ -80,4 +85,10 @@ public class ApiController {
                 params = {"name"}
     )
     public List<ApiProject> findByUser(@RequestParam("name") String username) {return apiDataService.findByUser(username); }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProjectCreateResponse createProject(@Valid @RequestBody ProjectCreateRequest request) {
+        return apiDataService.createProject(request);
+    }
 }

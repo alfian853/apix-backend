@@ -11,5 +11,12 @@
 
     <artifactId>web-model</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.future</groupId>
+            <artifactId>entity</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>

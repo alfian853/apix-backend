@@ -6,6 +6,7 @@ import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
+import com.future.apix.response.ProjectUpdateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataUpdateService;
 import com.future.apix.util.jsonquery.JsonQueryExecutor;
@@ -73,9 +74,17 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
             throw new ConflictException("Edition Conflict!, Please refresh the tab");
         }
 
+        ProjectUpdateResponse response = new ProjectUpdateResponse();
+        response.setStatusToSuccess();
+        
         if( queryExecutor.executeQuery(pointer.getMethodField(), pointer.getQueryField()) ){
             //generate signature baru setelah kontennya berhasil diupdate
-            pointer.getMethodField().put("_signature", UUID.randomUUID().toString());
+            String newSignature = UUID.randomUUID().toString();
+            response.setNewSignature(newSignature);
+            pointer.getMethodField().put("_signature", newSignature);
+        }
+        else{//tidak ada update
+            response.setNewSignature((String) pointer.getQueryField().get("_signature"));
         }
 
         /** karna pointer.getMethodField() me-return object yang didalam @target(bukan hasil clone),
@@ -85,6 +94,6 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
 
         apiRepository.save(project);
 
-        return RequestResponse.success();
+        return response;
     }
 }

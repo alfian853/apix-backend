@@ -1,7 +1,7 @@
 package com.future.apix.service.command.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.apix.service.command.Swagger2ImportCommand;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.future.apix.entity.ApiMethodData;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ApiSection;
@@ -9,6 +9,7 @@ import com.future.apix.entity.apidetail.*;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.response.RequestResponse;
+import com.future.apix.service.command.Swagger2ImportCommand;
 import com.future.apix.util.validator.BodyValidator;
 import com.future.apix.util.validator.SchemaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,9 +119,11 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
 
         }
 
-//#debug        System.out.println("Tes : "+path+" "+data.getKey());
 
-        HashMap<String, RequestBody> responses = (HashMap<String, RequestBody>) dataMap.get("responses");
+        HashMap<String, RequestBody> responses = oMapper.convertValue(
+                dataMap.get("responses"),
+                TypeFactory.defaultInstance().constructMapType(HashMap.class,String.class,RequestBody.class)
+        );
         methodData.setResponses(responses);
 
         HttpMethod method = HttpMethod.valueOf(data.getKey().toUpperCase());
@@ -159,12 +162,12 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             //httpMethod,operationData
             Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
             if(section == null && !pair.getKey().equals("parameters")){
-                System.out.println(pair.getKey());
+//                System.out.println(pair.getKey());
                 section = this.getSection(toStrObjMap(pair.getValue()));
             }
             switch (pair.getKey()){
                 case "parameters":
-                    System.out.println(pathsData.getKey());
+//                    System.out.println(pathsData.getKey());
                     setApiLinkPathVariable(project,section, pathsData.getKey(), pair);
                     break;
                 default:
@@ -253,7 +256,10 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                 }
             }
 
-            apiRepository.save(project);
+            //supaya semua $ref menjadi ref, karna ketika pertama kali diimport, disave di db dalam bentuk $ref
+            //ketika di fetch, maka $ref menjadi ref, dan ketika di save lagi tetap menjadi ref
+            String id = apiRepository.save(project).getId();
+            apiRepository.save(apiRepository.findById(id).get());
 
             return RequestResponse.success("Data Imported");
 

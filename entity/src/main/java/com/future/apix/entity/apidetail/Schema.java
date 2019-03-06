@@ -26,8 +26,12 @@ public class Schema {
     String collectionFormat;
 
     //untuk custom dataType, isi schema = isi custom dataType
-    @JsonProperty("$ref")
     String ref;
+
+    public void set$ref(String ref){
+        this.ref = ref;
+    }
+
 
     /** if datatype = Object
     *isi object value [

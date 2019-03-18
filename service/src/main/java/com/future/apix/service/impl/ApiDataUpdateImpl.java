@@ -40,14 +40,16 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
     **/
     private SignaturePointer getSignaturePointer(HashMap<String,Object> target, HashMap<String,Object> query){
 
+
         for (Object o : query.entrySet()) {
             Map.Entry<String, Object> pair = (Map.Entry) o;
 
             // jika child adalah http method, return child itu
             if (pair.getValue() instanceof HashMap) {
-                return getSignaturePointer(
+                SignaturePointer res = getSignaturePointer(
                         (HashMap<String, Object>) target.get(pair.getKey()),
                         (HashMap<String, Object>) pair.getValue());
+                if(res != null)return res;
             }
             else if(pair.getKey().equals("_signature")){
                 SignaturePointer pointer = new SignaturePointer();
@@ -56,7 +58,7 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
                 return pointer;
             }
         }
-        throw new InvalidRequestException("signature not found!");
+        return null;
 
     }
 
@@ -69,6 +71,9 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
 
         //validasi signature
         SignaturePointer pointer = getSignaturePointer(target, query);
+        if(pointer == null){
+            throw new InvalidRequestException("signature not found!");
+        }
         if(!pointer.getQueryField().get("_signature").equals(
                 pointer.getMethodField().get("_signature"))){
             throw new ConflictException("Edition Conflict!, Please refresh the tab");

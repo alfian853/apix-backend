@@ -10,7 +10,7 @@ import java.util.HashMap;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RequestBody {
+public class OperationDetail {
 
     String name,in = "",description,type;
     boolean required;

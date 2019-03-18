@@ -2,7 +2,7 @@ package com.future.apix.util.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
-import com.future.apix.entity.apidetail.RequestBody;
+import com.future.apix.entity.apidetail.OperationDetail;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,7 +66,7 @@ public class ApiProjectConverter {
                     int paramId = 0;
                     methodDataMap.put("parameters",parameters);
 
-                    RequestBody body = methodData.getRequestBody();
+                    OperationDetail body = methodData.getRequest();
 
                     //push body to parameters
                     if(!body.getIn().equals("")){

@@ -2,8 +2,7 @@ package com.future.apix.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.future.apix.entity.apidetail.RequestBody;
-import com.future.apix.entity.apidetail.Schema;
+import com.future.apix.entity.apidetail.OperationDetail;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.http.MediaType;
@@ -31,9 +30,9 @@ public class ApiMethodData {
     List<String> produces = Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);
 
     @Valid
-    RequestBody requestBody = new RequestBody();
+    OperationDetail request = new OperationDetail();
 
-    //responseBody sama seperti requestBody
-    HashMap<String, RequestBody> responses = new HashMap<>();
+    //responseBody sama seperti request
+    HashMap<String, OperationDetail> responses = new HashMap<>();
 
 }

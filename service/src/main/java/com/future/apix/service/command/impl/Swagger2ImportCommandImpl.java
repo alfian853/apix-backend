@@ -18,21 +18,37 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
 
     @Autowired
-    ApiRepository apiRepository;
+    private ApiRepository apiRepository;
 
 
     @Autowired
     private ObjectMapper oMapper;
 
+
+    private HashMap<String,String> refDefinitions = new HashMap<>();
+
+
+    private void replaceRefWithId(HashMap<String, Object> data){
+        for(Object obj : data.entrySet()){
+            Map.Entry<String, Object> pair = (Map.Entry<String, Object>) obj;
+            System.out.println("Test : "+pair.getKey());
+            if(pair.getKey().equals("$ref") || pair.getKey().equals("ref")){
+                String ref = (String) pair.getValue();
+                System.out.println(ref.split("/")[2]);
+                ref = ref.split("/",3)[2];
+                pair.setValue(this.refDefinitions.get(ref));
+            }
+            else if(pair.getValue() instanceof HashMap){
+                replaceRefWithId(this.toStrObjMap(pair.getValue()));
+            }
+        }
+    }
 
     private void setApiPathVariable(ApiProject project, String section, String path, Map.Entry<String,Object> data) {
         List<HashMap<String, Object>> pathVariables = (List<HashMap<String, Object>>) data.getValue();
@@ -78,6 +94,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
 
             for (Object paramObj : parameters) {
                 HashMap<String, Object> parameter = toStrObjMap(paramObj);
+                this.replaceRefWithId(parameter);
                 String input = (String) parameter.get("in");
                 if(input.equals("query")){
                     methodData.getRequest().getQueryParamsLazily().put(
@@ -120,7 +137,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
 
         }
 
-
+        this.replaceRefWithId(toStrObjMap(dataMap.get("responses")));
         HashMap<String, OperationDetail> responses = oMapper.convertValue(
                 dataMap.get("responses"),
                 TypeFactory.defaultInstance().constructMapType(HashMap.class,String.class, OperationDetail.class)
@@ -167,10 +184,10 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             }
             switch (pair.getKey()){
                 case "parameters":
-                    setApiPathVariable(project,section, pathsData.getKey(), pair);
+                    this.setApiPathVariable(project,section, pathsData.getKey(), pair);
                     break;
                 default:
-                    setApiMethodData(project, section, pathsData.getKey(), pair);
+                    this.setApiMethodData(project, section, pathsData.getKey(), pair);
             }
         }
 
@@ -193,10 +210,46 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             project.setSchemes((List<String>) json.get("schemes"));
             project.setExternalDocs(oMapper.convertValue(json.get("externalDocs"), Contact.class));
 
+
+            /* Copy Definitions Operation*/
+            HashMap<String,Object> definitionsJson = toStrObjMap(json.get("definitions"));
+            HashMap<String,Object> newDefinitionsJson = new HashMap<>();
+
+            this.refDefinitions = new HashMap<>();
+            Iterator iterator = definitionsJson.entrySet().iterator();
+
+            while (iterator.hasNext()){
+                Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
+                HashMap<String,Object> isinya = toStrObjMap(pair.getValue());
+                isinya.put("name",pair.getKey());
+                String key = UUID.randomUUID().toString();
+                newDefinitionsJson.put(key, isinya);
+                this.refDefinitions.put(pair.getKey(), "#/definitions/"+key);
+            }
+
+            this.replaceRefWithId(newDefinitionsJson);
+
+            iterator = newDefinitionsJson.entrySet().iterator();
+            HashMap<String, Schema> definitions = project.getDefinitions();
+            while(iterator.hasNext()){
+                Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
+                Schema definition = oMapper.convertValue(pair.getValue(),Schema.class);
+
+                // validate content
+                if(SchemaValidator.isValid(definition.getPropertiesLazily())){
+                    definitions.put(pair.getKey(), definition);
+                }
+                else{
+                    throw new InvalidRequestException("Json OAS is not valid!");
+                }
+            }
+//            this.replaceRefWithId(toStrObjMap(definitions));
+//            System.out.println("kyattt");
+
             /* Copy Paths Operation */
             //     link, listOfMethod
             HashMap<String,Object> paths = toStrObjMap(json.get("paths"));
-            Iterator iterator = paths.entrySet().iterator();
+            iterator = paths.entrySet().iterator();
 
             while(iterator.hasNext()){
                 //       link,ListOfMethod
@@ -224,23 +277,6 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             /* End of Append Tags */
 
 
-            /* Copy Definitions Operation*/
-            HashMap<String,Object> definitionsJson = toStrObjMap(json.get("definitions"));
-            HashMap<String, Schema> definitions = project.getDefinitions();
-            iterator = definitionsJson.entrySet().iterator();
-
-            while(iterator.hasNext()){
-                Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-                Schema definition = oMapper.convertValue(pair.getValue(),Schema.class);
-
-                // validate content
-                if(SchemaValidator.isValid(definition.getPropertiesLazily())){
-                    definitions.put(pair.getKey(), definition);
-                }
-                else{
-                    throw new InvalidRequestException("Json OAS is not valid!");
-                }
-            }
 
             /* Security Definitions Operation */
             HashMap<String, Object> securityDefinitionJson = (HashMap<String, Object>) json.get("securityDefinitions");
@@ -258,7 +294,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             //supaya semua $ref menjadi ref, karna ketika pertama kali diimport, disave di db dalam bentuk $ref
             //ketika di fetch, maka $ref menjadi ref, dan ketika di save lagi tetap menjadi ref
             String id = apiRepository.save(project).getId();
-            apiRepository.save(apiRepository.findById(id).get());
+//            apiRepository.save(apiRepository.findById(id).get());
 
             return RequestResponse.success("Data Imported");
 

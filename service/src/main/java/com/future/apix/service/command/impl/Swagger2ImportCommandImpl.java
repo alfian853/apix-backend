@@ -230,21 +230,22 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             this.replaceRefWithId(newDefinitionsJson);
 
             iterator = newDefinitionsJson.entrySet().iterator();
-            HashMap<String, Schema> definitions = project.getDefinitions();
+            HashMap<String, Definition> definitions = project.getDefinitions();
             while(iterator.hasNext()){
                 Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-                Schema definition = oMapper.convertValue(pair.getValue(),Schema.class);
-
+//                Definition definition = oMapper.convertValue(pair.getValue(),Definition.class);
+                Definition definition = new Definition();
+                definition.setSchema(oMapper.convertValue(pair.getValue(), Schema.class));
+                definition.setName(definition.getSchema().getName());
+                definition.getSchema().setName(null);
                 // validate content
-                if(SchemaValidator.isValid(definition.getPropertiesLazily())){
+                if(SchemaValidator.isValid(definition.getSchema().getPropertiesLazily())){
                     definitions.put(pair.getKey(), definition);
                 }
                 else{
                     throw new InvalidRequestException("Json OAS is not valid!");
                 }
             }
-//            this.replaceRefWithId(toStrObjMap(definitions));
-//            System.out.println("kyattt");
 
             /* Copy Paths Operation */
             //     link, listOfMethod

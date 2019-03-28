@@ -37,7 +37,6 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
     private void replaceRefWithId(HashMap<String, Object> data){
         for(Object obj : data.entrySet()){
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>) obj;
-            System.out.println("Test : "+pair.getKey());
             if(pair.getKey().equals("$ref") || pair.getKey().equals("ref")){
                 String ref = (String) pair.getValue();
                 System.out.println(ref.split("/")[2]);
@@ -53,6 +52,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
     private void setApiPathVariable(ApiProject project, String section, String path, Map.Entry<String,Object> data) {
         List<HashMap<String, Object>> pathVariables = (List<HashMap<String, Object>>) data.getValue();
         for (HashMap<String, Object> variable : pathVariables) {
+            this.replaceRefWithId(variable);
             Schema pathVariable = oMapper.convertValue(variable, Schema.class);
             project.getSections().get(section).getPaths().computeIfAbsent(path, k -> new Path())
                     .getPathVariables()
@@ -84,9 +84,17 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
         methodData.setProduces((List<String>) dataMap.get("produces"));
         methodData.setDeprecated((Boolean) dataMap.get("deprecated"));
         Path pathOfMethod = project.getSections()
-                .computeIfAbsent(section, v -> new ApiSection()).getPaths()
-                .computeIfAbsent(path, v -> new Path());
-
+                .computeIfAbsent(section, v -> {
+                    ApiSection res =  new ApiSection();
+                    res.setSignature(UUID.randomUUID().toString());
+                    return res;
+                }).getPaths()
+                .computeIfAbsent(path, v -> {
+                    Path res = new Path();
+                    res.setSignature(UUID.randomUUID().toString());
+                    return res;
+                });
+        methodData.setSignature(UUID.randomUUID().toString());
 
         if(dataMap.get("parameters") != null){
 
@@ -143,6 +151,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                 TypeFactory.defaultInstance().constructMapType(HashMap.class,String.class, OperationDetail.class)
         );
         methodData.setResponses(responses);
+        methodData.setSignature(UUID.randomUUID().toString());
 
         HttpMethod method = HttpMethod.valueOf(data.getKey().toUpperCase());
         if(
@@ -205,11 +214,12 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             json = oMapper.readValue(file.getInputStream(), HashMap.class);
             ApiProject project = new ApiProject();
             project.setBasePath((String) json.get("basePath"));
+            toStrObjMap(json.get("info")).put("_signature", UUID.randomUUID().toString());
             project.setInfo(oMapper.convertValue(json.get("info"), ProjectInfo.class));
             project.setHost((String) json.get("host"));
             project.setSchemes((List<String>) json.get("schemes"));
             project.setExternalDocs(oMapper.convertValue(json.get("externalDocs"), Contact.class));
-
+            project.setSignature(UUID.randomUUID().toString());
 
             /* Copy Definitions Operation*/
             HashMap<String,Object> definitionsJson = toStrObjMap(json.get("definitions"));
@@ -238,6 +248,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                 definition.setSchema(oMapper.convertValue(pair.getValue(), Schema.class));
                 definition.setName(definition.getSchema().getName());
                 definition.getSchema().setName(null);
+                definition.setSignature(UUID.randomUUID().toString());
                 // validate content
                 if(SchemaValidator.isValid(definition.getSchema().getPropertiesLazily())){
                     definitions.put(pair.getKey(), definition);
@@ -272,6 +283,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                         tag.put("externalDocs",new Contact());
                     }
                     ApiSection section = project.getSections().get(tag.get("name"));
+                    section.setSignature(UUID.randomUUID().toString());
                     section.setInfo(oMapper.convertValue(tag, Tag.class));
                 }
             }
@@ -295,7 +307,6 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             //supaya semua $ref menjadi ref, karna ketika pertama kali diimport, disave di db dalam bentuk $ref
             //ketika di fetch, maka $ref menjadi ref, dan ketika di save lagi tetap menjadi ref
             String id = apiRepository.save(project).getId();
-//            apiRepository.save(apiRepository.findById(id).get());
 
             return RequestResponse.success("Data Imported");
 

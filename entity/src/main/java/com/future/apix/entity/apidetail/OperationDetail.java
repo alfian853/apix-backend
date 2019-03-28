@@ -3,6 +3,7 @@ package com.future.apix.entity.apidetail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.future.apix.entity.Mappable;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.HashMap;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OperationDetail {
+public class OperationDetail implements Mappable {
 
     String name,in = "",description,type;
     boolean required;

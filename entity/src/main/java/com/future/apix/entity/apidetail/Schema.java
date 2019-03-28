@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.future.apix.entity.Mappable;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -13,7 +14,7 @@ import java.util.List;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Schema {
+public class Schema implements Mappable {
 
     String type;
 
@@ -26,12 +27,8 @@ public class Schema {
     String collectionFormat;
 
     //untuk custom dataType, isi schema = isi custom dataType
+    @JsonProperty("$ref")
     String ref;
-
-    public void set$ref(String ref){
-        this.ref = ref;
-    }
-
 
     /** if datatype = Object
     *isi object value [

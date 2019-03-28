@@ -7,16 +7,13 @@ import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 @Data
-public class ApiSection{
+public class ApiSection implements Mappable{
     HashMap<String, Path> paths = new HashMap<>();
 
     @Field("_signature")
     @JsonProperty("_signature")
-    String signature = UUID.randomUUID().toString();
-
-    // simpan sesuai dengan Tags di swagger OAS
+    String signature;
     Tag info;
 }

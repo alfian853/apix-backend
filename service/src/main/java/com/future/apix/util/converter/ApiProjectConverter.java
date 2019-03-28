@@ -28,7 +28,7 @@ public class ApiProjectConverter {
             if(pair.getKey().equals("$ref") || pair.getKey().equals("ref")){
                 String ref = (String) pair.getValue();
                 ref = ref.split("/",3)[2];
-                pair.setValue("#definitions/"+idToName.get(ref));
+                pair.setValue("#/definitions/"+idToName.get(ref));
                 System.out.println(pair.getValue());
             }
             else if(pair.getValue() instanceof HashMap){

@@ -34,8 +34,16 @@ public class ApiProjectConverter {
         swaggerOas2.put("schema",project.getSchemes());
         LinkedHashMap<String,Object> paths = new LinkedHashMap<>();
         swaggerOas2.put("paths",paths);
+
+        HashMap<String, Object> definitions = new HashMap<>();
+        project.getDefinitions().forEach((key, value) -> {
+            definitions.put(value.getName(), value);
+            value.setName(null);
+            value.setSignature(null);
+        });
+        swaggerOas2.put("definitions", definitions);
         swaggerOas2.put("securityDefinitions",project.getSecurityDefinitions());
-        swaggerOas2.put("definitions",project.getDefinitions());
+
 
         project.getSections().forEach((sectionName,apiSection) -> {
 

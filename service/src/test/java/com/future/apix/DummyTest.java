@@ -1,7 +1,7 @@
 package com.future.apix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.apix.entity.apidetail.RequestBody;
+import com.future.apix.entity.apidetail.OperationDetail;
 import com.future.apix.entity.apidetail.Schema;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class DummyTest {
 
         schema.setItems(s);
         schema.setProperties(properties);
-        RequestBody requestBody = new RequestBody();
+        OperationDetail requestBody = new OperationDetail();
         requestBody.setSchema(schema);
 
         validator.validate(requestBody).forEach(x -> System.out.println(x.getMessage()));

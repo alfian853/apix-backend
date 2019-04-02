@@ -1,5 +1,6 @@
 package com.future.apix.config;
 
+import com.future.apix.auth.RestAuthenticationEntryPoint;
 import com.future.apix.service.impl.MongoUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -22,6 +23,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     MongoUserDetailsService userDetailsService;
 
+    @Autowired
+    private RestAuthenticationEntryPoint authEntryPoint;
+
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -39,10 +43,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+//        https://www.codementor.io/gtommee97/rest-authentication-with-spring-security-and-mongodb-j8wgh8kg7
         http
                 .csrf().disable()
                 .authorizeRequests().anyRequest().authenticated()
-                .and().httpBasic()
+                .and().httpBasic().authenticationEntryPoint(authEntryPoint)
                 .and().sessionManagement().disable();
     }
 

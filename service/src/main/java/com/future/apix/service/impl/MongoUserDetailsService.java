@@ -25,6 +25,6 @@ public class MongoUserDetailsService implements UserDetailsService {
         if (user != null)
             return user;
 
-        throw new UsernameNotFoundException("User not found!");
+        throw new UsernameNotFoundException("Username: " + username + " not found!");
     }
 }

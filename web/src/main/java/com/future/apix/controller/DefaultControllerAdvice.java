@@ -78,5 +78,16 @@ public class DefaultControllerAdvice {
         );
     }
 
+    @ExceptionHandler(value = {InvalidJwtAuthenticationException.class})
+    @RequestMapping(produces = "application/vnd.error+json")
+    public ResponseEntity<RequestResponse> invalidJwtToken(InvalidJwtAuthenticationException exception) {
+        exception.printStackTrace();
+
+        return new ResponseEntity<>(RequestResponse.failed(exception.getMessage()),
+                new HttpHeaders(),
+                HttpStatus.UNAUTHORIZED);
+
+    }
+
 
 }

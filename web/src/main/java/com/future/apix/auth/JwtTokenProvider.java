@@ -1,5 +1,6 @@
 package com.future.apix.auth;
 
+import com.future.apix.exception.InvalidJwtAuthenticationException;
 import com.future.apix.service.impl.MongoUserDetailsService;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.future.apix.auth;
+package com.future.apix.exception;
 
 import org.springframework.security.core.AuthenticationException;
 

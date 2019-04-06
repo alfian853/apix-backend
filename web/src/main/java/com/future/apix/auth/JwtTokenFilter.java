@@ -1,5 +1,6 @@
 package com.future.apix.auth;
 
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,10 +27,16 @@ public class JwtTokenFilter extends GenericFilterBean {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain)
         throws IOException, ServletException {
         String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication auth = token != null ? jwtTokenProvider.getAuthentication(token) : null;
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        try{
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+                Authentication auth = token != null ? jwtTokenProvider.getAuthentication(token) : null;
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+            filterChain.doFilter(req, res);
         }
-        filterChain.doFilter(req, res);
+        catch (RuntimeException e){
+            HttpServletResponse response = (HttpServletResponse) res;
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        }
     }
 }

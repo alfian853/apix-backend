@@ -22,7 +22,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
-@CrossOrigin
 public class ApiController {
 
     @Autowired

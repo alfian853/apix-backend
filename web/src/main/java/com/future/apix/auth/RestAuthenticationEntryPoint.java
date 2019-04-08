@@ -18,7 +18,7 @@ import java.io.PrintWriter;
 //https://o7planning.org/en/11649/secure-spring-boot-restful-service-using-basic-authentication
 // https://www.devglan.com/spring-security/spring-boot-security-rest-basic-authentication
 @Component
-public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private static final Logger logger = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
 
@@ -31,14 +31,15 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         PrintWriter writer = response.getWriter();
         writer.println("HTTP Status 401 - " + e.getMessage());
         */
-
 //        http://kelvinleong.github.io/authentication/2018/06/06/JWT-Authentication.html
         logger.error("Responding with unauthorized error. Message - ", e.getMessage());
+        System.out.println(request);
+        System.out.println(response);
         if (e instanceof InvalidJwtAuthenticationException) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token - " + e.getMessage());
         }
         else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Http Status 401 Unauthorized - " + e.getMessage());
+//            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Http Status 401 Unauthorized - " + e.getMessage());
         }
     }
 

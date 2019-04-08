@@ -55,6 +55,7 @@ public class ApiController {
 
     @GetMapping("/{id}")
     public ApiProject getById(@PathVariable("id") String id){
+        System.out.println("tes masukkk controller");
         return apiDataService.findById(id);
     }
 

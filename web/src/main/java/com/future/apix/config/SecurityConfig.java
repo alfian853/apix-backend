@@ -59,8 +59,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        https://www.codementor.io/gtommee97/rest-authentication-with-spring-security-and-mongodb-j8wgh8kg7
         http
                 .csrf().disable()
-                .httpBasic().disable()
-//                .and().httpBasic().authenticationEntryPoint(authEntryPoint)
+//                .httpBasic().disable()
+                .httpBasic().authenticationEntryPoint(authEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
@@ -70,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                     .authenticationEntryPoint(authEntryPoint)
                 .and()
-                    .apply(new JwtConfigurer(jwtTokenProvider))
+                    .apply(new JwtConfigurer(jwtTokenProvider));
                 ;
 
 

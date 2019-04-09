@@ -1,11 +1,10 @@
 package com.future.apix.config;
 
-import com.future.apix.auth.JwtConfigurer;
-import com.future.apix.auth.JwtTokenProvider;
-import com.future.apix.auth.RestAuthenticationEntryPoint;
+import com.future.apix.config.cors.CorsFilter;
+import com.future.apix.config.jwt.JwtConfigurer;
+import com.future.apix.config.jwt.JwtTokenProvider;
 import com.future.apix.service.impl.MongoUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 
 //https://www.codementor.io/gtommee97/rest-authentication-with-spring-security-and-mongodb-j8wgh8kg7
 //https://www.baeldung.com/securing-a-restful-web-service-with-spring-security
@@ -28,10 +28,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     MongoUserDetailsService userDetailsService;
 
     @Autowired
-    private RestAuthenticationEntryPoint authEntryPoint;
+    JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    JwtTokenProvider jwtTokenProvider;
+    CorsFilter corsFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -59,19 +59,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        https://www.codementor.io/gtommee97/rest-authentication-with-spring-security-and-mongodb-j8wgh8kg7
         http
                 .csrf().disable()
-//                .httpBasic().disable()
-                .httpBasic().authenticationEntryPoint(authEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/auth/login").permitAll()
-                    .anyRequest().authenticated()
+                .antMatchers("/jwt/login").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
-                    .authenticationEntryPoint(authEntryPoint)
                 .and()
-                    .apply(new JwtConfigurer(jwtTokenProvider));
-                ;
+                    .apply(new JwtConfigurer(jwtTokenProvider))
+                .and()
+                .addFilterBefore(corsFilter, ChannelProcessingFilter.class);
 
 
     }

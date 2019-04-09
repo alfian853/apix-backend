@@ -1,6 +1,6 @@
 package com.future.apix.controller;
 
-import com.future.apix.auth.JwtTokenProvider;
+import com.future.apix.config.jwt.JwtTokenProvider;
 import com.future.apix.entity.User;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.AuthenticationRequest;
@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController

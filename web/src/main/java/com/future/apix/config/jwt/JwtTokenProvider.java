@@ -1,4 +1,4 @@
-package com.future.apix.auth;
+package com.future.apix.config.jwt;
 
 import com.future.apix.exception.InvalidJwtAuthenticationException;
 import com.future.apix.service.impl.MongoUserDetailsService;

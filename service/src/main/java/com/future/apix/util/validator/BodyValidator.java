@@ -1,7 +1,7 @@
 package com.future.apix.util.validator;
 
 import com.future.apix.entity.apidetail.DataType;
-import com.future.apix.entity.apidetail.RequestBody;
+import com.future.apix.entity.apidetail.OperationDetail;
 
 public class BodyValidator {
 
@@ -14,7 +14,7 @@ public class BodyValidator {
         }
     }
 
-    public static boolean isValid(RequestBody requestBody) {
+    public static boolean isValid(OperationDetail requestBody) {
         if(requestBody.getIn() == null){
             System.out.println(requestBody);
         }

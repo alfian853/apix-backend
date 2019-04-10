@@ -1,6 +1,9 @@
 package com.future.apix.service;
 
 import com.future.apix.entity.ApiProject;
+import com.future.apix.entity.apidetail.ProjectInfo;
+import com.future.apix.request.ProjectCreateRequest;
+import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 
 import java.util.List;
@@ -19,4 +22,7 @@ public interface ApiDataService {
     RequestResponse deleteById(String id);
 
     List<ApiProject> findByUser(String username);
+
+    // create new Project
+    ProjectCreateResponse createProject(ProjectCreateRequest request);
 }

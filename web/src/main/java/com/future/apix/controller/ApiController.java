@@ -1,5 +1,8 @@
 package com.future.apix.controller;
 
+import com.future.apix.entity.apidetail.ProjectInfo;
+import com.future.apix.request.ProjectCreateRequest;
+import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.service.CommandExecutorService;
 import com.future.apix.service.command.Swagger2ExportCommand;
 import com.future.apix.service.command.Swagger2ImportCommand;
@@ -9,15 +12,16 @@ import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiDataUpdateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
-@CrossOrigin
 public class ApiController {
 
     @Autowired
@@ -39,7 +43,7 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/export/{id}")
+    @GetMapping("/{id}/export")
     public RequestResponse exportToOas(@PathVariable("id")String id, @RequestParam("type") String type){
         if(type.equals("oas-swagger2")){
             return commandExecutor.execute(Swagger2ExportCommand.class,id);
@@ -51,6 +55,7 @@ public class ApiController {
 
     @GetMapping("/{id}")
     public ApiProject getById(@PathVariable("id") String id){
+        System.out.println("tes masukkk controller");
         return apiDataService.findById(id);
     }
 
@@ -80,4 +85,10 @@ public class ApiController {
                 params = {"name"}
     )
     public List<ApiProject> findByUser(@RequestParam("name") String username) {return apiDataService.findByUser(username); }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProjectCreateResponse createProject(@Valid @RequestBody ProjectCreateRequest request) {
+        return apiDataService.createProject(request);
+    }
 }

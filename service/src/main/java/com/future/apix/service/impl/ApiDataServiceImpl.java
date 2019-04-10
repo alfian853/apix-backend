@@ -1,9 +1,13 @@
 package com.future.apix.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
+import com.future.apix.entity.apidetail.ProjectInfo;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.UserRepository;
+import com.future.apix.request.ProjectCreateRequest;
+import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +19,10 @@ import java.util.List;
 public class ApiDataServiceImpl implements ApiDataService {
 
     @Autowired
-    ApiRepository apiRepository;
+    private ApiRepository apiRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private ObjectMapper oMapper;
 
     @Override
     public ApiProject findById(String id) {
@@ -47,8 +51,21 @@ public class ApiDataServiceImpl implements ApiDataService {
 //        User user = userRepository.findByUsername(username);
 //        return apiRepository.findByUsersIn(user);
         return apiRepository.findByUsersIn(username);
+    }
 
+    @Override
+    public ProjectCreateResponse createProject(ProjectCreateRequest request) {
+        ApiProject project = new ApiProject();
+        project.setBasePath(request.getBasePath());
+        project.setHost(request.getHost());
+        project.setInfo(oMapper.convertValue(request.getInfo(), ProjectInfo.class));
+        apiRepository.save(project);
 
+        ProjectCreateResponse response = new ProjectCreateResponse();
+        response.setStatusToSuccess();
+        response.setMessage("Project has been created!");
+        response.setApiProject(project);
+        return response;
     }
 
 

@@ -34,7 +34,7 @@ public class JwtTokenFilter extends GenericFilterBean {
         }
         catch (RuntimeException e){
             HttpServletResponse response = (HttpServletResponse) res;
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
         }
     }
 }

@@ -24,6 +24,7 @@ public class User implements UserDetails {
     String username, password;
 
     private List<String> roles = new ArrayList<>();
+    private List<String> teams = new ArrayList<>();
 
     public enum Role {
         ROLE_ADMIN, ROLE_USER;

@@ -10,14 +10,18 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
 @RestController
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -38,9 +42,15 @@ public class UserController {
         return ResponseEntity.ok(model);
     }
 
-    @GetMapping("/teamsIn") // masih sementara
-    public RequestResponse isTeamIn(@RequestBody TeamInUserRequest userTeam) {
-        return userService.checkUserTeams(userTeam.getUsername(), userTeam.getTeams());
-
+    @GetMapping("/principal") // Retrieve all user data in class User (in ['principal'])
+    public ResponseEntity getPrincipal(Principal user){
+        return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/teamsIn")
+    public RequestResponse isTeamIn( Principal user, @RequestBody TeamInUserRequest userTeam) {
+        return userService.checkUserTeams(user.getName(), userTeam.getTeams());
+    }
+
+
 }

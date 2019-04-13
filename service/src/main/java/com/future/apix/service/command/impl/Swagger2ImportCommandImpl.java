@@ -2,9 +2,9 @@ package com.future.apix.service.command.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.future.apix.entity.ApiMethodData;
+import com.future.apix.entity.apidetail.ApiMethodData;
 import com.future.apix.entity.ApiProject;
-import com.future.apix.entity.ApiSection;
+import com.future.apix.entity.apidetail.ApiSection;
 import com.future.apix.entity.apidetail.*;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;

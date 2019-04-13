@@ -1,16 +1,15 @@
 package com.future.apix.controller;
 
-import com.future.apix.entity.apidetail.ProjectInfo;
-import com.future.apix.request.ProjectCreateRequest;
-import com.future.apix.response.ProjectCreateResponse;
-import com.future.apix.service.CommandExecutorService;
-import com.future.apix.service.command.Swagger2ExportCommand;
-import com.future.apix.service.command.Swagger2ImportCommand;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.request.ProjectCreateRequest;
+import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiDataUpdateService;
+import com.future.apix.service.CommandExecutorService;
+import com.future.apix.service.command.Swagger2ExportCommand;
+import com.future.apix.service.command.Swagger2ImportCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -55,8 +54,10 @@ public class ApiController {
 
     @GetMapping("/{id}")
     public ApiProject getById(@PathVariable("id") String id){
-        System.out.println("tes masukkk controller");
-        return apiDataService.findById(id);
+        ApiProject project = apiDataService.findById(id);
+        System.out.println(project.getCreatedAt());
+        System.out.println(project.getUpdatedAt());
+        return project;
     }
 
     @PutMapping("/{id}")

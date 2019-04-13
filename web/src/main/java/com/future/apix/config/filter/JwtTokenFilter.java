@@ -1,5 +1,6 @@
-package com.future.apix.config.jwt;
+package com.future.apix.config.filter;
 
+import com.future.apix.config.jwt.JwtTokenProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;

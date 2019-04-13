@@ -1,13 +1,11 @@
 package com.future.apix.entity.apidetail;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.future.apix.entity.ApiMethodData;
 import com.future.apix.entity.Mappable;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 @Data
 public class Path implements Mappable {

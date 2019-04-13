@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class ExportResponse extends RequestResponse {
+public class DownloadResponse extends RequestResponse {
 
     @JsonProperty("file_url")
     String fileUrl;
 
-    public static ExportResponse builder(){
-        return new ExportResponse();
+    public static DownloadResponse builder(){
+        return new DownloadResponse();
     }
 
-    public ExportResponse fileUrl(String fileUrl){
+    public DownloadResponse fileUrl(String fileUrl){
         this.fileUrl = fileUrl;
         return this;
     }

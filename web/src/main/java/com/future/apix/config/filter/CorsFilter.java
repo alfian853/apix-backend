@@ -1,4 +1,4 @@
-package com.future.apix.config.cors;
+package com.future.apix.config.filter;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;

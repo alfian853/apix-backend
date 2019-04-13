@@ -1,7 +1,8 @@
-package com.future.apix.entity;
+package com.future.apix.entity.apidetail;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.future.apix.entity.Mappable;
 import com.future.apix.entity.apidetail.OperationDetail;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;

@@ -78,9 +78,9 @@ public class DefaultControllerAdvice {
         );
     }
 
-    @ExceptionHandler(value = {InvalidJwtAuthenticationException.class})
+    @ExceptionHandler(value = {InvalidJwtAuthenticationException.class, InvalidAuthenticationException.class})
     @RequestMapping(produces = "application/vnd.error+json")
-    public ResponseEntity<RequestResponse> invalidJwtToken(InvalidJwtAuthenticationException exception) {
+    public ResponseEntity<RequestResponse> invalidJwtToken(Exception exception) {
         exception.printStackTrace();
 
         return new ResponseEntity<>(RequestResponse.failed(exception.getMessage()),
@@ -88,18 +88,5 @@ public class DefaultControllerAdvice {
                 HttpStatus.UNAUTHORIZED);
 
     }
-
-    @ExceptionHandler(value = {InvalidAuthenticationException.class})
-    @RequestMapping(produces = "application/vnd.error+json")
-    public ResponseEntity<RequestResponse> invalidAuthenticationExceptionHandler(InvalidAuthenticationException exception){
-        exception.printStackTrace();
-
-        return new ResponseEntity<>(
-                RequestResponse.failed(exception.getMessage()),
-                new HttpHeaders(),
-                HttpStatus.UNAUTHORIZED
-        );
-    }
-
 
 }

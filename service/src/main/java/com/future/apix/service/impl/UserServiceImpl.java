@@ -13,6 +13,8 @@ import com.future.apix.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,9 +28,11 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ObjectMapper oMapper;
 
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Override
     public UserProfileResponse userProfile (Authentication authentication) {
-        UserProfileResponse response = new UserProfileResponse();
+        UserProfileResponse response;
         if (authentication != null) {
 
             response = oMapper.convertValue(authentication.getPrincipal(), UserProfileResponse.class);
@@ -50,7 +54,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RequestResponse createUsers(List<User> users) {
-        userRepository.saveAll(users);
+        for (User user: users) {
+            User newUser = new User();
+            newUser.setUsername(user.getUsername());
+            newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            newUser.setTeams(user.getTeams());
+            newUser.setRoles(user.getRoles());
+            userRepository.save(newUser);
+        }
 
         RequestResponse response = new RequestResponse();
         return response.success("User(s) are created!");

@@ -2,9 +2,11 @@ package com.future.apix.controller;
 
 import com.future.apix.request.TeamInUserRequest;
 import com.future.apix.response.RequestResponse;
+import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,10 +29,10 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+/*
     @GetMapping("/profile")
     public ResponseEntity currentUser(@AuthenticationPrincipal UserDetails userDetails) {
         Map<Object, Object> model = new HashMap<>();
-
 
         model.put("username", userDetails.getUsername());
         model.put("roles", userDetails.getAuthorities()
@@ -45,6 +47,12 @@ public class UserController {
     @GetMapping("/principal") // Retrieve all user data in class User (in ['principal'])
     public ResponseEntity getPrincipal(Principal user){
         return ResponseEntity.ok(user);
+    }
+*/
+
+    @GetMapping("/profile")
+    public UserProfileResponse getAuth(Authentication authentication) {
+        return userService.userProfile(authentication);
     }
 
     @GetMapping("/teamsIn")

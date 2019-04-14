@@ -18,8 +18,6 @@ public class Schema implements Mappable {
 
     String type;
 
-    Object required = Boolean.FALSE;
-
     String description;
 
     String name,in;

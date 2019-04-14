@@ -9,7 +9,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import javax.persistence.Entity;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;

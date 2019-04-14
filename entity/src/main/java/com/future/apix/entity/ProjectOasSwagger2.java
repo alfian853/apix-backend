@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 @Data
-@Document("api_project_oas_swagger2")
+@Document("ApiProjectOasSwagger2")
 public class ProjectOasSwagger2 {
 
     @Id
@@ -17,7 +17,13 @@ public class ProjectOasSwagger2 {
     String projectId;
 
     //will be manually updated
-    Date updatedAt;
+    Date oasFileProjectUpdateDate;
+
+    String oasFileName;
+
+    Date generatedCodesProjectUpdatedDate;
+
+    String generatedCodesFileName;
 
     HashMap<String, Object> oasSwagger2;
 }

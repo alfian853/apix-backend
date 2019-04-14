@@ -26,7 +26,8 @@ public class ApiDataServiceImpl implements ApiDataService {
 
     @Override
     public ApiProject findById(String id) {
-        return apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
+        return apiRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
     }
 
     @Override

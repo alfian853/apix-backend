@@ -12,6 +12,7 @@ import com.future.apix.service.command.Swagger2ExportCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -66,16 +67,18 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
 
             try {
                 if(swagger2.getGeneratedCodesFileName() != null){
-                    new ProcessBuilder(
-                            "rm",CODEGEN_DIR + swagger2.getGeneratedCodesFileName()
-                    ).start().waitFor();
+//                    new ProcessBuilder(
+//                            "rm",CODEGEN_DIR + swagger2.getGeneratedCodesFileName()
+//                    ).start().waitFor();
+                    FileSystemUtils.deleteRecursively(new File(CODEGEN_DIR + swagger2.getGeneratedCodesFileName()));
                 }
 
                 //hapus temp folder untuk codegen jika ada
                 if(resultDir.exists()){
-                    new ProcessBuilder(
-                            "rm",resultDir.getPath()
-                    ).start().waitFor();
+                    FileSystemUtils.deleteRecursively(new File(resultDir.getPath()));
+//                    new ProcessBuilder(
+//                            "rm",resultDir.getPath()
+//                    ).start().waitFor();
                 }
                 resultDir.mkdir();
 
@@ -83,7 +86,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                         "java",
                         "-jar",CODEGEN_JAR,"generate",
                         "-i",OAS_DIR + swagger2.getOasFileName(),
-                        "-l","java","-o",CODEGEN_DIR + baseName
+                        "-l","spring","-o",CODEGEN_DIR + baseName
                 );
                 pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
                 pb.redirectError(ProcessBuilder.Redirect.INHERIT);
@@ -105,12 +108,13 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                 pb.start().waitFor();
 
 
-                pb = new ProcessBuilder(
-                        "rm","-rf",CODEGEN_DIR+baseName
-                );
-                pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-                pb.start().waitFor();
+//                pb = new ProcessBuilder(
+////                        "rm","-rf",CODEGEN_DIR+baseName
+////                );
+                FileSystemUtils.deleteRecursively(new File(CODEGEN_DIR+baseName));
+//                pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+//                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
+//                pb.start().waitFor();
 
                 swagger2.setGeneratedCodesFileName(baseName+".zip");
                 swagger2.setGeneratedCodesProjectUpdatedDate(project.getUpdatedAt());

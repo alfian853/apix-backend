@@ -19,12 +19,10 @@ public class MvcConfig implements WebMvcConfigurer {
     @Autowired
     private Environment env;
 
-    private final String BASE_PATH = "file:web/src/main/resources";
-
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/export_oas/*")
-                .addResourceLocations(BASE_PATH+"/"+env.getProperty("apix.export_directory"));
+        registry.addResourceHandler("/download/**")
+                .addResourceLocations("file:"+env.getProperty("apix.public.directory"));
     }
 
     @Bean

@@ -15,7 +15,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 @Component
 public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
@@ -31,13 +33,13 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
     private ApiProjectConverter converter = ApiProjectConverter.getInstance();
 
-    final String TARGET_DIRECTORY = "web/src/main/resources/exported-oas/";
-
     private String EXPORT_URL;
+    private String EXPORT_DIR;
 
     @Autowired
     public Swagger2ExportCommandImpl(Environment env) {
-        this.EXPORT_URL = env.getProperty("apix.export_relative_url");
+        this.EXPORT_URL = env.getProperty("apix.export_oas.relative_url");
+        this.EXPORT_DIR = env.getProperty("apix.export_oas.directory");
     }
 
 
@@ -49,45 +51,61 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
         ProjectOasSwagger2 swagger2 = swagger2Repository.findProjectOasSwagger2ByProjectId(projectId)
                 .orElse(new ProjectOasSwagger2());
 
-        boolean notExistOrExpired = swagger2.getOasSwagger2() == null ||
-                ! swagger2.getUpdatedAt().equals(project.getUpdatedAt());
+
+        String newFileName = project.getInfo().getTitle()+"_"+project.getInfo().getVersion()
+                +"_"+ UUID.randomUUID().toString().substring(0,5)
+                +".json";
+
+
+
         DownloadResponse response = new DownloadResponse();
 
-        String fileName = project.getInfo().getTitle()+"_"+project.getInfo().getVersion()+".json";
-        File file = new File(TARGET_DIRECTORY + fileName);
 
         try{
-            if(notExistOrExpired){
+            if(swagger2.getOasSwagger2() == null){
                 LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
-                mapper.writerWithDefaultPrettyPrinter().writeValue(
-                        file,
-                        oasHashMap
-                );
-                swagger2.setProjectId(projectId);
                 swagger2.setOasSwagger2(oasHashMap);
-                swagger2.setUpdatedAt(project.getUpdatedAt());
-                swagger2Repository.save(swagger2);
-                response.fileUrl(EXPORT_URL+fileName);
-                response.setStatusToSuccess();
+            }
+
+            boolean notExistOrExpired = false;
+
+            //if not exist
+            if(swagger2.getOasFileName() == null){
+                notExistOrExpired = true;
             }
             else{
-                if(file.exists()){
-                    response.fileUrl(EXPORT_URL+fileName);
-                    response.setStatusToSuccess();
+                File testFile = new File(EXPORT_DIR + swagger2.getOasFileName());
+                //if not the latest version
+                if(! swagger2.getOasFileProjectUpdateDate().equals(project.getUpdatedAt())){
+                    Files.deleteIfExists(testFile.toPath());
+                    notExistOrExpired = true;
                 }
-                else{
-                    mapper.writerWithDefaultPrettyPrinter().writeValue(
-                            file,swagger2.getOasSwagger2()
-                    );
-                    response.fileUrl(EXPORT_URL+fileName);
-                    response.setStatusToSuccess();
+                else if(!testFile.exists()){
+                    notExistOrExpired = true;
                 }
+            }
+
+            if(notExistOrExpired){
+                mapper.writerWithDefaultPrettyPrinter().writeValue(
+                        new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()
+                );
+                swagger2.setProjectId(projectId);
+                swagger2.setOasFileName(newFileName);
+                swagger2.setOasFileProjectUpdateDate(project.getUpdatedAt());
+
+                swagger2Repository.save(swagger2);
+            }
+            else{
+                response.fileUrl(EXPORT_URL + swagger2.getOasFileName());
+                response.setStatusToSuccess();
             }
         }
         catch (Exception e){
             e.printStackTrace();
             throw new DefaultRuntimeException("internal server error!");
         }
+        response.fileUrl(EXPORT_URL + swagger2.getOasFileName());
+        response.setStatusToSuccess();
 
         return response;
     }

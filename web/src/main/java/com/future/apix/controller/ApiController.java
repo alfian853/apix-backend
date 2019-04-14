@@ -8,6 +8,7 @@ import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiDataUpdateService;
 import com.future.apix.service.CommandExecutorService;
+import com.future.apix.service.command.Swagger2CodegenCommand;
 import com.future.apix.service.command.Swagger2ExportCommand;
 import com.future.apix.service.command.Swagger2ImportCommand;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,6 @@ public class ApiController {
     @GetMapping("/{id}")
     public ApiProject getById(@PathVariable("id") String id){
         ApiProject project = apiDataService.findById(id);
-        System.out.println(project.getCreatedAt());
-        System.out.println(project.getUpdatedAt());
         return project;
     }
 
@@ -91,5 +90,10 @@ public class ApiController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectCreateResponse createProject(@Valid @RequestBody ProjectCreateRequest request) {
         return apiDataService.createProject(request);
+    }
+
+    @GetMapping("/{id}/codegen")
+    public Object getCodegen(@PathVariable("id") String id){
+        return commandExecutor.execute(Swagger2CodegenCommand.class, id);
     }
 }

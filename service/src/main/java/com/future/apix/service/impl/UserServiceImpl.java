@@ -53,18 +53,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public RequestResponse createUsers(List<User> users) {
-        for (User user: users) {
-            User newUser = new User();
-            newUser.setUsername(user.getUsername());
-            newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-            newUser.setTeams(user.getTeams());
-            newUser.setRoles(user.getRoles());
-            userRepository.save(newUser);
-        }
+    public RequestResponse createUser(User user) {
+
+        User newUser = new User();
+        newUser.setUsername(user.getUsername());
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        newUser.setTeams(user.getTeams());
+        newUser.setRoles(user.getRoles());
+        userRepository.save(newUser);
 
         RequestResponse response = new RequestResponse();
-        return response.success("User(s) are created!");
+        return response.success("User is created!");
     }
 
     @Override

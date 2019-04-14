@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -23,8 +24,8 @@ public class AdminController {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public RequestResponse createUsers(@RequestBody List<User> userList) {
-        return userService.createUsers(userList);
+    public RequestResponse createUser(@Valid @RequestBody User user) {
+        return userService.createUser(user);
     }
 
     @DeleteMapping("/users/{id}")

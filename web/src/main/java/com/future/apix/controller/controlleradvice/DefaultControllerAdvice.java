@@ -1,19 +1,27 @@
-package com.future.apix.controller;
+package com.future.apix.controller.controlleradvice;
 
 import com.future.apix.exception.*;
+import com.future.apix.response.MethodArgumentInvalidResponse;
 import com.future.apix.response.RequestResponse;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.WebRequest;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @ControllerAdvice
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class DefaultControllerAdvice {
 
     @ExceptionHandler(value={Exception.class, DefaultRuntimeException.class})
@@ -34,8 +42,7 @@ public class DefaultControllerAdvice {
             response.setMessage("Internal Server Error!");
         }
         HttpHeaders headers = new HttpHeaders();
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        return new ResponseEntity<>(response, headers,status);
+        return new ResponseEntity<>(response, headers, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(DataNotFoundException.class)

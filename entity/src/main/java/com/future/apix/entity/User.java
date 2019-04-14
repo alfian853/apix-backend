@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,9 +25,13 @@ public class User implements UserDetails {
     @Id
     String id;
 
-    @NotBlank
-    String username, password;
+    @NotBlank(message = "username must not be blank")
+    String username;
 
+    @NotBlank(message = "password must not be blank")
+    String password;
+
+    @NotEmpty
     private List<String> roles = new ArrayList<>();
     private List<String> teams = new ArrayList<>();
 
@@ -34,9 +39,13 @@ public class User implements UserDetails {
         ROLE_ADMIN, ROLE_USER;
     }
 
+    @Transient
     private boolean enabled = true;
+    @Transient
     private boolean accountNonExpired = true;
+    @Transient
     private boolean accountNonLocked = true;
+    @Transient
     private boolean credentialsNonExpired = true;
 
     @Override

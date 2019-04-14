@@ -13,7 +13,7 @@ public interface UserService {
     RequestResponse checkUserTeams(String username, List<String> teams); // untuk mengecek apakah teams dalam Project ada dalam User
 
     // Create Array of Users
-    RequestResponse createUsers(List<User> users);
+    RequestResponse createUser(User user);
     List<User> getUsers();
     RequestResponse deleteUser(String id);
 

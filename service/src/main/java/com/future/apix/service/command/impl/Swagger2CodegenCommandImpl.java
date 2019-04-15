@@ -9,13 +9,14 @@ import com.future.apix.response.DownloadResponse;
 import com.future.apix.service.CommandExecutorService;
 import com.future.apix.service.command.Swagger2CodegenCommand;
 import com.future.apix.service.command.Swagger2ExportCommand;
+import com.future.apix.util.QueueCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.HashMap;
 
 @Component
 public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
@@ -30,6 +31,8 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
     @Autowired
     CommandExecutorService executorService;
 
+    private static HashMap<String, QueueCommand<DownloadResponse>> pools = new HashMap<>();
+
     private String CODEGEN_URL,CODEGEN_DIR,CODEGEN_JAR,OAS_DIR;
 
     public Swagger2CodegenCommandImpl(Environment e) {
@@ -40,7 +43,23 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
     }
 
     @Override
-    public synchronized DownloadResponse executeCommand(String projectId) {
+    public DownloadResponse executeCommand(String projectId) {
+
+        if(!pools.containsKey(projectId)){
+            pools.put(
+                projectId,
+                new QueueCommand<DownloadResponse>() {
+                    @Override
+                    synchronized public DownloadResponse execute() {
+                        return generateSourceCode(projectId);
+                    }
+                }
+            );
+        }
+        return pools.get(projectId).execute();
+    }
+
+    private DownloadResponse generateSourceCode(String projectId){
 
         ApiProject project = apiRepository.findById(projectId).orElseThrow(DataNotFoundException::new);
 
@@ -64,21 +83,14 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                     CODEGEN_DIR + baseName
             );
 
-
             try {
                 if(swagger2.getGeneratedCodesFileName() != null){
-//                    new ProcessBuilder(
-//                            "rm",CODEGEN_DIR + swagger2.getGeneratedCodesFileName()
-//                    ).start().waitFor();
                     FileSystemUtils.deleteRecursively(new File(CODEGEN_DIR + swagger2.getGeneratedCodesFileName()));
                 }
 
                 //hapus temp folder untuk codegen jika ada
                 if(resultDir.exists()){
                     FileSystemUtils.deleteRecursively(new File(resultDir.getPath()));
-//                    new ProcessBuilder(
-//                            "rm",resultDir.getPath()
-//                    ).start().waitFor();
                 }
                 resultDir.mkdir();
 
@@ -93,28 +105,14 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                 pb.start().waitFor();
 
 
-//                pb = new ProcessBuilder("cd",CODEGEN_DIR).d;
-//                pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-//                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-//                pb.start().waitFor();
-//                pb.command("zip","-r"+baseName+"zip",baseName).start();
                 pb = new ProcessBuilder(
                         "zip","-r",baseName+".zip",
                         baseName
                 );
                 pb.directory(new File(CODEGEN_DIR));
-                pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
                 pb.start().waitFor();
 
-
-//                pb = new ProcessBuilder(
-////                        "rm","-rf",CODEGEN_DIR+baseName
-////                );
                 FileSystemUtils.deleteRecursively(new File(CODEGEN_DIR+baseName));
-//                pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-//                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-//                pb.start().waitFor();
 
                 swagger2.setGeneratedCodesFileName(baseName+".zip");
                 swagger2.setGeneratedCodesProjectUpdatedDate(project.getUpdatedAt());
@@ -133,4 +131,5 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
         response.setStatusToSuccess();
         return response;
     }
+
 }

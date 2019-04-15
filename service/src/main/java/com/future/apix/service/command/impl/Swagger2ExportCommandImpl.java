@@ -9,6 +9,7 @@ import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.service.command.Swagger2ExportCommand;
+import com.future.apix.util.QueueCommand;
 import com.future.apix.util.converter.ApiProjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -16,8 +17,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.UUID;
 
 @Component
 public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
@@ -36,27 +37,39 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
     private String EXPORT_URL;
     private String EXPORT_DIR;
 
+    private static HashMap<String, QueueCommand<DownloadResponse>> pools = new HashMap<>();
+
     @Autowired
     public Swagger2ExportCommandImpl(Environment env) {
         this.EXPORT_URL = env.getProperty("apix.export_oas.relative_url");
         this.EXPORT_DIR = env.getProperty("apix.export_oas.directory");
     }
 
-
     @Override
     public DownloadResponse executeCommand(String projectId) {
+        if(!pools.containsKey(projectId)){
+            pools.put(
+                    projectId,
+                    new QueueCommand<DownloadResponse>() {
+                        @Override
+                        synchronized public DownloadResponse execute() {
+                            return generateOasFile(projectId);
+                        }
+                    }
+            );
+        }
+        return pools.get(projectId).execute();
+    }
 
+    private DownloadResponse generateOasFile(String projectId){
         ApiProject project = apiRepository.findById(projectId).orElseThrow(DataNotFoundException::new);
 
         ProjectOasSwagger2 swagger2 = swagger2Repository.findProjectOasSwagger2ByProjectId(projectId)
                 .orElse(new ProjectOasSwagger2());
 
 
-        String newFileName = project.getInfo().getTitle()+"_"+project.getInfo().getVersion()
-                +"_"+ UUID.randomUUID().toString().substring(0,5)
-                +".json";
-
-
+        String newFileName = project.getInfo().getTitle()+"_"
+                + project.getInfo().getVersion() +"_"+ projectId +".json";
 
         DownloadResponse response = new DownloadResponse();
 

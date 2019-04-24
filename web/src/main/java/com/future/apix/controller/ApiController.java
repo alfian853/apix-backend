@@ -80,11 +80,12 @@ public class ApiController {
         return apiDataService.deleteById(id);
     }
 
-    //
+    /*
     @GetMapping(value = "/bebek",
                 params = {"name"}
     )
     public List<ApiProject> findByUser(@RequestParam("name") String username) {return apiDataService.findByUser(username); }
+    */
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

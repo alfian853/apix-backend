@@ -7,6 +7,6 @@ import lombok.Data;
 @Data
 public class ProjectCreateResponse extends RequestResponse {
 
-    @JsonProperty("new_project")
+    @JsonProperty("newProject")
     ApiProject apiProject;
 }

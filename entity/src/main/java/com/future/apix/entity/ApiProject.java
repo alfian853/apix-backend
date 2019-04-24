@@ -36,7 +36,7 @@ public class ApiProject implements Serializable, Mappable {
     HashMap<String, SecurityScheme> securityDefinitions = new HashMap<>();
     Contact externalDocs;
 
-    List<String> users;
+    List<String> teams;
 
     @CreatedDate
     Date createdAt;

@@ -51,7 +51,7 @@ public class ApiDataServiceImpl implements ApiDataService {
     public List<ApiProject> findByUser(String username) {
 //        User user = userRepository.findByUsername(username);
 //        return apiRepository.findByUsersIn(user);
-        return apiRepository.findByUsersIn(username);
+        return apiRepository.findByTeamsIn(username);
     }
 
     @Override

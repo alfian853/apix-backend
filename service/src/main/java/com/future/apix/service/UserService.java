@@ -12,9 +12,12 @@ public interface UserService {
     UserProfileResponse userProfile (Authentication authentication);
     RequestResponse checkUserTeams(String username, List<String> teams); // untuk mengecek apakah teams dalam Project ada dalam User
 
-    // Create Array of Users
-    RequestResponse createUser(User user);
+    /* For Admin -> User Management */
+    RequestResponse createUser(User user); // Create 1 user (with @Valid)
     List<User> getUsers();
     RequestResponse deleteUser(String id);
+
+    /* For User -> Team Management */
+    List<UserProfileResponse> getUsersByTeam(String team);
 
 }

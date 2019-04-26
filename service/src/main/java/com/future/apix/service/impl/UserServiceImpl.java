@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -76,5 +77,18 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("User does not exists!"));
         userRepository.deleteById(id);
         return new RequestResponse().success("User has been deleted!");
+    }
+
+    @Override
+    public List<UserProfileResponse> getUsersByTeam(String team) {
+        List<User> users = userRepository.findByTeams(team);
+        List<UserProfileResponse> profileResponses = new ArrayList<>();
+        for (User user: users) {
+            UserProfileResponse response = new UserProfileResponse();
+            response = oMapper.convertValue(user, UserProfileResponse.class);
+            profileResponses.add(response);
+            response.setStatusToSuccess();
+        }
+        return profileResponses;
     }
 }

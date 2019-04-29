@@ -9,4 +9,6 @@ public interface TeamRepository extends MongoRepository<Team, String> {
     List<Team> findByAccessEquals(String access);
 
     Team findByName(String name);
+
+    List<Team> findByMembersUsername(String username);
 }

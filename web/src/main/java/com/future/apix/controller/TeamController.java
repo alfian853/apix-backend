@@ -7,6 +7,7 @@ import com.future.apix.service.TeamService;
 import com.future.apix.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,6 +23,11 @@ public class TeamController {
     @GetMapping
     public List<Team> getTeams() {
         return teamService.getTeams();
+    }
+
+    @GetMapping("/my-team")
+    public List<Team> getMyTeams(Authentication auth){
+        return teamService.getMyTeam(auth);
     }
 
     @GetMapping("/{name}")

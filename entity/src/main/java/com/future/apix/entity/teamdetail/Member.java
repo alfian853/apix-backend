@@ -7,5 +7,7 @@ import lombok.Data;
 public class Member implements Mappable {
 
     String username;
-    String grant; // if team 'public': grant 'YES'; if team 'private': grant 'NO' until accepted by team creator
+    Boolean grant; 
+    // if team 'public': grant 'YES'; if team 'private': grant 'NO' until accepted by team creator
+    // REVISION -> if grant (false) => invitation by teamCreator not yet accepted by member
 }

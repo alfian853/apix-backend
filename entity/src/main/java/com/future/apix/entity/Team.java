@@ -17,13 +17,13 @@ public class Team {
     @Id
     String id;
 
-    @NotEmpty
+    @NotEmpty(message = "Team name must not be empty")
     private String name;
 
     private String division;
 
-    @NotNull
-    private String access;
+    @NotNull(message = "Access must not be null")
+    private String access = "public";
     // 'private' require team creator for grant; 'public' for anyone to enter
 
     private String teamCreator; // to give access

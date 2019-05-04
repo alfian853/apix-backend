@@ -19,6 +19,7 @@ import java.util.List;
 public class SwaggerConfig {
 //    https://www.baeldung.com/swagger-2-documentation-for-spring-rest-api (sementara)
 //    https://stackoverflow.com/questions/50545286/spring-boot-swagger-ui-set-jwt-token
+// https://springbootdev.com/2018/02/12/swagger-for-documenting-your-spring-boot-rest-api/
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
 

@@ -31,7 +31,7 @@
         </dependency>
 
         <!-- Github Api for Java -->
-        Dependencies required: jackson-databind, commons-codec, commons-io, commons-lang3
+        <!--Dependencies required: jackson-databind, commons-codec, commons-io, commons-lang3-->
         <!-- https://mvnrepository.com/artifact/org.kohsuke/github-api -->
         <dependency>
             <groupId>org.kohsuke</groupId>
@@ -65,6 +65,13 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.eclipse.mylyn.github/org.eclipse.egit.github.core -->
+        <dependency>
+            <groupId>org.eclipse.mylyn.github</groupId>
+            <artifactId>org.eclipse.egit.github.core</artifactId>
+            <version>2.1.5</version>
         </dependency>
 
 

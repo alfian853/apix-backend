@@ -21,7 +21,7 @@ public class GithubServiceImpl implements GithubService {
         }
         return gitHub;
     }
-    */
+
     private static String token;
 
 
@@ -43,6 +43,28 @@ public class GithubServiceImpl implements GithubService {
         GitHub gitHub = GitHub.connectUsingOAuth(token);
         GHRepository repository = gitHub.getRepository(repoName);
         return repository;
+    }
+    */
+
+    @Override
+    public GHUser getMyself(String user, String password) throws IOException {
+        GitHub gitHub = GitHubBuilder.fromCredentials().withPassword(user, password).build();
+        GHUser ghUser = gitHub.getMyself();
+        return ghUser;
+    }
+
+    @Override
+    public GitHubBuilder getPropertyFile() throws IOException {
+        GitHubBuilder gitHubBuilder = GitHubBuilder.fromPropertyFile();
+        System.out.println(gitHubBuilder);
+        return gitHubBuilder;
+    }
+
+    @Override
+    public GitHubBuilder getPropertyFileName(String propertyName) throws IOException {
+        GitHubBuilder gitHubBuilder = GitHubBuilder.fromPropertyFile(propertyName);
+        System.out.println(gitHubBuilder);
+        return gitHubBuilder;
     }
 
 }

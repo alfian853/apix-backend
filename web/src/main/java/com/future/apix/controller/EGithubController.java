@@ -1,8 +1,10 @@
 package com.future.apix.controller;
 
+import com.future.apix.request.GithubAuthRequest;
 import com.future.apix.service.EGithubService;
-import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +20,13 @@ public class EGithubController {
     EGithubService eGithubService;
 
     @PostMapping("/user")
-    public String setCredentials(@RequestBody String user, @RequestBody String password) {
-        return eGithubService.setCredentials(user, password);
+    public String setCredentials(@RequestBody GithubAuthRequest authRequest) {
+        return eGithubService.setCredentials(authRequest.getUser(), authRequest.getPassword());
     }
 
     @PostMapping("/token")
-    public String setOAuthToken(@RequestBody String token) {
-        return eGithubService.setToken(token);
-    }
-
-    @GetMapping("/repo")
-    public List<Repository> getRepositories(@RequestParam("user") String user) throws IOException {
-        return eGithubService.getUserRepositories(user);
+    public String setOAuthToken(@RequestBody GithubAuthRequest authRequest) {
+        return eGithubService.setToken(authRequest.getToken());
     }
 
     @GetMapping("/repository")
@@ -39,5 +36,27 @@ public class EGithubController {
         for (Repository repo : service.getRepositories(user))
             System.out.println(repo.getName() + " Watchers: " + repo.getWatchers());
         return service.getRepositories(user);
+    }
+
+    @GetMapping("/repo")
+    public PageIterator<Repository> getRepositories(@RequestParam("start") int start, @RequestParam("size") int size) throws IOException {
+        return eGithubService.getRepositories(start, size);
+    }
+
+
+    @PostMapping("/repo")
+    public Repository createRepository(@RequestBody Repository repository) throws IOException {
+        return eGithubService.createRepository(repository);
+    }
+
+    @GetMapping("/branch")
+    public List<RepositoryBranch> getBranches(RepositoryId repoId) throws IOException {
+        return eGithubService.getBranches(repoId);
+    }
+
+    @GetMapping("/contents")
+    List<RepositoryContents> getContents(IRepositoryIdProvider repository, String path)
+            throws IOException {
+        return eGithubService.getContents(repository, path);
     }
 }

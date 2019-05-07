@@ -19,14 +19,19 @@ public class EGithubController {
     @Autowired
     EGithubService eGithubService;
 
-    @PostMapping("/user")
+    @PostMapping("/login")
     public String setCredentials(@RequestBody GithubAuthRequest authRequest) {
-        return eGithubService.setCredentials(authRequest.getUser(), authRequest.getPassword());
+        return eGithubService.setCredentials(authRequest);
     }
 
     @PostMapping("/token")
     public String setOAuthToken(@RequestBody GithubAuthRequest authRequest) {
-        return eGithubService.setToken(authRequest.getToken());
+        return eGithubService.setToken(authRequest);
+    }
+
+    @GetMapping("/myself")
+    public User getMyself() throws IOException {
+        return eGithubService.getMyself();
     }
 
     @GetMapping("/repository")
@@ -39,8 +44,8 @@ public class EGithubController {
     }
 
     @GetMapping("/repo")
-    public PageIterator<Repository> getRepositories(@RequestParam("start") int start, @RequestParam("size") int size) throws IOException {
-        return eGithubService.getRepositories(start, size);
+    public List<Repository> getRepositories() throws IOException {
+        return eGithubService.getRepositories();
     }
 
 

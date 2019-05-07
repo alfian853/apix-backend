@@ -34,34 +34,29 @@ public class EGithubController {
         return eGithubService.getMyself();
     }
 
-    @GetMapping("/repository")
-    public List<Repository> getRepositories2(@RequestParam("user") String user) throws IOException {
-        GitHubClient client = new GitHubClient().setCredentials("natashaval", "Jengsusy69");
-        RepositoryService service = new RepositoryService();
-        for (Repository repo : service.getRepositories(user))
-            System.out.println(repo.getName() + " Watchers: " + repo.getWatchers());
-        return service.getRepositories(user);
-    }
-
-    @GetMapping("/repo")
-    public List<Repository> getRepositories() throws IOException {
-        return eGithubService.getRepositories();
-    }
-
-
-    @PostMapping("/repo")
+    @PostMapping("/repos")
     public Repository createRepository(@RequestBody Repository repository) throws IOException {
         return eGithubService.createRepository(repository);
     }
 
-    @GetMapping("/branch")
-    public List<RepositoryBranch> getBranches(RepositoryId repoId) throws IOException {
+    @GetMapping("/repos")
+    public List<Repository> getRepositories2() throws IOException {
+        return eGithubService.getRepositories2();
+    }
+
+    @GetMapping("/branches")
+    public List<RepositoryBranch> getBranches(@RequestBody RepositoryId repoId) throws IOException {
         return eGithubService.getBranches(repoId);
     }
 
     @GetMapping("/contents")
-    List<RepositoryContents> getContents(IRepositoryIdProvider repository, String path)
+    public List<RepositoryContents> getContents(@RequestBody RepositoryId repoId)
             throws IOException {
-        return eGithubService.getContents(repository, path);
+        return eGithubService.getContents(repoId);
+    }
+
+    @GetMapping("/readme")
+    public RepositoryContents getReadme(RepositoryId repoId, String ref) throws IOException {
+        return eGithubService.getReadme(repoId, ref);
     }
 }

@@ -2,6 +2,7 @@ package com.future.apix.service.impl;
 
 import com.future.apix.request.GithubAuthRequest;
 import com.future.apix.service.EGithubService;
+import org.apache.commons.codec.binary.Base64;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +26,7 @@ public class EGithubServiceImpl implements EGithubService {
 
     private RepositoryService repositoryService = new RepositoryService(this.client);
 
-//    private ContentsService CONTENT_SERVICE = new ContentsService(this.client);
+    private ContentsService contentsService = new ContentsService(this.client);
 
     private UserService userService = new UserService(this.client);
 
@@ -72,12 +74,19 @@ public class EGithubServiceImpl implements EGithubService {
         return repositories;
     }
 
+    /*
     @Override
     public List<Repository> getRepositories() throws IOException {
         // create new RepositoryService and new GithubClient
         RepositoryService service = initRepositoryService();
         System.out.println("CLIENT: " + service.getClient().toString());
         return service.getRepositories();
+    }
+    */
+
+    @Override
+    public List<Repository> getRepositories2() throws IOException {
+        return repositoryService.getRepositories();
     }
 
     @Override
@@ -87,14 +96,30 @@ public class EGithubServiceImpl implements EGithubService {
     }
     @Override
     public List<RepositoryBranch> getBranches(RepositoryId repoId) throws IOException {
-//        return REPOSITORY_SERVICE.getBranches(repoId);
-        return null;
+        return repositoryService.getBranches(repoId);
+//        return null;
     }
 
     @Override
-    public List<RepositoryContents> getContents(IRepositoryIdProvider repository, String path) throws IOException {
-//        return CONTENT_SERVICE.getContents(repository, path);
-        return null;
+    public List<RepositoryContents> getContents(RepositoryId repoId) throws IOException {
+        return contentsService.getContents(repoId);
+        // return null;
+    }
+
+    @Override
+    public RepositoryContents getReadme(RepositoryId repoId, String ref) throws IOException {
+        RepositoryContents encodedReadme = contentsService.getReadme(repoId, ref);
+        RepositoryContents decodedReadme = new RepositoryContents();
+        decodedReadme.setSize(encodedReadme.getSize());
+        decodedReadme.setEncoding(encodedReadme.getEncoding());
+        decodedReadme.setName(encodedReadme.getName());
+        decodedReadme.setType(encodedReadme.getType());
+        decodedReadme.setPath(encodedReadme.getPath());
+        decodedReadme.setSha(encodedReadme.getSha());
+        String decodedContent = new String(Base64.decodeBase64(encodedReadme.getContent().getBytes()));
+        System.out.println(decodedContent);
+        decodedReadme.setContent(decodedContent);
+        return decodedReadme;
     }
 
     @Override

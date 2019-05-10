@@ -1,15 +1,17 @@
 package com.future.apix.controller;
 
+import com.future.apix.response.RequestResponse;
 import com.future.apix.service.GithubService;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
-import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.GitUser;
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryContents;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/github")
@@ -17,32 +19,37 @@ public class GithubController {
     @Autowired
     GithubService githubService;
 
-    @PostMapping("/myself")
-    public GHUser getMyself(@RequestBody String user, @RequestBody String password) throws IOException {
-        return githubService.getMyself(user, password);
+    @GetMapping("/repos")
+    public List<Repository> getRepositories() throws IOException {
+        return githubService.getRepositories();
     }
 
-    @GetMapping("/property1")
-    public GitHubBuilder getProperty() throws IOException{
-        return githubService.getPropertyFile();
+    @GetMapping("/repos/{user}/{repo}/branches")
+    public List<RepositoryBranch> getBranches(@PathVariable("user")String user, @PathVariable("repo") String repo) throws IOException {
+        return githubService.getBranches(user, repo);
     }
 
-    @GetMapping("/property2")
-    public GitHubBuilder getPropertyName(@RequestParam("propertyName") String propertyName) throws IOException{
-        return githubService.getPropertyFileName(propertyName);
+    @GetMapping("/repos/{user}/{repo}/readme")
+    public RepositoryContents getReadme(
+            @PathVariable("user")String user,
+            @PathVariable("repo") String repo,
+            @RequestParam(required = false) String ref) throws IOException {
+        return githubService.getReadme(user, repo, ref);
     }
 
-    /*
-    @PostMapping("/token")
-    public ResponseEntity setToken(@RequestParam("token") String token) throws IOException{
-        githubService.setToken(token);
-        return ResponseEntity.ok("Token has been set!");
+    @GetMapping("/properties")
+    public ResponseEntity getProperties(){
+        return ResponseEntity.ok(githubService.getGithubProperties());
     }
 
-    @GetMapping("/repo/{name}")
-    public GHRepository getRepository(@PathVariable("name") String repoName) throws IOException {
-        return githubService.getRespository(repoName);
+    @PostMapping("/auth")
+    public RequestResponse setAuth(){
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+        response.setMessage(githubService.authorizeUser());
+        return response;
     }
-    */
+
+
 
 }

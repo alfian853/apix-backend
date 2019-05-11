@@ -1,5 +1,6 @@
 package com.future.apix.controller;
 
+import com.future.apix.request.GithubContentsRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.GithubService;
 import org.eclipse.egit.github.core.Repository;
@@ -18,6 +19,14 @@ import java.util.List;
 public class GithubController {
     @Autowired
     GithubService githubService;
+
+    @PostMapping("/auth")
+    public RequestResponse setAuth(){
+        RequestResponse response = new RequestResponse();
+        response.setStatusToSuccess();
+        response.setMessage(githubService.authorizeUser());
+        return response;
+    }
 
     @GetMapping("/repos")
     public List<Repository> getRepositories() throws IOException {
@@ -42,14 +51,15 @@ public class GithubController {
         return ResponseEntity.ok(githubService.getGithubProperties());
     }
 
-    @PostMapping("/auth")
-    public RequestResponse setAuth(){
-        RequestResponse response = new RequestResponse();
-        response.setStatusToSuccess();
-        response.setMessage(githubService.authorizeUser());
-        return response;
+    @PutMapping("/repos/{user}/{repo}/contents/{path}")
+    public Object createContents(
+            @PathVariable("user") String user,
+            @PathVariable("repo") String repo,
+            @PathVariable("path") String path,
+            @RequestBody GithubContentsRequest request
+            ) throws IOException {
+        return githubService.createContents(user, repo, path, request);
     }
-
 
 
 }

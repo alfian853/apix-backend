@@ -1,6 +1,7 @@
 package com.future.apix.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.request.GithubContentsRequest;
 import com.future.apix.service.GithubService;
 import org.apache.commons.codec.binary.Base64;
 import org.eclipse.egit.github.core.Repository;
@@ -16,6 +17,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_CONTENTS;
+
+
 import java.io.IOException;
 import java.util.List;
 
@@ -25,6 +30,9 @@ public class GithubServiceImpl implements GithubService {
 
     @Value("${apix.github.token}")
     private String token;
+
+    @Value("${apix.github.oaspath}") // DO NOT FORGET TO CHANGE CRUD CONTENT PATH TO oas2.md
+    private String oasPath;
 
     private GitHubClient client = new GitHubClient();
 
@@ -77,5 +85,22 @@ public class GithubServiceImpl implements GithubService {
     public String authorizeUser(){
         this.client.setOAuth2Token(token);
         return "User has been authorized!";
+    }
+
+    @Override
+    public List<RepositoryContents> getContents(String user, String repo, String path, String ref) throws IOException {
+        RepositoryId repoId = new RepositoryId(user, repo);
+        return contentsService.getContents(repoId, path, ref);
+    }
+
+    @Override
+    public Object createContents(String user, String repo, String path, GithubContentsRequest contentsRequest) throws IOException {
+        StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+        uri.append('/').append(user).append('/').append(repo);
+        uri.append(SEGMENT_CONTENTS).append('/').append(path);
+
+        System.out.println(uri.toString());
+        return this.client.post(uri.toString(), contentsRequest, GithubContentsRequest.class);
+
     }
 }

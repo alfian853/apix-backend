@@ -1,5 +1,8 @@
 package com.future.apix.controller;
 
+import com.future.apix.response.github.GithubBranchResponse;
+import com.future.apix.response.github.GithubContentResponse;
+import com.future.apix.response.github.GithubRepoResponse;
 import com.future.apix.response.github.GithubUserResponse;
 import com.future.apix.service.GithubApiService;
 import org.kohsuke.github.*;
@@ -7,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -36,14 +40,15 @@ public class GithubApiController {
     }
 
     @GetMapping("/user/repos")
-    public PagedIterable<GHRepository> getMyselfRepositories() throws IOException {
+    public List<GithubRepoResponse> getMyselfRepositories() throws IOException {
         return githubService.getMyselfRepositories();
     }
 
-    @GetMapping("/repos/{repo}")
-    public GHRepository getRepository(
-            @PathVariable("repo") String repoName) throws IOException {
-        return githubService.getRepository(repoName);
+    @GetMapping("/repos/{owner}/{repo}")
+    public GithubRepoResponse getRepository(
+            @PathVariable("owner") String owner,
+            @PathVariable("repo") String repo) throws IOException {
+        return githubService.getRepository(owner + "/" + repo);
     }
 
     @GetMapping("/repos/{repo}/branches")
@@ -52,22 +57,24 @@ public class GithubApiController {
         return githubService.getBranches(repoName);
     }
 
-    @GetMapping("/repos/{repo}/branches/{branch}")
-    public GHBranch getBranch(
-            @PathVariable("repo") String repoName,
+    @GetMapping("/repos/{owner}/{repo}/branches/{branch}")
+    public GithubBranchResponse getBranch(
+            @PathVariable("owner") String owner,
+            @PathVariable("repo") String repo,
             @PathVariable("branch") String branchName
     ) throws IOException {
-        return githubService.getBranch(repoName, branchName);
+        return githubService.getBranch(owner + "/" + repo, branchName);
     }
 
-    @GetMapping("/repos/{repo}/readme")
-    public GHContent getReadme(
-            @PathVariable("repo") String repoName) throws IOException {
-        return githubService.getReadme(repoName);
+    @GetMapping("/repos/{owner}/{repo}/readme")
+    public GithubContentResponse getReadme(
+            @PathVariable("owner") String owner,
+            @PathVariable("repo") String repo) throws IOException {
+        return githubService.getReadme(owner + "/" + repo);
     }
 
     @GetMapping("/repos/{repo}/contents/{path}")
-    public GHContent getFileContent(
+    public GithubContentResponse getFileContent(
             @PathVariable("repo") String repoName,
             @PathVariable("path") String contentPath,
             @RequestParam(required = false) String ref

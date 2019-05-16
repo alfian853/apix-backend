@@ -106,11 +106,11 @@ public class GithubApiServiceImpl implements GithubApiService {
         GitHub gitHub = authToken();
         if (ref == null || ref.length() <= 0) ref = "master";
         GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, ref);
-        System.out.println("ContentPath: " + contentPath + "; Is File: " + content.isFile());
-        System.out.println("Url: " + content.getUrl());
-        InputStream i = content.read();
-        String readContent = IOUtils.toString(i, StandardCharsets.UTF_8.name());
-        System.out.println("Content: " + readContent);
+//        System.out.println("ContentPath: " + contentPath + "; Is File: " + content.isFile());
+//        System.out.println("Url: " + content.getUrl());
+//        InputStream i = content.read();
+//        String readContent = IOUtils.toString(i, StandardCharsets.UTF_8.name());
+//        System.out.println("Content: " + readContent);
 
         if (content.isFile()) {
             return convertContent(content);
@@ -121,13 +121,17 @@ public class GithubApiServiceImpl implements GithubApiService {
     }
 
     @Override
-    public GithubContentUpdateResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException {
+    public GithubCommitResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException {
         GitHub gitHub = authToken();
         if (request.getBranch() == null || request.getBranch().length() <= 0) request.setBranch("master");
         GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, request.getBranch());
         if (content.isFile()) {
             GHContentUpdateResponse ghResponse = content.update(request.getContent(), request.getMessage(), request.getBranch());
-            return convertContentUpdate(ghResponse);
+//            GHContent contentResponse = ghResponse.getContent();
+//            GHCommit commit = ghResponse.getCommit();
+//            return convertContentUpdate(ghResponse);
+//            return convertContent(contentResponse);
+            return convertCommit(ghResponse.getCommit());
         }
         else
             throw new InvalidRequestException("Content is not a file!");
@@ -194,6 +198,16 @@ public class GithubApiServiceImpl implements GithubApiService {
     private GithubContentUpdateResponse convertContentUpdate(GHContentUpdateResponse updateResponse) {
         GithubContentUpdateResponse response = new GithubContentUpdateResponse();
         response = oMapper.convertValue(updateResponse, GithubContentUpdateResponse.class);
+        return response;
+    }
+
+    private GithubCommitResponse convertCommit(GHCommit commit) throws IOException {
+        GithubCommitResponse response = new GithubCommitResponse();
+        response.setSha(commit.getSHA1());
+        response.setMessage(commit.getCommitShortInfo().getMessage());
+        response.setOwner(convertRepository(commit.getOwner()));
+        response.setCommitter(convertUser(commit.getCommitter()));
+        response.setCommitDate(commit.getCommitDate());
         return response;
     }
 }

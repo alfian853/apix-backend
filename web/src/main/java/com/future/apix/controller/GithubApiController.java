@@ -86,7 +86,7 @@ public class GithubApiController {
     }
 
     @PutMapping("/repos/{owner}/{repo}/contents/{path:.+}")
-    public GithubContentUpdateResponse updateFileContent(
+    public GithubCommitResponse updateFileContent(
             @PathVariable("owner") String owner,
             @PathVariable("repo") String repo,
             @PathVariable("path") String contentPath,

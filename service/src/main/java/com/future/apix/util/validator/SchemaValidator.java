@@ -28,12 +28,6 @@ public class SchemaValidator {
         boolean patternIsNull = schema.getPattern() == null;
         DataType type = getType(schema.getType());
 
-        if(schema.getRequired() instanceof List == schema.getRequired() instanceof Boolean){
-            System.out.println("invalid required field!");
-            System.out.println(schema.getRequired()+" "+ (schema.getRequired() instanceof Boolean));
-            return false;
-        }
-
         if(type == null) return (!formatIsNull && schema.getFormat().equals("date-time"));
         
         if( type == DataType.INTEGER){

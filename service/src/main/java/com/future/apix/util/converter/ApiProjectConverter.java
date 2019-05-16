@@ -24,12 +24,10 @@ public class ApiProjectConverter {
     private void replaceRefWithId(HashMap<String, Object> data,HashMap<String, String> idToName){
         for(Object obj : data.entrySet()){
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>) obj;
-            System.out.println(pair.getKey());
             if(pair.getKey().equals("$ref") || pair.getKey().equals("ref")){
                 String ref = (String) pair.getValue();
                 ref = ref.split("/",3)[2];
                 pair.setValue("#/definitions/"+idToName.get(ref));
-                System.out.println(pair.getValue());
             }
             else if(pair.getValue() instanceof HashMap){
                 replaceRefWithId((HashMap<String, Object>) pair.getValue(), idToName);

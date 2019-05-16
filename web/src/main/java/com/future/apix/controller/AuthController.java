@@ -4,6 +4,7 @@ import com.future.apix.config.jwt.JwtTokenProvider;
 import com.future.apix.entity.User;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.AuthenticationRequest;
+import com.future.apix.response.AuthLoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +32,7 @@ public class AuthController {
     UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody AuthenticationRequest data) {
+    public AuthLoginResponse login(@RequestBody AuthenticationRequest data) {
         try {
             String username = data.getUsername();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, data.getPassword()));
@@ -39,11 +40,13 @@ public class AuthController {
             User user = userRepository.findByUsername(username);
             String token = jwtTokenProvider.createToken(username, user.getRoles());
 
-            Map<String, Object> model = new HashMap<>();
-            model.put("username", username);
-            model.put("token", token);
+            AuthLoginResponse response = new AuthLoginResponse();
+            response.setUsername(username);
+            response.setToken(token);
+            response.setSuccess(true);
+            response.setMessage("User is authenticated!");
 
-            return ResponseEntity.ok(model);
+            return response;
         } catch (AuthenticationException e) {
             throw new BadCredentialsException ("Invalid username or password!");
         }

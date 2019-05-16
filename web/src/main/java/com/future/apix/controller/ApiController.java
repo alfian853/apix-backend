@@ -1,16 +1,16 @@
 package com.future.apix.controller;
 
-import com.future.apix.entity.apidetail.ProjectInfo;
-import com.future.apix.request.ProjectCreateRequest;
-import com.future.apix.response.ProjectCreateResponse;
-import com.future.apix.service.CommandExecutorService;
-import com.future.apix.service.command.Swagger2ExportCommand;
-import com.future.apix.service.command.Swagger2ImportCommand;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.request.ProjectCreateRequest;
+import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiDataUpdateService;
+import com.future.apix.service.CommandExecutorService;
+import com.future.apix.service.command.Swagger2CodegenCommand;
+import com.future.apix.service.command.Swagger2ExportCommand;
+import com.future.apix.service.command.Swagger2ImportCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -55,8 +55,8 @@ public class ApiController {
 
     @GetMapping("/{id}")
     public ApiProject getById(@PathVariable("id") String id){
-        System.out.println("tes masukkk controller");
-        return apiDataService.findById(id);
+        ApiProject project = apiDataService.findById(id);
+        return project;
     }
 
     @PutMapping("/{id}")
@@ -80,15 +80,21 @@ public class ApiController {
         return apiDataService.deleteById(id);
     }
 
-    //
+    /*
     @GetMapping(value = "/bebek",
                 params = {"name"}
     )
     public List<ApiProject> findByUser(@RequestParam("name") String username) {return apiDataService.findByUser(username); }
+    */
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectCreateResponse createProject(@Valid @RequestBody ProjectCreateRequest request) {
         return apiDataService.createProject(request);
+    }
+
+    @GetMapping("/{id}/codegen")
+    public Object getCodegen(@PathVariable("id") String id){
+        return commandExecutor.execute(Swagger2CodegenCommand.class, id);
     }
 }

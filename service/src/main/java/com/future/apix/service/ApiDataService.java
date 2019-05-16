@@ -8,7 +8,7 @@ import com.future.apix.response.RequestResponse;
 
 import java.util.List;
 
-public interface ApiDataService {
+public interface  ApiDataService {
 
     ApiProject findById(String id);
 

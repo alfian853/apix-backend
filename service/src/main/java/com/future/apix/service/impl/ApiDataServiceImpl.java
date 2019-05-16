@@ -26,7 +26,8 @@ public class ApiDataServiceImpl implements ApiDataService {
 
     @Override
     public ApiProject findById(String id) {
-        return apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
+        return apiRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
     }
 
     @Override
@@ -41,7 +42,7 @@ public class ApiDataServiceImpl implements ApiDataService {
 
     @Override
     public RequestResponse deleteById(String id){
-        ApiProject project = apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
+        ApiProject project = apiRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
         apiRepository.deleteById(id);
         return RequestResponse.success("Project has been deleted!");
     }
@@ -50,7 +51,7 @@ public class ApiDataServiceImpl implements ApiDataService {
     public List<ApiProject> findByUser(String username) {
 //        User user = userRepository.findByUsername(username);
 //        return apiRepository.findByUsersIn(user);
-        return apiRepository.findByUsersIn(username);
+        return apiRepository.findByTeamsIn(username);
     }
 
     @Override

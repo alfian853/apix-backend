@@ -1,6 +1,6 @@
 package com.future.apix.config;
 
-import com.future.apix.config.cors.CorsFilter;
+import com.future.apix.config.filter.CorsFilter;
 import com.future.apix.config.jwt.JwtConfigurer;
 import com.future.apix.config.jwt.JwtTokenProvider;
 import com.future.apix.service.impl.MongoUserDetailsService;
@@ -51,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .withUser("user").password(passwordEncoder().encode("user")).roles("USER");
 
-        auth.userDetailsService(userDetailsService);
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override
@@ -62,7 +62,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/jwt/login").permitAll()
+                .antMatchers("/auth/login",
+                        "/swagger-ui.html",
+                        "/v2/api-docs",
+                        "/swagger-resources/**",
+                        "/webjars/**",
+                        "/github/**",
+                        "/egithub/**")
+                .permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()

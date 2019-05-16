@@ -1,5 +1,6 @@
 package com.future.apix.config.jwt;
 
+import com.future.apix.config.filter.JwtTokenFilter;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.DefaultSecurityFilterChain;

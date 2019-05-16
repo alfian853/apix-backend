@@ -1,12 +1,11 @@
 package com.future.apix.controller;
 
-import com.future.apix.response.github.GithubBranchResponse;
-import com.future.apix.response.github.GithubContentResponse;
-import com.future.apix.response.github.GithubRepoResponse;
-import com.future.apix.response.github.GithubUserResponse;
+import com.future.apix.request.GithubContentsRequest;
+import com.future.apix.response.github.*;
 import com.future.apix.service.GithubApiService;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -73,13 +72,27 @@ public class GithubApiController {
         return githubService.getReadme(owner + "/" + repo);
     }
 
-    @GetMapping("/repos/{repo}/contents/{path}")
+    @GetMapping("/repos/{owner}/{repo}/contents/{path:.+}")
+//            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public GithubContentResponse getFileContent(
-            @PathVariable("repo") String repoName,
+//            https://stackoverflow.com/questions/30548822/spring-mvc-4-application-json-content-type-is-not-being-set-correctly
+            // GET ERROR 406 for content since the request uri ends with .[suffix] the requestedMediaTypes be "text/[suffix]"
+            @PathVariable("owner") String owner,
+            @PathVariable("repo") String repo,
             @PathVariable("path") String contentPath,
             @RequestParam(required = false) String ref
     ) throws IOException {
-        return githubService.getFileContent(repoName, contentPath, ref);
+        return githubService.getFileContent(owner + "/" + repo, contentPath, ref);
+    }
+
+    @PutMapping("/repos/{owner}/{repo}/contents/{path:.+}")
+    public GithubContentUpdateResponse updateFileContent(
+            @PathVariable("owner") String owner,
+            @PathVariable("repo") String repo,
+            @PathVariable("path") String contentPath,
+            @RequestBody GithubContentsRequest request
+            ) throws IOException {
+        return githubService.updateFile(owner + "/" + repo, contentPath, request);
     }
 
 }

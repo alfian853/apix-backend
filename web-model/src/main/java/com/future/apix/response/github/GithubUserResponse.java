@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class GithubUserResponse {
 //    private String company;
 //    private String blog;
 //    private String location;
-//    private String email;
+    private String email;
 //    private int publicRepoCount;
 //    private int publicGistCount;
 //    private int followersCount;
@@ -29,6 +30,8 @@ public class GithubUserResponse {
 //    private String updatedAt;
 
 //    private Map<String, List<String>> responseHeaderFields;
+
+    private Date date; // for GitUser (author or committer)
 
 
 }

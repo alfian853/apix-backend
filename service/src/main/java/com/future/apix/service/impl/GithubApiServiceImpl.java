@@ -2,17 +2,20 @@ package com.future.apix.service.impl;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.apix.response.github.GithubBranchResponse;
-import com.future.apix.response.github.GithubContentResponse;
-import com.future.apix.response.github.GithubRepoResponse;
-import com.future.apix.response.github.GithubUserResponse;
+import com.future.apix.exception.DataNotFoundException;
+import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.request.GithubContentsRequest;
+import com.future.apix.response.github.*;
 import com.future.apix.service.GithubApiService;
+import org.apache.commons.io.IOUtils;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -103,7 +106,31 @@ public class GithubApiServiceImpl implements GithubApiService {
         GitHub gitHub = authToken();
         if (ref == null || ref.length() <= 0) ref = "master";
         GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, ref);
-        return convertContent(content);
+        System.out.println("ContentPath: " + contentPath + "; Is File: " + content.isFile());
+        System.out.println("Url: " + content.getUrl());
+        InputStream i = content.read();
+        String readContent = IOUtils.toString(i, StandardCharsets.UTF_8.name());
+        System.out.println("Content: " + readContent);
+
+        if (content.isFile()) {
+            return convertContent(content);
+
+        }
+        else throw new DataNotFoundException("File is not available!");
+
+    }
+
+    @Override
+    public GithubContentUpdateResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException {
+        GitHub gitHub = authToken();
+        if (request.getBranch() == null || request.getBranch().length() <= 0) request.setBranch("master");
+        GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, request.getBranch());
+        if (content.isFile()) {
+            GHContentUpdateResponse ghResponse = content.update(request.getContent(), request.getMessage(), request.getBranch());
+            return convertContentUpdate(ghResponse);
+        }
+        else
+            throw new InvalidRequestException("Content is not a file!");
     }
 
 //    ============ private Function ===============
@@ -118,6 +145,14 @@ public class GithubApiServiceImpl implements GithubApiService {
         response.setId(user.getId());
         response.setLogin(user.getLogin());
         response.setName(user.getName());
+        return response;
+    }
+
+    private GithubUserResponse convertCommitter(GitUser user) {
+        GithubUserResponse response = new GithubUserResponse();
+        response.setDate(user.getDate());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
         return response;
     }
 
@@ -148,10 +183,17 @@ public class GithubApiServiceImpl implements GithubApiService {
         response.setPath(content.getPath());
         response.setSha(content.getSha());
         response.setSize(content.getSize());
-        response.setContent(content.getContent());
-        response.setEncondedContent(content.getEncodedContent());
         response.setUrl(content.getUrl());
         response.setHtmlUrl(content.getHtmlUrl());
+        InputStream i = content.read();
+        String readContent = IOUtils.toString(i, StandardCharsets.UTF_8.name());
+        response.setContent(readContent);
+        return response;
+    }
+
+    private GithubContentUpdateResponse convertContentUpdate(GHContentUpdateResponse updateResponse) {
+        GithubContentUpdateResponse response = new GithubContentUpdateResponse();
+        response = oMapper.convertValue(updateResponse, GithubContentUpdateResponse.class);
         return response;
     }
 }

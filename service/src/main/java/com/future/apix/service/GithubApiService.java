@@ -1,9 +1,7 @@
 package com.future.apix.service;
 
-import com.future.apix.response.github.GithubBranchResponse;
-import com.future.apix.response.github.GithubContentResponse;
-import com.future.apix.response.github.GithubRepoResponse;
-import com.future.apix.response.github.GithubUserResponse;
+import com.future.apix.request.GithubContentsRequest;
+import com.future.apix.response.github.*;
 import org.kohsuke.github.*;
 
 import java.io.IOException;
@@ -24,4 +22,5 @@ public interface GithubApiService {
     GithubBranchResponse getBranch(String repoName, String branchName) throws IOException;
     GithubContentResponse getReadme(String repoName) throws IOException;
     GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException;
+    GithubContentUpdateResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException;
 }

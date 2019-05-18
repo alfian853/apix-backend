@@ -22,5 +22,6 @@ public interface GithubApiService {
     GithubBranchResponse getBranch(String repoName, String branchName) throws IOException;
     GithubContentResponse getReadme(String repoName) throws IOException;
     GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException;
-    GithubContentUpdateResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException;
+
+    GithubCommitResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException;
 }

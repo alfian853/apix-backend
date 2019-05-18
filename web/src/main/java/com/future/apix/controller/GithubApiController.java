@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -86,11 +87,11 @@ public class GithubApiController {
     }
 
     @PutMapping("/repos/{owner}/{repo}/contents/{path:.+}")
-    public GithubContentUpdateResponse updateFileContent(
+    public GithubCommitResponse updateFileContent(
             @PathVariable("owner") String owner,
             @PathVariable("repo") String repo,
             @PathVariable("path") String contentPath,
-            @RequestBody GithubContentsRequest request
+            @Valid @RequestBody GithubContentsRequest request
             ) throws IOException {
         return githubService.updateFile(owner + "/" + repo, contentPath, request);
     }

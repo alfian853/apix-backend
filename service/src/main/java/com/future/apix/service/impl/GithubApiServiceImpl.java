@@ -123,12 +123,6 @@ public class GithubApiServiceImpl implements GithubApiService {
         GitHub gitHub = authToken();
         if (ref == null || ref.length() <= 0) ref = "master";
         GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, ref);
-        System.out.println("ContentPath: " + contentPath + "; Is File: " + content.isFile());
-        System.out.println("Url: " + content.getUrl());
-        InputStream i = content.read();
-        String readContent = IOUtils.toString(i, StandardCharsets.UTF_8.name());
-//        System.out.println("Content: " + readContent);
-
         if (content.isFile()) {
             return convertContent(content);
 
@@ -232,7 +226,6 @@ public class GithubApiServiceImpl implements GithubApiService {
         response.setCommitDate(commit.getCommitDate());
         return response;
     }
-
     private String readFromFile(Path filePath) {
         StringBuilder contentBuilder = new StringBuilder();
         try (Stream<String> stream = Files.lines(filePath , StandardCharsets.UTF_8))
@@ -244,4 +237,5 @@ public class GithubApiServiceImpl implements GithubApiService {
         }
         return contentBuilder.toString();
     }
+
 }

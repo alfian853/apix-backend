@@ -8,7 +8,6 @@ import java.util.Date;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GithubCommitResponse {
     private String sha;
     private String message;

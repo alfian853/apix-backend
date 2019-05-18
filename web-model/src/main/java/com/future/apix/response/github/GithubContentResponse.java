@@ -15,9 +15,9 @@ public class GithubContentResponse {
     private long size;
     private String name;
     private String repoName;
+    private String sha;
     private String path;
     private String content;
-    private String sha;
     private String url;
     private String htmlUrl;
 

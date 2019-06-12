@@ -18,7 +18,7 @@ public interface GithubApiService {
     List<GithubRepoResponse> getMyselfRepositories() throws IOException;
 
     GithubRepoResponse getRepository(String repoName) throws IOException;
-    Map<String, GHBranch> getBranches(String repoName) throws IOException;
+    List<String> getBranches(String repoName) throws IOException;
     GithubBranchResponse getBranch(String repoName, String branchName) throws IOException;
     GithubContentResponse getReadme(String repoName) throws IOException;
     GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException;

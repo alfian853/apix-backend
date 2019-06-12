@@ -51,10 +51,11 @@ public class GithubApiController {
         return githubService.getRepository(owner + "/" + repo);
     }
 
-    @GetMapping("/repos/{repo}/branches")
-    public Map<String, GHBranch> getBranches(
-            @PathVariable("repo") String repoName) throws IOException {
-        return githubService.getBranches(repoName);
+    @GetMapping("/repos/{owner}/{repo}/branches")
+    public List<String> getBranches(
+            @PathVariable("owner") String owner,
+            @PathVariable("repo") String repo) throws IOException {
+        return githubService.getBranches(owner + "/" + repo);
     }
 
     @GetMapping("/repos/{owner}/{repo}/branches/{branch}")

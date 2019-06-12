@@ -37,6 +37,7 @@ public class ApiProject implements Serializable, Mappable {
     Contact externalDocs;
 
     List<String> teams;
+    Github githubProject;
 
     @CreatedDate
     Date createdAt;

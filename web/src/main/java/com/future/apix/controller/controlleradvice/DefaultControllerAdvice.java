@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -31,7 +32,7 @@ public class DefaultControllerAdvice {
         RequestResponse response = new RequestResponse();
         if(exception instanceof DataIntegrityViolationException){
             DataIntegrityViolationException e = (DataIntegrityViolationException) exception;
-                response.setMessage(Objects.requireNonNull(e.getRootCause()).getMessage());
+            response.setMessage(Objects.requireNonNull(e.getRootCause()).getMessage());
         }
         else{
             response.setMessage(exception.getMessage());

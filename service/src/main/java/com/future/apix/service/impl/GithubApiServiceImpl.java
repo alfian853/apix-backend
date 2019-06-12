@@ -99,9 +99,19 @@ public class GithubApiServiceImpl implements GithubApiService {
     }
 
     @Override
-    public Map<String, GHBranch> getBranches(String repoName) throws IOException {
+    public List<String> getBranches(String repoName) throws IOException {
         GitHub gitHub = authToken();
-        return gitHub.getRepository(repoName).getBranches();
+//        List<GithubBranchResponse> branchList = new ArrayList<>();
+        List<String> branchName = new ArrayList<>();
+        Map<String, GHBranch> branches = gitHub.getRepository(repoName).getBranches();
+        for (Map.Entry<String, GHBranch> entry : branches.entrySet()){
+//            GithubBranchResponse response = convertBranch(entry.getValue());
+//            branchList.add(response);
+            if (entry.getKey() != "master") branchName.add(entry.getKey());
+            // exclude master, since it is default branch
+        }
+//        return branchList;
+        return branchName;
     }
 
     @Override

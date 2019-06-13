@@ -75,10 +75,13 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
 
         try{
+            /*
             if(swagger2.getOasSwagger2() == null){
+            // !! hanya jalan  jika masih kosong, jika update maka hanya mengambil yang pertama (NOT WORKING)
                 LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
                 swagger2.setOasSwagger2(oasHashMap);
             }
+            */
 
             boolean notExistOrExpired = false;
 
@@ -89,7 +92,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
             else{
                 File testFile = new File(EXPORT_DIR + swagger2.getOasFileName());
                 //if not the latest version
-                if(! swagger2.getOasFileProjectUpdateDate().equals(project.getUpdatedAt())){
+                if(swagger2.getOasFileProjectUpdateDate().before(project.getUpdatedAt())){
                     Files.deleteIfExists(testFile.toPath());
                     notExistOrExpired = true;
                 }
@@ -99,6 +102,9 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
             }
 
             if(notExistOrExpired){
+                LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
+                swagger2.setOasSwagger2(oasHashMap); // kenapa harus disimpan lagi?
+
                 mapper.writerWithDefaultPrettyPrinter().writeValue(
                         new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()
                 );
@@ -111,6 +117,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
             else{
                 response.fileUrl(EXPORT_URL + swagger2.getOasFileName());
                 response.setStatusToSuccess();
+                response.setMessage("File export already exists!");
             }
         }
         catch (Exception e){
@@ -119,6 +126,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
         }
         response.fileUrl(EXPORT_URL + swagger2.getOasFileName());
         response.setStatusToSuccess();
+        response.setMessage("File has been exported!");
 
         return response;
     }

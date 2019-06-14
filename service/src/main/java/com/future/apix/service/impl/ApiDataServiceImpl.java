@@ -2,6 +2,7 @@ package com.future.apix.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
+import com.future.apix.entity.apidetail.Github;
 import com.future.apix.entity.apidetail.ProjectInfo;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.repository.ApiRepository;
@@ -13,7 +14,9 @@ import com.future.apix.service.ApiDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ApiDataServiceImpl implements ApiDataService {
@@ -60,6 +63,9 @@ public class ApiDataServiceImpl implements ApiDataService {
         project.setBasePath(request.getBasePath());
         project.setHost(request.getHost());
         project.setInfo(oMapper.convertValue(request.getInfo(), ProjectInfo.class));
+        project.setGithubProject(new Github());
+        project.getInfo().setSignature(UUID.randomUUID().toString());
+        project.setSignature(UUID.randomUUID().toString());
         apiRepository.save(project);
 
         ProjectCreateResponse response = new ProjectCreateResponse();
@@ -67,6 +73,10 @@ public class ApiDataServiceImpl implements ApiDataService {
         response.setMessage("Project has been created!");
         response.setApiProject(project);
         return response;
+    }
+
+    private HashMap<String,Object> toStrObjMap(Object object){
+        return (HashMap<String,Object>) object;
     }
 
 

@@ -18,11 +18,12 @@ import java.util.List;
 
 @Component
 public class JwtTokenProvider {
-    @Value("${security.jwt.token.secret-key:seret}")
+//    @Value("${security.jwt.token.secret-key:seret}")
     private String secretKey = "secret";
 
-    @Value("${security.jwt.token.expire-length:3600000}")
-    private long validityInMilliseconds = 3600000; // 1 hour
+//    @Value("${security.jwt.token.expire-length:3600000}")
+//    private long validityInMilliseconds = 3600000; // 1 hour
+    private long validityInMilliseconds = 99000000; // 1 hour
 
     @Autowired
     private MongoUserDetailsService userDetailsService;

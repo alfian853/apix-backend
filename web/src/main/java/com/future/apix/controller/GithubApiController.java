@@ -97,4 +97,14 @@ public class GithubApiController {
         return githubService.updateFile(owner + "/" + repo, contentPath, request);
     }
 
+    @PostMapping("/repos/{owner}/{repo}/contents/{path:.+}/sha")
+    public Boolean shaFileContent(
+            @PathVariable("owner") String owner,
+            @PathVariable("repo") String repo,
+            @PathVariable("path") String contentPath,
+            @Valid @RequestBody GithubContentsRequest request
+    ) throws IOException {
+        return githubService.shaUpdateFile(owner + "/" + repo, contentPath, request);
+    }
+
 }

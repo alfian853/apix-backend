@@ -7,8 +7,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 public class Github implements Mappable {
-    String owner, repo, branch;
-    String path;
+    String owner = "";
+    String repo = "";
+    String branch = "";
+    String path = "";
 
     @Field("_signature")
     @JsonProperty("_signature")

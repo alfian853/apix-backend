@@ -10,6 +10,7 @@ import com.future.apix.response.github.*;
 import com.future.apix.service.CommandExecutorService;
 import com.future.apix.service.GithubApiService;
 import com.future.apix.service.command.Swagger2ExportCommand;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,6 +148,8 @@ public class GithubApiServiceImpl implements GithubApiService {
         if (request.getBranch() == null || request.getBranch().length() <= 0) request.setBranch("master");
         GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, request.getBranch());
         if (content.isFile()) {
+            String existSha = DigestUtils.sha256Hex(content.read());
+
             String projectId = request.getProjectId();
             commandExecutor.execute(Swagger2ExportCommand.class, projectId);
             String oasPath = oasRepository.findProjectOasSwagger2ByProjectId(projectId).orElseThrow(DataNotFoundException::new).getOasFileName();
@@ -154,6 +157,8 @@ public class GithubApiServiceImpl implements GithubApiService {
             String readContent = readFromFile(path);
 //            System.out.println("Content\n" + readContent);
 
+            String exportSha = DigestUtils.sha256Hex(readContent);
+            if (existSha.equals(exportSha)) throw new InvalidRequestException("Content of OAS in Github is already the same");
             GHContentUpdateResponse ghResponse = content.update(readContent, request.getMessage(), request.getBranch());
 //            return convertContentUpdate(ghResponse);
             return convertCommit(ghResponse.getCommit());

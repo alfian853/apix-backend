@@ -24,6 +24,4 @@ public interface GithubApiService {
     GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException;
 
     GithubCommitResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException;
-
-    Boolean shaUpdateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException;
 }

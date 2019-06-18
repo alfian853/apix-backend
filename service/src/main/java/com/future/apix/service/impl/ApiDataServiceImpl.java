@@ -65,7 +65,6 @@ public class ApiDataServiceImpl implements ApiDataService {
         project.setInfo(oMapper.convertValue(request.getInfo(), ProjectInfo.class));
         project.setGithubProject(new Github());
         project.getInfo().setSignature(UUID.randomUUID().toString());
-        project.getGithubProject().setSignature(UUID.randomUUID().toString());
         project.setSignature(UUID.randomUUID().toString());
         apiRepository.save(project);
 

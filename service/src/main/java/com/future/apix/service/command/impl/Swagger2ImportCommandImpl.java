@@ -2,13 +2,10 @@ package com.future.apix.service.command.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.future.apix.entity.apidetail.ApiMethodData;
 import com.future.apix.entity.ApiProject;
-import com.future.apix.entity.apidetail.ApiSection;
 import com.future.apix.entity.apidetail.*;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
-import com.future.apix.response.RequestResponse;
 import com.future.apix.service.command.Swagger2ImportCommand;
 import com.future.apix.util.validator.BodyValidator;
 import com.future.apix.util.validator.SchemaValidator;
@@ -33,13 +30,15 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
 
     private HashMap<String,String> refDefinitions = new HashMap<>();
 
+    public void setMapper(ObjectMapper objectMapper){
+        this.oMapper = objectMapper;
+    }
 
     private void replaceRefWithId(HashMap<String, Object> data){
         for(Object obj : data.entrySet()){
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>) obj;
             if(pair.getKey().equals("$ref") || pair.getKey().equals("ref")){
                 String ref = (String) pair.getValue();
-                System.out.println(ref.split("/")[2]);
                 ref = ref.split("/",3)[2];
                 pair.setValue(this.refDefinitions.get(ref));
             }
@@ -206,8 +205,9 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
         return (HashMap<String,Object>) object;
     }
 
+
     @Override
-    public RequestResponse executeCommand(MultipartFile file) {
+    public ApiProject executeCommand(MultipartFile file) {
 
         HashMap<String,Object> json = null;
         try {
@@ -303,12 +303,10 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                     securityScheme.put(pair.getKey(), scheme);
                 }
             }
+            apiRepository.save(project);
+            return project;
 
-            //supaya semua $ref menjadi ref, karna ketika pertama kali diimport, disave di db dalam bentuk $ref
-            //ketika di fetch, maka $ref menjadi ref, dan ketika di save lagi tetap menjadi ref
-            String id = apiRepository.save(project).getId();
-
-            return RequestResponse.success("Data Imported");
+//            return RequestResponse.success("Data Imported");
 
         } catch (IOException e) {
             e.printStackTrace();

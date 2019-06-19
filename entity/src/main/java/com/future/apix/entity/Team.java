@@ -1,10 +1,14 @@
 package com.future.apix.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.future.apix.entity.teamdetail.Member;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -26,10 +30,13 @@ public class Team {
     private String access = "public";
     // 'private' require team creator for grant; 'public' for anyone to enter
 
-    private String teamCreator; // to give access
+    @NotEmpty(message = "Team creator name must not be empty")
+    private String creator; // person who create the team and give access to member
     private List<Member> members;
 
     @CreatedDate
     Date createdAt;
 
+    @LastModifiedDate
+    Date updatedAt;
 }

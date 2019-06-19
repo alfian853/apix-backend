@@ -2,10 +2,13 @@ package com.future.apix.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.Team;
+import com.future.apix.entity.User;
+import com.future.apix.entity.teamdetail.Member;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.repository.TeamRepository;
+import com.future.apix.repository.UserRepository;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.response.TeamResponse;
 import com.future.apix.response.UserProfileResponse;
@@ -20,6 +23,9 @@ import java.util.List;
 public class TeamServiceImpl implements TeamService {
     @Autowired
     TeamRepository teamRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     private ObjectMapper oMapper;
@@ -52,14 +58,22 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public TeamResponse createTeam(Team team) {
+    public RequestResponse createTeam(Team team) {
         Team existTeam = teamRepository.findByName(team.getName());
-        TeamResponse response = new TeamResponse();
+        RequestResponse response = new RequestResponse();
         if(existTeam == null) {
-            teamRepository.save(team);
-            response.setTeam(team);
+            Team createTeam = teamRepository.save(team);
             response.setStatusToSuccess();
             response.setMessage("Team is created!");
+//            System.out.println(createTeam);
+
+            // Add team to each of User
+            for (Member member: createTeam.getMembers()) {
+                User user = userRepository.findByUsername(member.getUsername());
+                user.getTeams().add(createTeam.getName());
+                userRepository.save(user);
+            }
+
             return response;
         }
         else throw new DuplicateEntryException("Team name is already exists!");

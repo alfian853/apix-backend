@@ -1,6 +1,7 @@
 package com.future.apix.controller;
 
 import com.future.apix.entity.Team;
+import com.future.apix.response.RequestResponse;
 import com.future.apix.response.TeamResponse;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.TeamService;
@@ -37,7 +38,7 @@ public class TeamController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TeamResponse createTeam(@RequestBody @Valid Team team) {
+    public RequestResponse createTeam(@RequestBody @Valid Team team) {
         return teamService.createTeam(team);
     }
 }

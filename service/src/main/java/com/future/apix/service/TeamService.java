@@ -1,6 +1,7 @@
 package com.future.apix.service;
 
 import com.future.apix.entity.Team;
+import com.future.apix.response.RequestResponse;
 import com.future.apix.response.TeamResponse;
 import org.springframework.security.core.Authentication;
 
@@ -11,7 +12,7 @@ public interface TeamService {
 
     TeamResponse getTeamByName(String name);
 
-    TeamResponse createTeam(Team team);
+    RequestResponse createTeam(Team team);
 
     List<Team> getMyTeam(Authentication authentication);
 }

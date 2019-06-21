@@ -24,20 +24,36 @@ import java.util.LinkedHashMap;
 public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
     @Autowired
-    ApiRepository apiRepository;
+    private ApiRepository apiRepository;
 
     @Autowired
-    OasSwagger2Repository swagger2Repository;
+    private OasSwagger2Repository swagger2Repository;
 
     @Autowired
     private ObjectMapper mapper;
 
-    private ApiProjectConverter converter = ApiProjectConverter.getInstance();
+    public void setObjectMapper(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
+
+    @Autowired
+    private ApiProjectConverter converter;
 
     private String EXPORT_URL;
     private String EXPORT_DIR;
 
     private static HashMap<String, QueueCommand<DownloadResponse>> pools = new HashMap<>();
+
+    public Swagger2ExportCommandImpl() {
+    }
+
+    public void setEXPORT_URL(String EXPORT_URL) {
+        this.EXPORT_URL = EXPORT_URL;
+    }
+
+    public void setEXPORT_DIR(String EXPORT_DIR) {
+        this.EXPORT_DIR = EXPORT_DIR;
+    }
 
     @Autowired
     public Swagger2ExportCommandImpl(Environment env) {
@@ -67,7 +83,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
         ProjectOasSwagger2 swagger2 = swagger2Repository.findProjectOasSwagger2ByProjectId(projectId)
                 .orElse(new ProjectOasSwagger2());
 
-
         String newFileName = project.getInfo().getTitle()+"_"
                 + project.getInfo().getVersion() +"_"+ projectId +".json";
 
@@ -75,14 +90,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
 
         try{
-            /*
-            if(swagger2.getOasSwagger2() == null){
-            // !! hanya jalan  jika masih kosong, jika update maka hanya mengambil yang pertama (NOT WORKING)
-                LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
-                swagger2.setOasSwagger2(oasHashMap);
-            }
-            */
-
             boolean notExistOrExpired = false;
 
             //if not exist
@@ -103,7 +110,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
             if(notExistOrExpired){
                 LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
-                swagger2.setOasSwagger2(oasHashMap); // kenapa harus disimpan lagi?
+                swagger2.setOasSwagger2(oasHashMap);
 
                 mapper.writerWithDefaultPrettyPrinter().writeValue(
                         new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()

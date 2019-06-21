@@ -1,6 +1,10 @@
 package com.future.apix.controller;
 
 import com.future.apix.entity.Team;
+<<<<<<< HEAD
+=======
+import com.future.apix.entity.teamdetail.Member;
+>>>>>>> 7052b06add21ddba182b24eda9932c634ab1e317
 import com.future.apix.response.RequestResponse;
 import com.future.apix.response.TeamResponse;
 import com.future.apix.response.UserProfileResponse;
@@ -40,5 +44,10 @@ public class TeamController {
     @ResponseStatus(HttpStatus.CREATED)
     public RequestResponse createTeam(@RequestBody @Valid Team team) {
         return teamService.createTeam(team);
+    }
+
+    @PutMapping("/{name}")
+    public RequestResponse grantTeam(@PathVariable("name") String name, @RequestBody List<Member> members) {
+        return teamService.grantTeamAccess(name, members);
     }
 }

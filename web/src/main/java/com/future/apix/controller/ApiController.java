@@ -36,7 +36,8 @@ public class ApiController {
     @PostMapping("/import")
     public RequestResponse importFromFile(@RequestParam("file")MultipartFile file, @RequestParam("type") String type){
         if(type.equals("oas-swagger2")){
-            return commandExecutor.execute(Swagger2ImportCommand.class, file);
+            return (commandExecutor.execute(Swagger2ImportCommand.class, file) == null)?
+                    RequestResponse.failed() : RequestResponse.success();
         }
         else{
             throw new InvalidRequestException("oas format is not supported");

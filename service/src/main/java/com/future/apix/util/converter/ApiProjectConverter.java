@@ -24,6 +24,7 @@ public class ApiProjectConverter {
     private void replaceRefWithId(HashMap<String, Object> data,HashMap<String, String> idToName){
         for(Object obj : data.entrySet()){
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>) obj;
+            if(pair.getKey() == null)continue;
             if(pair.getKey().equals("$ref") || pair.getKey().equals("ref")){
                 String ref = (String) pair.getValue();
                 ref = ref.split("/",3)[2];
@@ -52,7 +53,7 @@ public class ApiProjectConverter {
         swaggerOas2.put("info",info);
         swaggerOas2.put("host",project.getHost());
         swaggerOas2.put("basePath",project.getBasePath());
-        swaggerOas2.put("schema",project.getSchemes());
+        swaggerOas2.put("schema",project.getSchema());
         LinkedHashMap<String,Object> paths = new LinkedHashMap<>();
         swaggerOas2.put("paths",paths);
 

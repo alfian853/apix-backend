@@ -1,7 +1,5 @@
 package com.future.apix.service.impl;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.User;
 import com.future.apix.exception.DataNotFoundException;
@@ -14,12 +12,10 @@ import com.future.apix.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,9 +46,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public RequestResponse checkUserTeams(String username, List<String> teams) {
         User user = userRepository.findByUsernameAndTeamsIn(username, teams);
-        RequestResponse response = new RequestResponse();
-        if (user != null) return response.success("User is belonged to team");
-        return response.failed("User is not belonged to team!");
+        if (user != null) return RequestResponse.success("User is belonged to team");
+        return RequestResponse.failed("User is not belonged to team!");
     }
 
     @Override
@@ -84,7 +79,7 @@ public class UserServiceImpl implements UserService {
     public RequestResponse deleteUser(String id) {
         User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("User does not exists!"));
         userRepository.deleteById(id);
-        return new RequestResponse().success("User has been deleted!");
+        return RequestResponse.success("User has been deleted!");
     }
 
     @Override

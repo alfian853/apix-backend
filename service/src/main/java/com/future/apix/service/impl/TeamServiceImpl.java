@@ -78,4 +78,42 @@ public class TeamServiceImpl implements TeamService {
         }
         else throw new DuplicateEntryException("Team name is already exists!");
     }
+
+    @Override
+    public RequestResponse grantTeamAccess(String name, List<Member> members) {
+        String failedName = "";
+        Team team = teamRepository.findByName(name);
+        for (Member member: members) {
+            String memberName = member.getUsername();
+            User user = userRepository.findByUsername(memberName);
+            if (user == null) failedName += memberName + ", ";
+            if (!user.getTeams().contains(name)) { // update in User if not yet belong to team
+                user.getTeams().add(name);
+                userRepository.save(user);
+            }
+            int idx = team.getMembers().indexOf(member);
+            // Member yang ditulis dalam bentuk raw yang ada di Team, kemudian akan di REVERSE grant nya
+
+//            System.out.println("Hashcode from team: " + team.getMembers().get(0).hashCode() + "; Hashcode from memberinput: " + member.hashCode());
+            System.out.println("is equals? " + team.getMembers().get(idx).equals(member));
+//            System.out.println("is contain? " + team.getMembers().contains(member));
+//            System.out.println(memberName + "; index = " + idx);
+            team.getMembers().get(idx).setGrant(!member.getGrant()); // jadi di reverse -> if grant = false jadi TRUE
+        }
+        teamRepository.save(team);
+
+        RequestResponse response = new RequestResponse();
+//        if (failedName.equals("")) response.success("Team members grant has been updated!");
+//        else response.failed("Members: "  + failedName + "is failed to updated!");
+        if (failedName != "") {
+            response.setStatusToFailed();
+            response.setMessage("Members: "  + failedName + "is failed to updated!");
+        }
+        else {
+            response.setStatusToSuccess();
+            response.setMessage("Team members grant has been updated!");
+        }
+
+        return response;
+    }
 }

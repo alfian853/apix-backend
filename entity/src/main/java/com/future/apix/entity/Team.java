@@ -32,6 +32,7 @@ public class Team {
 
     @NotEmpty(message = "Team creator name must not be empty")
     private String creator; // person who create the team and give access to member
+
     private List<Member> members;
 
     @CreatedDate

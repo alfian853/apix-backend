@@ -32,7 +32,7 @@ public class ApiProject implements Serializable, Mappable {
     HashMap<String, ApiSection> sections = new HashMap<>();
     HashMap<String, Definition> definitions = new HashMap<>();
 
-    List<String> schemes;
+    List<String> schema;
     HashMap<String, SecurityScheme> securityDefinitions = new HashMap<>();
     Contact externalDocs;
 

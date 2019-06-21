@@ -32,6 +32,10 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
     @Autowired
     private ObjectMapper mapper;
 
+    public void setObjectMapper(ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
+
     private ApiProjectConverter converter = ApiProjectConverter.getInstance();
 
     private String EXPORT_URL;
@@ -75,14 +79,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
 
         try{
-            /*
-            if(swagger2.getOasSwagger2() == null){
-            // !! hanya jalan  jika masih kosong, jika update maka hanya mengambil yang pertama (NOT WORKING)
-                LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
-                swagger2.setOasSwagger2(oasHashMap);
-            }
-            */
-
             boolean notExistOrExpired = false;
 
             //if not exist
@@ -103,7 +99,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
             if(notExistOrExpired){
                 LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
-                swagger2.setOasSwagger2(oasHashMap); // kenapa harus disimpan lagi?
+                swagger2.setOasSwagger2(oasHashMap);
 
                 mapper.writerWithDefaultPrettyPrinter().writeValue(
                         new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()

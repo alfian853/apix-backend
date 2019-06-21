@@ -7,7 +7,6 @@ import com.future.apix.service.command.impl.Swagger2ImportCommandImpl;
 import com.future.apix.util.ApixUtil;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -45,7 +44,7 @@ public class Swagger2ImportCommandTest {
 
     @Test
     public void testSchemaNumber(){
-        URL url = getClass().getClassLoader().getResource("testcase-oas.json");
+        URL url = getClass().getClassLoader().getResource("swagger-oas.json");
         File testFile = new File(url.getPath());
         MockMultipartFile multipartFile = null;
         try {
@@ -57,8 +56,7 @@ public class Swagger2ImportCommandTest {
         }
         ApiProject result = command.executeCommand(multipartFile);
 
-        url = getClass().getClassLoader().getResource("import-result.json");
-        File expectedFile = new File(url.getPath());
+        url = getClass().getClassLoader().getResource("apix-oas.json");
         ApiProject expectedResult = null;
         try {
             expectedResult = mapper.readValue(Files.readAllBytes(Paths.get(url.getPath())), ApiProject.class);

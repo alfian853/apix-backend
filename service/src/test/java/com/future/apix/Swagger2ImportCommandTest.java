@@ -5,6 +5,7 @@ import com.future.apix.entity.ApiProject;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.service.command.impl.Swagger2ImportCommandImpl;
 import com.future.apix.util.ApixUtil;
+import com.google.gson.Gson;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,8 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -43,23 +45,25 @@ public class Swagger2ImportCommandTest {
     }
 
     @Test
-    public void testSchemaNumber(){
-        URL url = getClass().getClassLoader().getResource("swagger-oas.json");
-        File testFile = new File(url.getPath());
+    public void importTest() throws URISyntaxException {
+        URI uri = null;
+        uri = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
+        File testFile = new File(uri.getPath());
         MockMultipartFile multipartFile = null;
+        System.out.println(testFile.getPath());
         try {
             multipartFile = new MockMultipartFile("filename.json", "filename.json",
-                    "application/json", Files.readAllBytes(Paths.get(url.getPath())
-            ));
+                    "application/json", Files.readAllBytes(Paths.get(uri))
+            );
         } catch (IOException e) {
             e.printStackTrace();
         }
         ApiProject result = command.executeCommand(multipartFile);
 
-        url = getClass().getClassLoader().getResource("apix-oas.json");
+        uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         ApiProject expectedResult = null;
         try {
-            expectedResult = mapper.readValue(Files.readAllBytes(Paths.get(url.getPath())), ApiProject.class);
+            expectedResult = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
             expectedResult.setId(result.getId());
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,9 +72,8 @@ public class Swagger2ImportCommandTest {
         verify(repository, times(1)).save(any());
         HashMap<String, Object> obj1 = mapper.convertValue(result, HashMap.class);
         HashMap<String, Object> obj2 = mapper.convertValue(expectedResult, HashMap.class);
-        System.out.println(obj1.get("info"));
         Assert.assertTrue(ApixUtil.isEqualObject(obj1, obj2,
-                new HashSet<>(Arrays.asList("definitions","_signature","$ref"))));
+                new HashSet<>(Arrays.asList("definitions","_signature","$ref","required","createdAt","updatedAt"))));
 
 
     }

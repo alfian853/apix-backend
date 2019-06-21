@@ -124,11 +124,9 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                     body.setIn("formData");
                     body.setName("formData");
                     body.getSchemaLazily().setType("object");
-                    body.getSchemaLazily().getPropertiesLazily().put(
-                            parameter.get("name").toString(),
-                            oMapper.convertValue(parameter, Schema.class)
-                    );
-
+                    HashMap<String, Object> schema = toStrObjMap(parameter.get("schema"));
+                    HashMap<String, Object> properties = toStrObjMap(schema.get("properties"));
+                    body.getSchemaLazily().setProperties(oMapper.convertValue(properties, HashMap.class));
                 }
                 else if(input.equals("path")){
                     if(pathOfMethod.getPathVariables().containsKey(parameter.get("name"))){
@@ -217,7 +215,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             toStrObjMap(json.get("info")).put("_signature", UUID.randomUUID().toString());
             project.setInfo(oMapper.convertValue(json.get("info"), ProjectInfo.class));
             project.setHost((String) json.get("host"));
-            project.setSchemes((List<String>) json.get("schemes"));
+            project.setSchema((List<String>) json.get("schema"));
             project.setExternalDocs(oMapper.convertValue(json.get("externalDocs"), Contact.class));
             project.setSignature(UUID.randomUUID().toString());
 

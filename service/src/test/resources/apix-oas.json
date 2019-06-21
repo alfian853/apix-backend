@@ -1,886 +1,898 @@
 {
-  "_signature" : "7da7d438-2828-4eab-bc90-6d3436ddcb99",
-  "basePath" : "/v2",
-  "host" : "petstore.swagger.io",
-  "info" : {
-    "_signature" : "3f5de9f7-be6c-4d51-a008-6b0feee0ded2",
-    "description" : "# ini judul\nThis is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n```\nwwqewqe\n```",
-    "version" : "1.0.0",
-    "title" : "Petstore API",
-    "termsOfService" : "http://swagger.io/terms/",
-    "contact" : {
-      "email" : "apiteam@swagger.io"
+  "_signature": "35ec91fa-6697-4298-b454-89c12f535c4d",
+  "basePath": "/v2",
+  "host": "petstore.swagger.io",
+  "info": {
+    "_signature": "6381e9bd-44a9-423f-b606-0a6b703da5a7",
+    "description": "# ini judul\nThis is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n```\nwwqewqe\n```",
+    "version": "1.0.0",
+    "title": "Petstore API",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "apiteam@swagger.io"
     },
-    "license" : {
-      "name" : "Apache 2.0",
-      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     }
   },
-  "sections" : {
-    "store" : {
-      "paths" : {
-        "/store/inventory" : {
-          "methods" : {
-            "get" : {
-              "_signature" : "7101bbe1-c4cd-436d-a5f7-9ea5a2cca52a",
-              "summary" : "Returns pet inventories by status",
-              "description" : "Returns a map of status codes to quantities",
-              "operationId" : "getInventory",
-              "consumes" : [
+  "sections": {
+    "store": {
+      "paths": {
+        "/store/inventory": {
+          "methods": {
+            "get": {
+              "_signature": "a7a0cb48-a446-4f8c-939d-524c3527e7d4",
+              "summary": "Returns pet inventories by status",
+              "description": "Returns a map of status codes to quantities",
+              "operationId": "getInventory",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {}
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {},
+                "headers": {}
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "successful operation",
-                  "required" : false,
-                  "schema" : {
-                    "type" : "object"
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "successful operation",
+                  "required": false,
+                  "schema": {
+                    "type": "object"
                   }
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "2639c5f8-4274-4bc6-b6f9-ae8092a2a873"
+          "description": "",
+          "_signature": "a7533a86-3ca4-4596-a433-79b0d02f5cde"
         },
-        "/store/order" : {
-          "methods" : {
-            "post" : {
-              "_signature" : "2707fa97-6f5e-4fa8-8609-cfb71614980b",
-              "summary" : "Place an order for a pet",
-              "description" : "",
-              "operationId" : "placeOrder",
-              "consumes" : [],
-              "produces" : [
+        "/store/order": {
+          "methods": {
+            "post": {
+              "_signature": "79e83c21-1852-4808-9599-248fb1a60029",
+              "summary": "Place an order for a pet",
+              "description": "",
+              "operationId": "placeOrder",
+              "consumes": [],
+              "produces": [
                 "application/xml",
                 "application/json"
               ],
-              "request" : {
-                "name" : "body",
-                "in" : "body",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {
-                  "$ref" : "#/definitions/b9191814-364e-4295-a2db-eb17f113b3d0"
+              "request": {
+                "name": "body",
+                "in": "body",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {
+                  "$ref": "#/definitions/0c4d375c-ef8d-45e3-94c6-3af3a474272f"
                 }
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "successful operation",
-                  "required" : false,
-                  "schema" : {
-                    "$ref" : "#/definitions/b9191814-364e-4295-a2db-eb17f113b3d0"
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "successful operation",
+                  "required": false,
+                  "schema": {
+                    "$ref": "#/definitions/0c4d375c-ef8d-45e3-94c6-3af3a474272f"
                   }
                 },
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid Order",
-                  "required" : false
+                "400": {
+                  "in": "",
+                  "description": "Invalid Order",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "4d2895f0-22ad-40ce-bbe2-00c1e8734a94"
+          "description": "",
+          "_signature": "0ca90b5b-a7a7-45a1-83fa-8380ffe14bf2"
         },
-        "/store/order/{orderId}" : {
-          "methods" : {
-            "get" : {
-              "_signature" : "7f6aa443-211e-4293-804d-ebf57e4786fa",
-              "summary" : "Find purchase order by ID",
-              "description" : "For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions",
-              "operationId" : "getOrderById",
-              "consumes" : [
+        "/store/order/{orderId}": {
+          "methods": {
+            "get": {
+              "_signature": "7f93fe62-3006-4179-a713-8c58a9f24f74",
+              "summary": "Find purchase order by ID",
+              "description": "For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions",
+              "operationId": "getOrderById",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/xml",
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {}
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {},
+                "headers": {}
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "successful operation",
-                  "required" : false,
-                  "schema" : {
-                    "$ref" : "#/definitions/b9191814-364e-4295-a2db-eb17f113b3d0"
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "successful operation",
+                  "required": false,
+                  "schema": {
+                    "$ref": "#/definitions/0c4d375c-ef8d-45e3-94c6-3af3a474272f"
                   }
                 },
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid ID supplied",
-                  "required" : false
+                "400": {
+                  "in": "",
+                  "description": "Invalid ID supplied",
+                  "required": false
                 },
-                "404" : {
-                  "in" : "",
-                  "description" : "Order not found",
-                  "required" : false
+                "404": {
+                  "in": "",
+                  "description": "Order not found",
+                  "required": false
                 }
               }
             },
-            "delete" : {
-              "_signature" : "88343dfd-b736-4a33-995b-802c8722935f",
-              "summary" : "Delete purchase order by ID",
-              "description" : "For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors",
-              "operationId" : "deleteOrder",
-              "consumes" : [
+            "delete": {
+              "_signature": "d7586fd3-e2d8-4d38-b98e-ce224f2cfd1d",
+              "summary": "Delete purchase order by ID",
+              "description": "For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors",
+              "operationId": "deleteOrder",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {}
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {}
               },
-              "responses" : {
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid ID supplied",
-                  "required" : false
+              "responses": {
+                "400": {
+                  "in": "",
+                  "description": "Invalid ID supplied",
+                  "required": false
                 },
-                "404" : {
-                  "in" : "",
-                  "description" : "Order not found",
-                  "required" : false
+                "404": {
+                  "in": "",
+                  "description": "Order not found",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "pathVariables" : {
-            "orderId" : {
-              "type" : "integer",
-              "name" : "orderId",
-              "in" : "path",
-              "format" : "int64",
-              "maximum" : 10,
-              "minimum" : 1
+          "description": "",
+          "pathVariables": {
+            "orderId": {
+              "type": "integer",
+              "name": "orderId",
+              "in": "path",
+              "format": "int64",
+              "maximum": 10,
+              "minimum": 1
             }
           },
-          "_signature" : "69b3f6cd-f3bd-496d-bf1e-9fdff0d73c78"
+          "_signature": "c530f7f6-a12b-4155-a2a5-1b062c926c90"
         }
       },
-      "_signature" : "b8bb7863-e19d-48bf-aa09-3f51b73ac8a3"
+      "_signature": "edf10ddb-00b8-4a3c-a118-d908aba8cd5b"
     },
-    "user" : {
-      "paths" : {
-        "/user/createWithList" : {
-          "methods" : {
-            "post" : {
-              "_signature" : "6eaaab0e-6790-4288-b6e8-cd36fa763ea3",
-              "summary" : "Creates list of users with given input array",
-              "description" : "",
-              "operationId" : "createUsersWithListInput",
-              "consumes" : [],
-              "produces" : [
+    "user": {
+      "paths": {
+        "/user/createWithList": {
+          "methods": {
+            "post": {
+              "_signature": "a7e753ea-3607-4460-a745-285aa8b84a3e",
+              "summary": "Creates list of users with given input array",
+              "description": "",
+              "operationId": "createUsersWithListInput",
+              "consumes": [],
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "name" : "body",
-                "in" : "body",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/definitions/f935c632-8775-4be2-a24b-4465003a5d5d"
+              "request": {
+                "name": "body",
+                "in": "body",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/bd5a4861-623d-4453-917e-a6f75d68b207"
                   }
                 }
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "Status 200",
-                  "required" : false
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "Status 200",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "9f802b46-0f7b-47de-a60d-9fb367a6b609"
+          "description": "",
+          "_signature": "a348d9ed-0e58-49b1-a2bd-8adf405116fb"
         },
-        "/user/login" : {
-          "methods" : {
-            "get" : {
-              "_signature" : "e006324e-2568-428b-bf89-cb04746cd1aa",
-              "summary" : "Logs user into the system",
-              "description" : "",
-              "operationId" : "loginUser",
-              "consumes" : [
+        "/user/login": {
+          "methods": {
+            "get": {
+              "_signature": "80a2866e-dcb9-4170-802d-6faf5df844b3",
+              "summary": "Logs user into the system",
+              "description": "",
+              "operationId": "loginUser",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/xml",
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {
-                  "password" : {
-                    "type" : "string",
-                    "description" : "The password for login in clear text",
-                    "name" : "password",
-                    "in" : "query"
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {
+                  "password": {
+                    "type": "string",
+                    "description": "The password for login in clear text",
+                    "name": "password",
+                    "in": "query"
                   },
-                  "username" : {
-                    "type" : "string",
-                    "description" : "The user name for login",
-                    "name" : "username",
-                    "in" : "query"
+                  "username": {
+                    "type": "string",
+                    "description": "The user name for login",
+                    "name": "username",
+                    "in": "query"
                   }
                 },
-                "headers" : {}
+                "headers": {}
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "successful operation",
-                  "required" : false,
-                  "headers" : {
-                    "X-Rate-Limit" : {
-                      "type" : "integer",
-                      "description" : "calls per hour allowed by the user",
-                      "format" : "int32"
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "successful operation",
+                  "required": false,
+                  "headers": {
+                    "X-Rate-Limit": {
+                      "type": "integer",
+                      "description": "calls per hour allowed by the user",
+                      "format": "int32"
                     },
-                    "X-Expires-After" : {
-                      "type" : "string",
-                      "description" : "date in UTC when token expires",
-                      "format" : "date-time"
+                    "X-Expires-After": {
+                      "type": "string",
+                      "description": "date in UTC when token expires",
+                      "format": "date-time"
                     }
                   },
-                  "schema" : {
-                    "type" : "string"
+                  "schema": {
+                    "type": "string"
                   }
                 },
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid username/password supplied",
-                  "required" : false
+                "400": {
+                  "in": "",
+                  "description": "Invalid username/password supplied",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "263b8566-0884-4c73-80a5-8b9493c35636"
+          "description": "",
+          "_signature": "3cddeab0-ccf0-4c63-8aeb-82eaa4c4809c"
         },
-        "/user" : {
-          "methods" : {
-            "post" : {
-              "_signature" : "7dcbed29-902a-401e-8793-571b3c6dd2a0",
-              "summary" : "Create user",
-              "description" : "This can only be done by the logged in user.",
-              "operationId" : "createUser",
-              "consumes" : [],
-              "produces" : [
+        "/user": {
+          "methods": {
+            "post": {
+              "_signature": "03122fe1-12c6-45f1-a9a8-10b055bc15b0",
+              "summary": "Create user",
+              "description": "This can only be done by the logged in user.",
+              "operationId": "createUser",
+              "consumes": [],
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "name" : "body",
-                "in" : "body",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {
-                  "$ref" : "#/definitions/f935c632-8775-4be2-a24b-4465003a5d5d"
+              "request": {
+                "name": "body",
+                "in": "body",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {
+                  "$ref": "#/definitions/bd5a4861-623d-4453-917e-a6f75d68b207"
                 }
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "Status 200",
-                  "required" : false
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "Status 200",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "a8a77f29-2d9a-4e49-a0c6-7e03df1d4232"
+          "description": "",
+          "_signature": "b380b8d8-d356-41ba-9319-fcdde1d56283"
         },
-        "/user/createWithArray" : {
-          "methods" : {
-            "post" : {
-              "_signature" : "82cfed90-4fec-47e7-83f1-e8b3398571fa",
-              "summary" : "Creates list of users with given input array",
-              "description" : "",
-              "operationId" : "createUsersWithArrayInput",
-              "consumes" : [],
-              "produces" : [
+        "/user/createWithArray": {
+          "methods": {
+            "post": {
+              "_signature": "3a04fc55-e8d6-4844-a3b3-164b4a2569c2",
+              "summary": "Creates list of users with given input array",
+              "description": "",
+              "operationId": "createUsersWithArrayInput",
+              "consumes": [],
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "name" : "body",
-                "in" : "body",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/definitions/f935c632-8775-4be2-a24b-4465003a5d5d"
+              "request": {
+                "name": "body",
+                "in": "body",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/bd5a4861-623d-4453-917e-a6f75d68b207"
                   }
                 }
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "Status 200",
-                  "required" : false
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "Status 200",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "51142dbe-c39b-4629-a5f8-f4166f3c79fc"
+          "description": "",
+          "_signature": "4d2e4881-00e5-4ca5-a513-3417b0b4cac9"
         },
-        "/user/{username}" : {
-          "methods" : {
-            "get" : {
-              "_signature" : "fd3d3431-dad5-4836-a5cc-1e0a7ce47f75",
-              "summary" : "Get user by user name",
-              "description" : "",
-              "operationId" : "getUserByName",
-              "consumes" : [
+        "/user/{username}": {
+          "methods": {
+            "get": {
+              "_signature": "3cd842b2-045b-4cef-b23e-605bca527d17",
+              "summary": "Get user by user name",
+              "description": "",
+              "operationId": "getUserByName",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/xml",
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {}
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {},
+                "headers": {}
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "successful operation",
-                  "required" : false,
-                  "schema" : {
-                    "$ref" : "#/definitions/f935c632-8775-4be2-a24b-4465003a5d5d"
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "successful operation",
+                  "required": false,
+                  "schema": {
+                    "$ref": "#/definitions/bd5a4861-623d-4453-917e-a6f75d68b207"
                   }
                 },
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid username supplied",
-                  "required" : false
+                "400": {
+                  "in": "",
+                  "description": "Invalid username supplied",
+                  "required": false
                 },
-                "404" : {
-                  "in" : "",
-                  "description" : "User not found",
-                  "required" : false
+                "404": {
+                  "in": "",
+                  "description": "User not found",
+                  "required": false
                 }
               }
             },
-            "delete" : {
-              "_signature" : "b1ba239d-56aa-4d15-a82c-bf2a852e558f",
-              "summary" : "Delete user",
-              "description" : "This can only be done by the logged in user.",
-              "operationId" : "deleteUser",
-              "consumes" : [
+            "delete": {
+              "_signature": "c471f019-836c-475e-8e13-8c244a3e72e3",
+              "summary": "Delete user",
+              "description": "This can only be done by the logged in user.",
+              "operationId": "deleteUser",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {}
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {}
               },
-              "responses" : {
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid username supplied",
-                  "required" : false
+              "responses": {
+                "400": {
+                  "in": "",
+                  "description": "Invalid username supplied",
+                  "required": false
                 },
-                "404" : {
-                  "in" : "",
-                  "description" : "User not found",
-                  "required" : false
+                "404": {
+                  "in": "",
+                  "description": "User not found",
+                  "required": false
                 }
               }
             },
-            "put" : {
-              "_signature" : "041c3f8b-bc81-49ff-891e-a31ed2c92cb1",
-              "summary" : "Updated user",
-              "description" : "This can only be done by the logged in user.",
-              "operationId" : "updateUser",
-              "consumes" : [],
-              "produces" : [
+            "put": {
+              "_signature": "c326f2bb-0b95-4aa6-a969-6d1343dfe857",
+              "summary": "Updated user",
+              "description": "This can only be done by the logged in user.",
+              "operationId": "updateUser",
+              "consumes": [],
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "name" : "body",
-                "in" : "body",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {
-                  "$ref" : "#/definitions/f935c632-8775-4be2-a24b-4465003a5d5d"
+              "request": {
+                "name": "body",
+                "in": "body",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {
+                  "$ref": "#/definitions/bd5a4861-623d-4453-917e-a6f75d68b207"
                 }
               },
-              "responses" : {
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid user supplied",
-                  "required" : false
+              "responses": {
+                "400": {
+                  "in": "",
+                  "description": "Invalid user supplied",
+                  "required": false
                 },
-                "404" : {
-                  "in" : "",
-                  "description" : "User not found",
-                  "required" : false
+                "404": {
+                  "in": "",
+                  "description": "User not found",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "pathVariables" : {
-            "username" : {
-              "type" : "string",
-              "description" : "The name that needs to be fetched. Use user1 for testing.",
-              "name" : "username",
-              "in" : "path"
+          "description": "",
+          "pathVariables": {
+            "username": {
+              "type": "string",
+              "description": "The name that needs to be fetched. Use user1 for testing.",
+              "name": "username",
+              "in": "path"
             }
           },
-          "_signature" : "d2d26ea2-dcd8-4f47-9b69-1e737dc2eba3"
+          "_signature": "c03f5f4f-ea8a-4f0f-9b1d-6dda7f6369f0"
         },
-        "/user/logout" : {
-          "methods" : {
-            "get" : {
-              "_signature" : "62e2e0fb-b3db-4678-ad6a-fd258e847747",
-              "summary" : "Logs out current logged in user session",
-              "operationId" : "logoutUser",
-              "consumes" : [
+        "/user/logout": {
+          "methods": {
+            "get": {
+              "_signature": "43ff7564-191a-47d8-a42a-b42d01ac1532",
+              "summary": "Logs out current logged in user session",
+              "operationId": "logoutUser",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {}
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {},
+                "headers": {}
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "Status 200",
-                  "required" : false
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "Status 200",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "249970bf-5206-4cc0-820a-5a5f15188b09"
+          "description": "",
+          "_signature": "77e6722a-9907-453a-a313-5e56c5218fa3"
         }
       },
-      "_signature" : "9c4c9e2f-a458-462d-a8a7-58913d75b9e4"
+      "_signature": "70ff024b-0143-47d3-9577-c95135419157"
     },
-    "pet" : {
-      "paths" : {
-        "/pet/findByStatus" : {
-          "methods" : {
-            "get" : {
-              "_signature" : "2e569def-4d8c-4633-865f-e7b2517a8358",
-              "summary" : "Finds Pets by status",
-              "description" : "Multiple status values can be provided with comma separated strings",
-              "operationId" : "findPetsByStatus",
-              "consumes" : [
+    "pet": {
+      "paths": {
+        "/pet/findByStatus": {
+          "methods": {
+            "get": {
+              "_signature": "a45dd78b-b439-4e22-ba6f-921c9f2785c7",
+              "summary": "Finds Pets by status",
+              "description": "Multiple status values can be provided with comma separated strings",
+              "operationId": "findPetsByStatus",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/xml",
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {
-                  "status" : {
-                    "type" : "array",
-                    "description" : "Status values that need to be considered for filter",
-                    "name" : "status",
-                    "in" : "query",
-                    "items" : {
-                      "type" : "string",
-                      "enum" : [
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {
+                  "status": {
+                    "type": "array",
+                    "description": "Status values that need to be considered for filter",
+                    "name": "status",
+                    "in": "query",
+                    "items": {
+                      "type": "string",
+                      "enum": [
                         "available",
                         "pending",
                         "sold"
                       ],
-                      "default" : "available"
+                      "default": "available"
                     }
                   }
                 },
-                "headers" : {}
+                "headers": {}
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "successful operation",
-                  "required" : false,
-                  "schema" : {
-                    "type" : "array",
-                    "items" : {
-                      "$ref" : "#/definitions/dbe1f796-8f09-4ccd-848a-4dcdbce4df8e"
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "successful operation",
+                  "required": false,
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/2998540f-bc1c-4fea-9f4f-f7e233dfc8ad"
                     }
                   }
                 },
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid status value",
-                  "required" : false
+                "400": {
+                  "in": "",
+                  "description": "Invalid status value",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "935d74ee-d06e-421c-9ab7-cfdb07606bfd"
+          "description": "",
+          "_signature": "272b88b6-512f-462a-af76-c9a78452a4ed"
         },
-        "/pet/{petId}/uploadImage" : {
-          "methods" : {
-            "post" : {
-              "_signature" : "9b37f984-7abd-4128-8154-b9af630d4ea4",
-              "summary" : "uploads an image",
-              "description" : "",
-              "operationId" : "uploadFile",
-              "consumes" : [
+        "/pet/{petId}/uploadImage": {
+          "methods": {
+            "post": {
+              "_signature": "ccc70ea2-72e2-4a1a-a9c3-fba855d89fed",
+              "summary": "uploads an image",
+              "description": "",
+              "operationId": "uploadFile",
+              "consumes": [
                 "multipart/form-data"
               ],
-              "produces" : [
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "name" : "formData",
-                "in" : "formData",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {
-                  "type" : "object",
-                  "properties" : {
-                    "formData" : {
-                      "name" : "formData",
-                      "in" : "formData"
+              "request": {
+                "name": "formData",
+                "in": "formData",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "file": {
+                      "type": "file",
+                      "required": false,
+                      "description": "file to upload",
+                      "name": "file",
+                      "in": "formData"
+                    },
+                    "additionalMetadata": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Additional data to pass to server",
+                      "name": "additionalMetadata",
+                      "in": "formData"
                     }
                   }
                 }
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "successful operation",
-                  "required" : false,
-                  "schema" : {
-                    "$ref" : "#/definitions/8ca67139-c7bb-4219-8908-672db1568bb0"
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "successful operation",
+                  "required": false,
+                  "schema": {
+                    "$ref": "#/definitions/096de9c1-4d35-4a59-a5eb-aec748c05b72"
                   }
                 }
               }
             }
           },
-          "description" : "",
-          "pathVariables" : {
-            "petId" : {
-              "type" : "integer",
-              "description" : "ID of pet to return",
-              "name" : "petId",
-              "in" : "path",
-              "format" : "int64"
+          "description": "",
+          "pathVariables": {
+            "petId": {
+              "type": "integer",
+              "description": "ID of pet to return",
+              "name": "petId",
+              "in": "path",
+              "format": "int64"
             }
           },
-          "_signature" : "39812ff5-ec1c-4fad-b1b5-af634b5be722"
+          "_signature": "ce095fe6-ab55-4b43-b056-10932bfc2775"
         },
-        "/pet" : {
-          "methods" : {
-            "post" : {
-              "_signature" : "b15123ee-d584-4b82-8896-68147047a8f7",
-              "summary" : "Add a new pet to the store",
-              "operationId" : "addPet",
-              "consumes" : [
+        "/pet": {
+          "methods": {
+            "post": {
+              "_signature": "99e2a608-19ec-48cb-8478-359c16140572",
+              "summary": "Add a new pet to the store",
+              "operationId": "addPet",
+              "consumes": [
                 "application/json",
                 "application/x-www-form-urlencoded",
                 "multipart/form-data"
               ],
-              "produces" : [
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "name" : "body",
-                "in" : "body",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {
-                  "type" : "object",
-                  "properties" : {
-                    "qnumber" : {
-                      "type" : "number",
-                      "description" : "qnumber desc",
-                      "example" : "22",
-                      "format" : "double",
-                      "enum" : [
+              "request": {
+                "name": "body",
+                "in": "body",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "qnumber": {
+                      "type": "number",
+                      "description": "qnumber desc",
+                      "example": "22",
+                      "format": "double",
+                      "enum": [
                         "1.0",
                         "2.0",
                         "3.0"
                       ],
-                      "default" : 22.0,
-                      "maximum" : 3,
-                      "minimum" : 2
+                      "default": 22,
+                      "maximum": 3,
+                      "minimum": 2
                     },
-                    "qstring" : {
-                      "type" : "string",
-                      "description" : "qstring desc",
-                      "example" : "example1",
-                      "pattern" : "qweasd",
-                      "enum" : [
+                    "qstring": {
+                      "type": "string",
+                      "description": "qstring desc",
+                      "example": "example1",
+                      "pattern": "qweasd",
+                      "enum": [
                         "string1",
                         "string2"
                       ],
-                      "default" : "eq",
-                      "maxLength" : 3
+                      "default": "eq",
+                      "maxLength": 3
                     },
-                    "qinteger" : {
-                      "type" : "integer",
-                      "format" : "int32"
+                    "qinteger": {
+                      "type": "integer",
+                      "format": "int32"
                     },
-                    "qboolean" : {
-                      "type" : "boolean",
-                      "example" : "true",
-                      "default" : true
+                    "qboolean": {
+                      "type": "boolean",
+                      "example": "true",
+                      "default": true
                     },
-                    "qarray" : {
-                      "type" : "array",
-                      "description" : "desc1",
-                      "items" : {
-                        "type" : "array",
-                        "description" : "desc2",
-                        "items" : {
-                          "type" : "array",
-                          "description" : "desc3",
-                          "items" : {
-                            "type" : "string",
-                            "description" : "strdesc",
-                            "example" : "exa1",
-                            "pattern" : "daasdad",
-                            "enum" : [
+                    "qarray": {
+                      "type": "array",
+                      "description": "desc1",
+                      "items": {
+                        "type": "array",
+                        "description": "desc2",
+                        "items": {
+                          "type": "array",
+                          "description": "desc3",
+                          "items": {
+                            "type": "string",
+                            "description": "strdesc",
+                            "example": "exa1",
+                            "pattern": "daasdad",
+                            "enum": [
                               "asd",
                               "qwe"
                             ],
-                            "default" : "default",
-                            "maxLength" : 6,
-                            "minLength" : 5
+                            "default": "default",
+                            "maxLength": 6,
+                            "minLength": 5
                           },
-                          "example" : "5",
-                          "maxItems" : 5,
-                          "minItems" : 4
+                          "example": "5",
+                          "maxItems": 5,
+                          "minItems": 4
                         },
-                        "example" : "2",
-                        "maxItems" : 4,
-                        "minItems" : 3
+                        "example": "2",
+                        "maxItems": 4,
+                        "minItems": 3
                       },
-                      "example" : "1",
-                      "maxItems" : 3,
-                      "minItems" : 1
+                      "example": "1",
+                      "maxItems": 3,
+                      "minItems": 1
                     }
                   }
                 }
               },
-              "responses" : {
-                "405" : {
-                  "in" : "",
-                  "description" : "Invalid input",
-                  "required" : false
+              "responses": {
+                "405": {
+                  "in": "",
+                  "description": "Invalid input",
+                  "required": false
                 }
               }
             },
-            "put" : {
-              "_signature" : "0d4f24fb-170b-4481-8085-d3f84b4f3692",
-              "summary" : "Update an existing pet",
-              "description" : "",
-              "operationId" : "updatePet",
-              "consumes" : [
+            "put": {
+              "_signature": "cfe19932-6d8f-449f-9ccc-ad0cf4fbd3de",
+              "summary": "Update an existing pet",
+              "description": "",
+              "operationId": "updatePet",
+              "consumes": [
                 "application/json",
                 "application/xml"
               ],
-              "produces" : [
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "name" : "body",
-                "in" : "body",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {},
-                "schema" : {
-                  "$ref" : "#/definitions/dbe1f796-8f09-4ccd-848a-4dcdbce4df8e"
+              "request": {
+                "name": "body",
+                "in": "body",
+                "required": false,
+                "queryParams": {},
+                "headers": {},
+                "schema": {
+                  "$ref": "#/definitions/2998540f-bc1c-4fea-9f4f-f7e233dfc8ad"
                 }
               },
-              "responses" : {
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid ID supplied",
-                  "required" : false
+              "responses": {
+                "400": {
+                  "in": "",
+                  "description": "Invalid ID supplied",
+                  "required": false
                 },
-                "404" : {
-                  "in" : "",
-                  "description" : "Pet not found",
-                  "required" : false
+                "404": {
+                  "in": "",
+                  "description": "Pet not found",
+                  "required": false
                 },
-                "405" : {
-                  "in" : "",
-                  "description" : "Validation exception",
-                  "required" : false
+                "405": {
+                  "in": "",
+                  "description": "Validation exception",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "78a4b925-792e-43a2-860f-b23d8b219010"
+          "description": "",
+          "_signature": "689ab801-40dd-452e-af9f-f58cbd219e2d"
         },
-        "/pet/findByTags" : {
-          "methods" : {
-            "get" : {
-              "_signature" : "9da9cc09-e6c1-4b18-a312-4abcce0173f2",
-              "summary" : "Finds Pets by tags",
-              "description" : "Muliple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-              "operationId" : "findPetsByTags",
-              "consumes" : [
+        "/pet/findByTags": {
+          "methods": {
+            "get": {
+              "_signature": "81d12a44-3a50-4351-92a9-ce92568c66d2",
+              "summary": "Finds Pets by tags",
+              "description": "Muliple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
+              "operationId": "findPetsByTags",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/xml",
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {
-                  "tags" : {
-                    "type" : "array",
-                    "description" : "Tags to filter by",
-                    "name" : "tags",
-                    "in" : "query",
-                    "items" : {
-                      "type" : "string"
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {
+                  "tags": {
+                    "type": "array",
+                    "description": "Tags to filter by",
+                    "name": "tags",
+                    "in": "query",
+                    "items": {
+                      "type": "string"
                     }
                   }
                 },
-                "headers" : {}
+                "headers": {}
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "successful operation",
-                  "required" : false,
-                  "schema" : {
-                    "type" : "array",
-                    "items" : {
-                      "$ref" : "#/definitions/dbe1f796-8f09-4ccd-848a-4dcdbce4df8e"
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "successful operation",
+                  "required": false,
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/2998540f-bc1c-4fea-9f4f-f7e233dfc8ad"
                     }
                   }
                 },
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid tag value",
-                  "required" : false
+                "400": {
+                  "in": "",
+                  "description": "Invalid tag value",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "_signature" : "b25f5229-65c0-4f22-8c18-cf36770429b3"
+          "description": "",
+          "_signature": "b57854f4-b32e-4469-a263-fc1b300b8d82"
         },
-        "/pet/{petId}" : {
-          "methods" : {
-            "post" : {
-              "_signature" : "2868971a-5e68-48e6-ae4e-b8e9a70a4c05",
-              "summary" : "Updates a pet in the store with form data",
-              "operationId" : "updatePetWithForm",
-              "consumes" : [
+        "/pet/{petId}": {
+          "methods": {
+            "post": {
+              "_signature": "cacd5dc5-9e91-40d9-95a8-3c0f60dae98c",
+              "summary": "Updates a pet in the store with form data",
+              "operationId": "updatePetWithForm",
+              "consumes": [
                 "application/x-www-form-urlencoded"
               ],
-              "produces" : [
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "name" : "formData",
-                "in" : "formData",
-                "required" : false,
-                "queryParams" : {
-                  "param1" : {
-                    "type" : "string",
-                    "name" : "param1",
-                    "in" : "query",
-                    "example" : "2"
+              "request": {
+                "name": "formData",
+                "in": "formData",
+                "required": false,
+                "queryParams": {
+                  "param1": {
+                    "type": "string",
+                    "name": "param1",
+                    "in": "query",
+                    "example": "2"
                   },
-                  "param2" : {
-                    "type" : "string",
-                    "name" : "param2",
-                    "in" : "query",
-                    "example" : "3",
-                    "pattern" : "asdasd",
-                    "enum" : [
+                  "param2": {
+                    "type": "string",
+                    "name": "param2",
+                    "in": "query",
+                    "example": "3",
+                    "pattern": "asdasd",
+                    "enum": [
                       "yeah",
                       "aww"
                     ],
-                    "default" : "descr",
-                    "maxLength" : 2,
-                    "minLength" : 1
+                    "default": "descr",
+                    "maxLength": 2,
+                    "minLength": 1
                   }
                 },
-                "headers" : {},
-                "schema" : {
-                  "type" : "object",
-                  "properties" : {
-                    "formData" : {
-                      "name" : "formData",
-                      "in" : "formData"
+                "headers": {},
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "string1": {
+                      "type": "string",
+                      "required": false,
+                      "name": "string1",
+                      "in": "formData"
                     }
                   }
                 }
               },
-              "responses" : {
-                "405" : {
-                  "in" : "",
-                  "description" : "Invalid input",
-                  "required" : false,
-                  "schema" : {
-                    "type" : "array",
-                    "description" : "yY",
-                    "items" : {
-                      "type" : "object",
-                      "properties" : {
-                        "sat" : {
-                          "type" : "string"
+              "responses": {
+                "405": {
+                  "in": "",
+                  "description": "Invalid input",
+                  "required": false,
+                  "schema": {
+                    "type": "array",
+                    "description": "yY",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "sat": {
+                          "type": "string"
                         }
                       }
                     }
@@ -888,157 +900,162 @@
                 }
               }
             },
-            "get" : {
-              "_signature" : "c67bcb6d-e3d2-4719-8bbf-a1f8c676e372",
-              "summary" : "Find pet by ID",
-              "description" : "Returns a single pet",
-              "operationId" : "getPetById",
-              "consumes" : [
+            "get": {
+              "_signature": "51b4c53c-878a-4167-bf35-2c8ff373c16d",
+              "summary": "Find pet by ID",
+              "description": "Returns a single pet",
+              "operationId": "getPetById",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/xml",
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {}
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {},
+                "headers": {}
               },
-              "responses" : {
-                "200" : {
-                  "in" : "",
-                  "description" : "successful operation",
-                  "required" : false,
-                  "schema" : {
-                    "$ref" : "#/definitions/dbe1f796-8f09-4ccd-848a-4dcdbce4df8e"
+              "responses": {
+                "200": {
+                  "in": "",
+                  "description": "successful operation",
+                  "required": false,
+                  "schema": {
+                    "$ref": "#/definitions/2998540f-bc1c-4fea-9f4f-f7e233dfc8ad"
                   }
                 },
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid ID supplied",
-                  "required" : false
+                "400": {
+                  "in": "",
+                  "description": "Invalid ID supplied",
+                  "required": false
                 },
-                "404" : {
-                  "in" : "",
-                  "description" : "Pet not found",
-                  "required" : false
+                "404": {
+                  "in": "",
+                  "description": "Pet not found",
+                  "required": false
                 }
               }
             },
-            "delete" : {
-              "_signature" : "84e3c87c-7de7-4c76-9a3c-5325c178f163",
-              "summary" : "Deletes a pet",
-              "description" : "",
-              "operationId" : "deletePet",
-              "consumes" : [
+            "delete": {
+              "_signature": "93839271-7d77-4699-85fd-d7a3fb84f2ac",
+              "summary": "Deletes a pet",
+              "description": "",
+              "operationId": "deletePet",
+              "consumes": [
                 "application/json"
               ],
-              "produces" : [
+              "produces": [
                 "application/json"
               ],
-              "request" : {
-                "in" : "",
-                "required" : false,
-                "queryParams" : {},
-                "headers" : {
-                  "api_key" : {
-                    "type" : "string",
-                    "name" : "api_key",
-                    "in" : "header"
+              "request": {
+                "in": "",
+                "required": false,
+                "queryParams": {},
+                "headers": {
+                  "api_key": {
+                    "type": "string",
+                    "name": "api_key",
+                    "in": "header"
                   }
                 },
-                "schema" : {}
+                "schema": {}
               },
-              "responses" : {
-                "400" : {
-                  "in" : "",
-                  "description" : "Invalid ID supplied",
-                  "required" : false
+              "responses": {
+                "400": {
+                  "in": "",
+                  "description": "Invalid ID supplied",
+                  "required": false
                 },
-                "404" : {
-                  "in" : "",
-                  "description" : "Pet not found",
-                  "required" : false
+                "404": {
+                  "in": "",
+                  "description": "Pet not found",
+                  "required": false
                 }
               }
             }
           },
-          "description" : "",
-          "pathVariables" : {
-            "petId" : {
-              "type" : "integer",
-              "description" : "ID of pet to return",
-              "name" : "petId",
-              "in" : "path"
+          "description": "",
+          "pathVariables": {
+            "petId": {
+              "type": "integer",
+              "description": "ID of pet to return",
+              "name": "petId",
+              "in": "path"
             }
           },
-          "_signature" : "829d40f3-8fd7-4db4-b47f-1286b2d4155b"
+          "_signature": "b6bff3b4-848d-4d8a-99f4-495211bb7b31"
         }
       },
-      "_signature" : "60977e10-6c0b-4dff-bb39-6db14c9c5724"
+      "_signature": "f203738f-dccc-477c-b00c-a81b0d4aba2e"
     }
   },
-  "definitions" : {
-    "f935c632-8775-4be2-a24b-4465003a5d5d" : {
-      "_signature" : "64b6ca30-adce-4f5e-bd46-31c965b2821b",
-      "name" : "User",
-      "schema" : {
-        "properties" : {}
+  "definitions": {
+    "4f9ec6f0-eedc-47f3-8381-70eac7f645fa": {
+      "_signature": "e67d0a6c-d3df-4ed4-a251-2cba0acfaab0",
+      "name": "Category",
+      "schema": {
+        "properties": {}
       }
     },
-    "b252f681-dcd3-4640-aba4-155e751b81a5" : {
-      "_signature" : "cd17501b-b48b-449d-95ce-41ac31c63746",
-      "name" : "Tag",
-      "schema" : {
-        "properties" : {}
+    "bd5a4861-623d-4453-917e-a6f75d68b207": {
+      "_signature": "fb2e2d5c-4ffc-4fbc-a7d5-685f20217af1",
+      "name": "User",
+      "schema": {
+        "properties": {}
       }
     },
-    "5ba977fa-ad46-403f-94b5-d7d81d6020a7" : {
-      "_signature" : "9e3d0bdb-df79-4066-90e1-ef3aa548cb57",
-      "name" : "Category",
-      "schema" : {
-        "properties" : {}
+    "c17ed596-bacd-4a37-a6a4-1078ac22eae2": {
+      "_signature": "a59f2ad1-8f3b-4ba5-ab40-2003f1b79807",
+      "name": "Tag",
+      "schema": {
+        "properties": {}
       }
     },
-    "8ca67139-c7bb-4219-8908-672db1568bb0" : {
-      "_signature" : "3324236d-7971-4a8e-9174-860087a0110d",
-      "name" : "ApiResponse",
-      "schema" : {
-        "properties" : {}
+    "096de9c1-4d35-4a59-a5eb-aec748c05b72": {
+      "_signature": "234831cc-7a77-4dee-b403-f4a1f1b599a1",
+      "name": "ApiResponse",
+      "schema": {
+        "properties": {}
       }
     },
-    "b9191814-364e-4295-a2db-eb17f113b3d0" : {
-      "_signature" : "08d3fc69-3c5a-44f5-b593-952d63027883",
-      "name" : "Order",
-      "schema" : {
-        "properties" : {}
+    "0c4d375c-ef8d-45e3-94c6-3af3a474272f": {
+      "_signature": "e227851a-1845-4c91-90cf-c95522167c35",
+      "name": "Order",
+      "schema": {
+        "properties": {}
       }
     },
-    "dbe1f796-8f09-4ccd-848a-4dcdbce4df8e" : {
-      "_signature" : "e9fdc040-de43-4904-8ec8-e058aca234a0",
-      "name" : "Pet",
-      "schema" : {
-        "properties" : {}
+    "2998540f-bc1c-4fea-9f4f-f7e233dfc8ad": {
+      "_signature": "f9eca28d-6289-44ae-86f7-effb6877f9e5",
+      "name": "Pet",
+      "schema": {
+        "properties": {}
       }
     }
   },
-  "securityDefinitions" : {
-    "petstore_auth" : {
-      "type" : "oauth2",
-      "flow" : "implicit",
-      "authorizationUrl" : "http://petstore.swagger.io/oauth/dialog",
-      "scopes" : {
-        "write:pets" : "modify pets in your account",
-        "read:pets" : "read your pets"
+  "schema": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "petstore_auth": {
+      "type": "oauth2",
+      "flow": "implicit",
+      "authorizationUrl": "http://petstore.swagger.io/oauth/dialog",
+      "scopes": {
+        "write:pets": "modify pets in your account",
+        "read:pets": "read your pets"
       }
     },
-    "api_key" : {
-      "type" : "apiKey",
-      "name" : "api_key",
-      "in" : "header",
-      "scopes" : {}
+    "api_key": {
+      "type": "apiKey",
+      "name": "api_key",
+      "in": "header",
+      "scopes": {}
     }
-  }
+  },
+  "createdAt": "2019-06-21T08:02:58.079Z",
+  "updatedAt": "2019-06-21T08:02:58.079Z"
 }

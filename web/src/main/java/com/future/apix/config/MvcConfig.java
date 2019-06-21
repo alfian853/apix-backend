@@ -1,6 +1,7 @@
 package com.future.apix.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.util.converter.ApiProjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +33,11 @@ public class MvcConfig implements WebMvcConfigurer {
     @Bean
     ObjectMapper getObjectMapper(){
         return new ObjectMapper();
+    }
+
+    @Bean
+    ApiProjectConverter getApiProjectConverter(){
+        return new ApiProjectConverter();
     }
 
 //    https://www.baeldung.com/spring-mvc-content-negotiation-json-xml

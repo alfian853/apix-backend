@@ -26,7 +26,7 @@ public class Team {
     private String access = "public";
     // 'private' require team creator for grant; 'public' for anyone to enter
 
-    private String teamCreator; // to give access
+    private String creator; // to give access
     private List<Member> members;
 
     @CreatedDate

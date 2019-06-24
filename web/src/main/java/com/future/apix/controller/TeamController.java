@@ -1,10 +1,7 @@
 package com.future.apix.controller;
 
 import com.future.apix.entity.Team;
-<<<<<<< HEAD
-=======
 import com.future.apix.entity.teamdetail.Member;
->>>>>>> 7052b06add21ddba182b24eda9932c634ab1e317
 import com.future.apix.response.RequestResponse;
 import com.future.apix.response.TeamResponse;
 import com.future.apix.response.UserProfileResponse;
@@ -36,7 +33,7 @@ public class TeamController {
     }
 
     @GetMapping("/{name}")
-    public TeamResponse getTeamByName(@PathVariable("name") String name) {
+    public Team getTeamByName(@PathVariable("name") String name) {
         return teamService.getTeamByName(name);
     }
 

@@ -33,11 +33,35 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
 
     private static HashMap<String, QueueCommand<DownloadResponse>> pools = new HashMap<>();
 
-    private String CODEGEN_URL,CODEGEN_DIR,CODEGEN_JAR,OAS_DIR;
+    private String CODEGEN_URL;
+
+    public void setCODEGEN_URL(String CODEGEN_URL) {
+        this.CODEGEN_URL = CODEGEN_URL;
+    }
+
+    public void setCODEGEN_RESULT_DIR(String CODEGEN_RESULT_DIR) {
+        this.CODEGEN_RESULT_DIR = CODEGEN_RESULT_DIR;
+    }
+
+    public void setCODEGEN_JAR(String CODEGEN_JAR) {
+        this.CODEGEN_JAR = CODEGEN_JAR;
+    }
+
+    public void setOAS_DIR(String OAS_DIR) {
+        this.OAS_DIR = OAS_DIR;
+    }
+
+    private String CODEGEN_RESULT_DIR;
+    private String CODEGEN_JAR;
+    private String OAS_DIR;
+
+    public Swagger2CodegenCommandImpl(){
+
+    }
 
     public Swagger2CodegenCommandImpl(Environment e) {
         this.CODEGEN_URL = e.getProperty("apix.codegen.relative_url");
-        this.CODEGEN_DIR = e.getProperty("apix.codegen.directory");
+        this.CODEGEN_RESULT_DIR = e.getProperty("apix.codegen.directory");
         this.CODEGEN_JAR = e.getProperty("apix.codegen.swagger_cli_jar");
         this.OAS_DIR = e.getProperty("apix.export_oas.directory");
     }
@@ -71,7 +95,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
         DownloadResponse response = new DownloadResponse();
 
         boolean notExistOrExpired = swagger2.getGeneratedCodesFileName() == null ||
-                !swagger2.getGeneratedCodesProjectUpdatedDate().equals(
+                swagger2.getGeneratedCodesProjectUpdatedDate().before(
                         project.getUpdatedAt()
                 );
 
@@ -80,12 +104,12 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                     0, swagger2.getOasFileName().length()-5
             );
             File resultDir = new File(
-                    CODEGEN_DIR + baseName
+                    CODEGEN_RESULT_DIR + baseName
             );
 
             try {
                 if(swagger2.getGeneratedCodesFileName() != null){
-                    FileSystemUtils.deleteRecursively(new File(CODEGEN_DIR + swagger2.getGeneratedCodesFileName()));
+                    FileSystemUtils.deleteRecursively(new File(CODEGEN_RESULT_DIR + swagger2.getGeneratedCodesFileName()));
                 }
 
                 //hapus temp folder untuk codegen jika ada
@@ -98,7 +122,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                         "java",
                         "-jar",CODEGEN_JAR,"generate",
                         "-i",OAS_DIR + swagger2.getOasFileName(),
-                        "-l","spring","-o",CODEGEN_DIR + baseName
+                        "-l","spring","-o", CODEGEN_RESULT_DIR + baseName
                 );
                 pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
                 pb.redirectError(ProcessBuilder.Redirect.INHERIT);
@@ -109,10 +133,10 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                         "zip","-r",baseName+".zip",
                         baseName
                 );
-                pb.directory(new File(CODEGEN_DIR));
+                pb.directory(new File(CODEGEN_RESULT_DIR));
                 pb.start().waitFor();
 
-                FileSystemUtils.deleteRecursively(new File(CODEGEN_DIR+baseName));
+                FileSystemUtils.deleteRecursively(new File(CODEGEN_RESULT_DIR +baseName));
 
                 swagger2.setGeneratedCodesFileName(baseName+".zip");
                 swagger2.setGeneratedCodesProjectUpdatedDate(project.getUpdatedAt());

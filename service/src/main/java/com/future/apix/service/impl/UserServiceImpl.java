@@ -29,11 +29,14 @@ public class UserServiceImpl implements UserService {
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+//    public void setoMapper(ObjectMapper oMapper) {
+//            this.oMapper = oMapper;
+//    }
+
     @Override
     public UserProfileResponse userProfile (Authentication authentication) {
         UserProfileResponse response;
         if (authentication != null) {
-
             response = oMapper.convertValue(authentication.getPrincipal(), UserProfileResponse.class);
             response.setStatusToSuccess();
             response.setMessage("User is authenticated");
@@ -43,6 +46,12 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     *
+     * @param username
+     * @param teams
+     * @return
+     */
     @Override
     public RequestResponse checkUserTeams(String username, List<String> teams) {
         User user = userRepository.findByUsernameAndTeamsIn(username, teams);
@@ -50,6 +59,11 @@ public class UserServiceImpl implements UserService {
         return RequestResponse.failed("User is not belonged to team!");
     }
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public RequestResponse createUser(User user) {

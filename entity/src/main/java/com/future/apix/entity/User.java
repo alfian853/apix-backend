@@ -2,7 +2,9 @@ package com.future.apix.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 @Document("Users")
 @JsonIgnoreProperties(value = {"enabled", "accountNonExpired", "accountNonLocked", "credentialsNonExpired"})
 public class User implements UserDetails {
@@ -37,6 +40,14 @@ public class User implements UserDetails {
 
     public enum Role {
         ROLE_ADMIN, ROLE_USER;
+    }
+
+    public User(String id, String username, String password, List<String> roles, List<String> teams) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+        this.teams = teams;
     }
 
     @Transient

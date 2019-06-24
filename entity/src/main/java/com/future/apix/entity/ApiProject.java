@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Document("ApiProjects")
@@ -24,7 +25,7 @@ public class ApiProject implements Serializable, Mappable {
 
     @Field("_signature")
     @JsonProperty("_signature")
-    String signature;
+    String signature = UUID.randomUUID().toString();
 
     String basePath,host;
     // String swagger, openapi; // swagger for version 2.0 and openapi for version 3.0

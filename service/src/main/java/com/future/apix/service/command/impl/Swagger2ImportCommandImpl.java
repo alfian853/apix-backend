@@ -83,17 +83,8 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
         methodData.setProduces((List<String>) dataMap.get("produces"));
         methodData.setDeprecated((Boolean) dataMap.get("deprecated"));
         Path pathOfMethod = project.getSections()
-                .computeIfAbsent(section, v -> {
-                    ApiSection res =  new ApiSection();
-                    res.setSignature(UUID.randomUUID().toString());
-                    return res;
-                }).getPaths()
-                .computeIfAbsent(path, v -> {
-                    Path res = new Path();
-                    res.setSignature(UUID.randomUUID().toString());
-                    return res;
-                });
-        methodData.setSignature(UUID.randomUUID().toString());
+                .computeIfAbsent(section, v -> new ApiSection()).getPaths()
+                .computeIfAbsent(path, v -> new Path());
 
         if(dataMap.get("parameters") != null){
 
@@ -148,7 +139,6 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                 TypeFactory.defaultInstance().constructMapType(HashMap.class,String.class, OperationDetail.class)
         );
         methodData.setResponses(responses);
-        methodData.setSignature(UUID.randomUUID().toString());
 
         HttpMethod method = HttpMethod.valueOf(data.getKey().toUpperCase());
         if(
@@ -212,12 +202,10 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             json = oMapper.readValue(file.getInputStream(), HashMap.class);
             ApiProject project = new ApiProject();
             project.setBasePath((String) json.get("basePath"));
-            toStrObjMap(json.get("info")).put("_signature", UUID.randomUUID().toString());
             project.setInfo(oMapper.convertValue(json.get("info"), ProjectInfo.class));
             project.setHost((String) json.get("host"));
             project.setSchema((List<String>) json.get("schema"));
             project.setExternalDocs(oMapper.convertValue(json.get("externalDocs"), Contact.class));
-            project.setSignature(UUID.randomUUID().toString());
 
             /* Copy Definitions Operation*/
             HashMap<String,Object> definitionsJson = toStrObjMap(json.get("definitions"));
@@ -246,7 +234,6 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                 definition.setSchema(oMapper.convertValue(pair.getValue(), Schema.class));
                 definition.setName(definition.getSchema().getName());
                 definition.getSchema().setName(null);
-                definition.setSignature(UUID.randomUUID().toString());
                 // validate content
                 if(SchemaValidator.isValid(definition.getSchema().getPropertiesLazily())){
                     definitions.put(pair.getKey(), definition);
@@ -281,7 +268,6 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                         tag.put("externalDocs",new Contact());
                     }
                     ApiSection section = project.getSections().get(tag.get("name"));
-                    section.setSignature(UUID.randomUUID().toString());
                     section.setInfo(oMapper.convertValue(tag, Tag.class));
                 }
             }

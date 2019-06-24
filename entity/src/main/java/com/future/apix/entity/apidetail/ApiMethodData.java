@@ -22,7 +22,7 @@ public class ApiMethodData implements Mappable {
     //for validation of edition
     @Field("_signature")
     @JsonProperty("_signature")
-    String signature;
+    String signature = UUID.randomUUID().toString();
     String summary,description,operationId;
     Boolean deprecated;
 

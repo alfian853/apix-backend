@@ -7,7 +7,6 @@ import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.response.ProjectUpdateResponse;
-import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataUpdateService;
 import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import lombok.Data;
@@ -23,7 +22,7 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
 
     @Data
     private class SignaturePointer {
-        HashMap<String, Object> methodField;
+        HashMap<String, Object> targetField;
         HashMap<String, Object> queryField;
     }
 
@@ -32,7 +31,8 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
     @Autowired
     ApiRepository apiRepository;
 
-    private ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper mapper;
 
 
     /**traverse ke field "section" or "path" or "link" or "method"
@@ -53,7 +53,7 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
             }
             else if(pair.getKey().equals("_signature")){
                 SignaturePointer pointer = new SignaturePointer();
-                pointer.setMethodField(target);
+                pointer.setTargetField(target);
                 pointer.setQueryField(query);
                 return pointer;
             }
@@ -63,7 +63,7 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
     }
 
     @Override
-    public RequestResponse doQuery(String id, HashMap<String, Object> query) {
+    public ProjectUpdateResponse doQuery(String id, HashMap<String, Object> query) {
 
         ApiProject project = apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
 
@@ -75,24 +75,24 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
             throw new InvalidRequestException("signature not found!");
         }
         if(!pointer.getQueryField().get("_signature").equals(
-                pointer.getMethodField().get("_signature"))){
+                pointer.getTargetField().get("_signature"))){
             throw new ConflictException("Edition Conflict!, Please refresh the tab");
         }
 
         ProjectUpdateResponse response = new ProjectUpdateResponse();
         response.setStatusToSuccess();
         
-        if( queryExecutor.executeQuery(pointer.getMethodField(), pointer.getQueryField()) ){
+        if( queryExecutor.executeQuery(pointer.getTargetField(), pointer.getQueryField()) ){
             //generate signature baru setelah kontennya berhasil diupdate
             String newSignature = UUID.randomUUID().toString();
             response.setNewSignature(newSignature);
-            pointer.getMethodField().put("_signature", newSignature);
+            pointer.getTargetField().put("_signature", newSignature);
         }
         else{//tidak ada update
             response.setNewSignature((String) pointer.getQueryField().get("_signature"));
         }
 
-        /** karna pointer.getMethodField() me-return object yang didalam @target(bukan hasil clone),
+        /** karna pointer.getTargetField() me-return object yang didalam @target(bukan hasil clone),
          * maka tidak perlu di menge-set hasil query kedalam @target
          **/
         project = mapper.convertValue(target, ApiProject.class);

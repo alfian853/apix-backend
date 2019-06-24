@@ -1,0 +1,42 @@
+{
+  "sections" : {
+    "pet": {
+      "paths": {
+        "/pet": {
+          "methods": {
+            "post": {
+              "_signature": "99e2a608-19ec-48cb-8478-359c16140572",
+              "request": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_actions" : [
+                      {
+                        "action" : "rename",
+                        "key": "qnumber",
+                        "newKey": "qnumber2"
+                      },
+                      {
+                        "action": "delete",
+                        "key" : "qstring"
+                      }
+                    ],
+                    "_hasActions" : true,
+                    "qnumber2": {
+                      "_actions" : [{
+                        "action" : "put",
+                        "key": "maximum",
+                        "value": 10
+                      }],
+                      "_hasActions" : true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

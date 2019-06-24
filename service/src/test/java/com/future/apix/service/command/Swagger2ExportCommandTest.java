@@ -1,4 +1,4 @@
-package com.future.apix;
+package com.future.apix.service.command;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;

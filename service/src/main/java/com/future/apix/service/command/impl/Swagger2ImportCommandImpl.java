@@ -269,6 +269,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                     }
                     ApiSection section = project.getSections().get(tag.get("name"));
                     section.setInfo(oMapper.convertValue(tag, Tag.class));
+                    section.getInfo().setSignature(UUID.randomUUID().toString());
                 }
             }
             /* End of Append Tags */

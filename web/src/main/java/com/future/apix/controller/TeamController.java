@@ -39,7 +39,7 @@ public class TeamController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TeamResponse createTeam(@RequestBody @Valid Team team) {
+    public RequestResponse createTeam(@RequestBody @Valid Team team) {
         return teamService.createTeam(team);
     }
 

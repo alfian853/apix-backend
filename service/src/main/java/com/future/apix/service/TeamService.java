@@ -13,7 +13,7 @@ public interface TeamService {
 
     Team getTeamByName(String name);
 
-    TeamResponse createTeam(Team team);
+    RequestResponse createTeam(Team team);
 
     List<Team> getMyTeam(Authentication authentication);
 

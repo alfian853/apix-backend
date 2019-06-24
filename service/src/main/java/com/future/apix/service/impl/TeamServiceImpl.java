@@ -58,7 +58,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public TeamResponse createTeam(Team team) {
+    public RequestResponse createTeam(Team team) {
         Team existTeam = teamRepository.findByName(team.getName());
         TeamResponse response = new TeamResponse();
 
@@ -68,10 +68,18 @@ public class TeamServiceImpl implements TeamService {
         userRepository.save(creator);
 
         if(existTeam == null) {
-            teamRepository.save(team);
-            response.setTeam(team);
+            Team createTeam = teamRepository.save(team);
             response.setStatusToSuccess();
             response.setMessage("Team is created!");
+//            System.out.println(createTeam);
+
+            // Add team to each of User
+            for (Member member: createTeam.getMembers()) {
+                User user = userRepository.findByUsername(member.getUsername());
+                user.getTeams().add(createTeam.getName());
+                userRepository.save(user);
+            }
+
             return response;
         }
         else throw new DuplicateEntryException("Team name is already exists!");

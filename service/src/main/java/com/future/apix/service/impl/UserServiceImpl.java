@@ -3,12 +3,14 @@ package com.future.apix.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.User;
 import com.future.apix.exception.DataNotFoundException;
+import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,11 +29,14 @@ public class UserServiceImpl implements UserService {
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+//    public void setoMapper(ObjectMapper oMapper) {
+//            this.oMapper = oMapper;
+//    }
+
     @Override
     public UserProfileResponse userProfile (Authentication authentication) {
         UserProfileResponse response;
         if (authentication != null) {
-
             response = oMapper.convertValue(authentication.getPrincipal(), UserProfileResponse.class);
             response.setStatusToSuccess();
             response.setMessage("User is authenticated");
@@ -41,6 +46,12 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    /**
+     *
+     * @param username
+     * @param teams
+     * @return
+     */
     @Override
     public RequestResponse checkUserTeams(String username, List<String> teams) {
         User user = userRepository.findByUsernameAndTeamsIn(username, teams);
@@ -48,17 +59,29 @@ public class UserServiceImpl implements UserService {
         return RequestResponse.failed("User is not belonged to team!");
     }
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public RequestResponse createUser(User user) {
+        User exist = userRepository.findByUsername(user.getUsername());
+        if (exist == null) {
+            User newUser = new User();
+            newUser.setUsername(user.getUsername());
+            newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            newUser.setTeams(user.getTeams());
+            newUser.setRoles(user.getRoles());
+            userRepository.save(newUser);
 
-        User newUser = new User();
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        newUser.setTeams(user.getTeams());
-        newUser.setRoles(user.getRoles());
-        userRepository.save(newUser);
-
-        return RequestResponse.success("User is created!");
+            RequestResponse response = new RequestResponse();
+            return response.success("User is created!");
+        }
+        else {
+            throw new DuplicateEntryException("Username is already exists!");
+        }
     }
 
     @Override

@@ -12,7 +12,7 @@ public interface ApiRepository extends MongoRepository<ApiProject, String>{
     List<ApiProject> findAllProjects();
 
     // List of Projects with users
-    List<ApiProject> findByTeamsIn(String username);
+    List<ApiProject> findByTeamsIn(String teamName);
 
     /*
     @Query(value = "{'teams': {$all: [?0] }}")

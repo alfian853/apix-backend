@@ -33,10 +33,10 @@ public class ApiDataServiceImpl implements ApiDataService {
                 .orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
     }
 
-    @Override
-    public List<ApiProject> findAll() {
-        return apiRepository.findAll();
-    }
+//    @Override
+//    public List<ApiProject> findAll() {
+//        return apiRepository.findAll();
+//    }
 
     @Override
     public List<ApiProject> findAllProjects() {
@@ -45,16 +45,17 @@ public class ApiDataServiceImpl implements ApiDataService {
 
     @Override
     public RequestResponse deleteById(String id){
-        ApiProject project = apiRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
+        ApiProject project = apiRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
         apiRepository.deleteById(id);
         return RequestResponse.success("Project has been deleted!");
     }
 
     @Override
-    public List<ApiProject> findByUser(String username) {
+    public List<ApiProject> findByUser(String teamName) {
 //        User user = userRepository.findByUsername(username);
 //        return apiRepository.findByUsersIn(user);
-        return apiRepository.findByTeamsIn(username);
+        return apiRepository.findByTeamsIn(teamName);
     }
 
     @Override
@@ -76,9 +77,9 @@ public class ApiDataServiceImpl implements ApiDataService {
         return response;
     }
 
-    private HashMap<String,Object> toStrObjMap(Object object){
-        return (HashMap<String,Object>) object;
-    }
+//    private HashMap<String,Object> toStrObjMap(Object object){
+//        return (HashMap<String,Object>) object;
+//    }
 
 
 }

@@ -46,10 +46,10 @@ public class UserController {
         return userService.userProfile(authentication);
     }
 
-    @GetMapping("/teamsIn")
-    public RequestResponse isTeamIn( Principal user, @RequestBody List<String> userTeam) {
-        return userService.checkUserTeams(user.getName(), userTeam);
-    }
+//    @GetMapping("/teamsIn")
+//    public RequestResponse isTeamIn( Principal user, @RequestBody List<String> userTeam) {
+//        return userService.checkUserTeams(user.getName(), userTeam);
+//    }
 
 
 }

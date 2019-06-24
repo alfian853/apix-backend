@@ -47,31 +47,23 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public Team getTeamByName(String name) {
         Team team = teamRepository.findByName(name);
-        if (team != null) { return team;
-//            TeamResponse response = new TeamResponse();
-//            response.setStatusToSuccess();
-//            response.setMessage("Team is found!");
-//            response.setTeam(team);
-//            return response;
-        }
+        if (team != null) { return team; }
         else throw new DataNotFoundException("Team is not found!");
     }
 
     @Override
     public RequestResponse createTeam(Team team) {
         Team existTeam = teamRepository.findByName(team.getName());
-        TeamResponse response = new TeamResponse();
+        RequestResponse response = new RequestResponse();
 
-        /* Add team to team creator*/
-        User creator = userRepository.findByUsername(team.getCreator());
-        creator.getTeams().add(team.getName());
-        userRepository.save(creator);
+        if(existTeam == null) { /* Add team to team creator*/
+            User creator = userRepository.findByUsername(team.getCreator());
+            creator.getTeams().add(team.getName());
+            userRepository.save(creator);
 
-        if(existTeam == null) {
             Team createTeam = teamRepository.save(team);
             response.setStatusToSuccess();
             response.setMessage("Team is created!");
-//            System.out.println(createTeam);
 
             // Add team to each of User
             for (Member member: createTeam.getMembers()) {
@@ -82,6 +74,7 @@ public class TeamServiceImpl implements TeamService {
 
             return response;
         }
+
         else throw new DuplicateEntryException("Team name is already exists!");
     }
 
@@ -89,37 +82,30 @@ public class TeamServiceImpl implements TeamService {
     public RequestResponse grantTeamAccess(String name, List<Member> members) {
         String failedName = "";
         Team team = teamRepository.findByName(name);
-        for (Member member: members) {
-            String memberName = member.getUsername();
-            User user = userRepository.findByUsername(memberName);
-            if (user == null) failedName += memberName + ", ";
-            if (!user.getTeams().contains(name)) { // update in User if not yet belong to team
-                user.getTeams().add(name);
-                userRepository.save(user);
+        if (team != null) {
+            for (Member member : members) {
+                String memberName = member.getUsername();
+                User user = userRepository.findByUsername(memberName);
+                if (user == null) failedName += memberName + ", ";
+                else if (user!=null && !user.getTeams().contains(name)) { // update in User if not yet belong to team
+                    user.getTeams().add(name);
+                    userRepository.save(user);
+                }
+                int idx = team.getMembers().indexOf(member);
+                team.getMembers().get(idx).setGrant(!member.getGrant()); // jadi di reverse -> if grant = false jadi TRUE
             }
-            int idx = team.getMembers().indexOf(member);
-            // Member yang ditulis dalam bentuk raw yang ada di Team, kemudian akan di REVERSE grant nya
+            teamRepository.save(team);
 
-//            System.out.println("Hashcode from team: " + team.getMembers().get(0).hashCode() + "; Hashcode from memberinput: " + member.hashCode());
-            System.out.println("is equals? " + team.getMembers().get(idx).equals(member));
-//            System.out.println("is contain? " + team.getMembers().contains(member));
-//            System.out.println(memberName + "; index = " + idx);
-            team.getMembers().get(idx).setGrant(!member.getGrant()); // jadi di reverse -> if grant = false jadi TRUE
+            RequestResponse response = new RequestResponse();
+            if (failedName != "") {
+                response.setStatusToFailed();
+                response.setMessage("Members: " + failedName + "is failed to updated!");
+            } else {
+                response.setStatusToSuccess();
+                response.setMessage("Team members grant has been updated!");
+            }
+            return response;
         }
-        teamRepository.save(team);
-
-        RequestResponse response = new RequestResponse();
-//        if (failedName.equals("")) response.success("Team members grant has been updated!");
-//        else response.failed("Members: "  + failedName + "is failed to updated!");
-        if (failedName != "") {
-            response.setStatusToFailed();
-            response.setMessage("Members: "  + failedName + "is failed to updated!");
-        }
-        else {
-            response.setStatusToSuccess();
-            response.setMessage("Team members grant has been updated!");
-        }
-
-        return response;
+        else throw new DataNotFoundException("Team is not found!");
     }
 }

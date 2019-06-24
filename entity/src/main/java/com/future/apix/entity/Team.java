@@ -3,6 +3,7 @@ package com.future.apix.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.future.apix.entity.teamdetail.Member;
 import com.sun.org.apache.xpath.internal.operations.Bool;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -15,7 +16,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
-@Data
+@Data @Builder
 @Document("Teams")
 public class Team {
     @Id

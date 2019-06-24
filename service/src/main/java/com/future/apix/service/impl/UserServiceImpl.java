@@ -52,12 +52,12 @@ public class UserServiceImpl implements UserService {
      * @param teams
      * @return
      */
-    @Override
-    public RequestResponse checkUserTeams(String username, List<String> teams) {
-        User user = userRepository.findByUsernameAndTeamsIn(username, teams);
-        if (user != null) return RequestResponse.success("User is belonged to team");
-        return RequestResponse.failed("User is not belonged to team!");
-    }
+//    @Override
+//    public RequestResponse checkUserTeams(String username, List<String> teams) {
+//        User user = userRepository.findByUsernameAndTeamsIn(username, teams);
+//        if (user != null) return RequestResponse.success("User is belonged to team");
+//        return RequestResponse.failed("User is not belonged to team!");
+//    }
 
     /**
      *
@@ -96,16 +96,16 @@ public class UserServiceImpl implements UserService {
         return RequestResponse.success("User has been deleted!");
     }
 
-    @Override
-    public List<UserProfileResponse> getUsersByTeam(String team) {
-        List<User> users = userRepository.findByTeams(team);
-        List<UserProfileResponse> profileResponses = new ArrayList<>();
-        for (User user: users) {
-            UserProfileResponse response = new UserProfileResponse();
-            response = oMapper.convertValue(user, UserProfileResponse.class);
-            profileResponses.add(response);
-            response.setStatusToSuccess();
-        }
-        return profileResponses;
-    }
+//    @Override
+//    public List<UserProfileResponse> getUsersByTeam(String team) {
+//        List<User> users = userRepository.findByTeams(team);
+//        List<UserProfileResponse> profileResponses = new ArrayList<>();
+//        for (User user: users) {
+//            UserProfileResponse response = new UserProfileResponse();
+//            response = oMapper.convertValue(user, UserProfileResponse.class);
+//            profileResponses.add(response);
+//            response.setStatusToSuccess();
+//        }
+//        return profileResponses;
+//    }
 }

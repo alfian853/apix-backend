@@ -3,6 +3,7 @@ package com.future.apix.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.User;
 import com.future.apix.exception.DataNotFoundException;
+import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.response.RequestResponse;
@@ -102,9 +103,37 @@ public class UserServiceTest {
         Assert.assertEquals(Arrays.asList("TeamTest"), response.getTeams());
     }
 
-    @Test(expected = InvalidAuthenticationException.class)
+    @Test
     public void userProfile_authenticationNull(){
+        try {
             serviceMock.userProfile(null);
+        } catch (InvalidAuthenticationException e){
+            Assert.assertEquals("User is not authenticated!", e.getMessage());
+        }
+    }
+
+    /*
+        public RequestResponse createUser(User user)
+     */
+
+    @Test
+    public void createUser_userAlreadyExist(){
+        when(userRepository.findByUsername(USER_USERNAME)).thenReturn(USER);
+        try {
+            serviceMock.createUser(USER);
+        } catch (DuplicateEntryException e) {
+            Assert.assertEquals("Username is already exists!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void createUser_success(){
+        when(userRepository.findByUsername(USER_USERNAME)).thenReturn(null);
+        when(userRepository.save(any(User.class))).thenReturn(USER);
+
+        RequestResponse response = serviceMock.createUser(USER);
+        Assert.assertTrue(response.getSuccess());
+        Assert.assertEquals("User is created!", response.getMessage());
     }
 
 }

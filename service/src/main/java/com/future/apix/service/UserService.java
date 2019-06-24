@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface UserService {
     UserProfileResponse userProfile (Authentication authentication);
-    RequestResponse checkUserTeams(String username, List<String> teams); // untuk mengecek apakah teams dalam Project ada dalam User
+//    RequestResponse checkUserTeams(String username, List<String> teams); // untuk mengecek apakah teams dalam Project ada dalam User
 
     /* For Admin -> User Management */
     RequestResponse createUser(User user); // Create 1 user (with @Valid)
@@ -18,6 +18,6 @@ public interface UserService {
     RequestResponse deleteUser(String id);
 
     /* For User -> Team Management */
-    List<UserProfileResponse> getUsersByTeam(String team);
+//    List<UserProfileResponse> getUsersByTeam(String team);
 
 }

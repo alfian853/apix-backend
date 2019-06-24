@@ -11,7 +11,7 @@ import java.util.List;
 public interface TeamService {
     List<Team> getTeams();
 
-    TeamResponse getTeamByName(String name);
+    Team getTeamByName(String name);
 
     TeamResponse createTeam(Team team);
 

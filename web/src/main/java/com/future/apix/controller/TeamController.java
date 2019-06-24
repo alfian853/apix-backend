@@ -33,7 +33,7 @@ public class TeamController {
     }
 
     @GetMapping("/{name}")
-    public TeamResponse getTeamByName(@PathVariable("name") String name) {
+    public Team getTeamByName(@PathVariable("name") String name) {
         return teamService.getTeamByName(name);
     }
 

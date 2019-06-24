@@ -37,6 +37,7 @@ public class ApiProject implements Serializable, Mappable {
     Contact externalDocs;
 
     List<String> teams;
+    // String teams; // jika 1 project hanya 1 repo -> kalau ada yang gabungan, berarti harus buat team baru
     Github githubProject;
 
     @CreatedDate

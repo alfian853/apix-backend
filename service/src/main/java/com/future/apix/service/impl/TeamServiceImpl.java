@@ -45,14 +45,14 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public TeamResponse getTeamByName(String name) {
+    public Team getTeamByName(String name) {
         Team team = teamRepository.findByName(name);
-        if (team != null) {
-            TeamResponse response = new TeamResponse();
-            response.setStatusToSuccess();
-            response.setMessage("Team is found!");
-            response.setTeam(team);
-            return response;
+        if (team != null) { return team;
+//            TeamResponse response = new TeamResponse();
+//            response.setStatusToSuccess();
+//            response.setMessage("Team is found!");
+//            response.setTeam(team);
+//            return response;
         }
         else throw new DataNotFoundException("Team is not found!");
     }
@@ -61,6 +61,12 @@ public class TeamServiceImpl implements TeamService {
     public TeamResponse createTeam(Team team) {
         Team existTeam = teamRepository.findByName(team.getName());
         TeamResponse response = new TeamResponse();
+
+        /* Add team to team creator*/
+        User creator = userRepository.findByUsername(team.getCreator());
+        creator.getTeams().add(team.getName());
+        userRepository.save(creator);
+
         if(existTeam == null) {
             teamRepository.save(team);
             response.setTeam(team);

@@ -50,17 +50,17 @@ public class GithubApiServiceImpl implements GithubApiService {
 
 //    private static GitHub gitHub;
 
-    @Override
-    public String authenticateUser() throws IOException {
-        GitHub gitHub = authToken();
-        return "Github is authenticated!";
-    }
-
-    @Override
-    public Boolean isAuthenticated() throws IOException {
-        GitHub gitHub = authToken();
-        return gitHub.isCredentialValid();
-    }
+//    @Override
+//    public String authenticateUser() throws IOException {
+//        GitHub gitHub = authToken();
+//        return "Github is authenticated!";
+//    }
+//
+//    @Override
+//    public Boolean isAuthenticated() throws IOException {
+//        GitHub gitHub = authToken();
+//        return gitHub.isCredentialValid();
+//    }
 
     @Override
     public GithubUserResponse getMyself() throws IOException {
@@ -69,12 +69,12 @@ public class GithubApiServiceImpl implements GithubApiService {
         return convertUser(self);
     }
 
-    @Override
-    public GithubUserResponse getUser(String login) throws IOException {
-        GitHub gitHub = authToken();
-        GHUser user = gitHub.getUser(login);
-        return convertUser(user);
-    }
+//    @Override
+//    public GithubUserResponse getUser(String login) throws IOException {
+//        GitHub gitHub = authToken();
+//        GHUser user = gitHub.getUser(login);
+//        return convertUser(user);
+//    }
 
     @Override
     public List<GithubRepoResponse> getMyselfRepositories() throws IOException {
@@ -92,12 +92,12 @@ public class GithubApiServiceImpl implements GithubApiService {
         return repoList;
     }
 
-    @Override
-    public GithubRepoResponse getRepository(String repoName) throws IOException {
-        GitHub gitHub = authToken();
-        GHRepository repository = gitHub.getRepository(repoName);
-        return convertRepository(repository);
-    }
+//    @Override
+//    public GithubRepoResponse getRepository(String repoName) throws IOException {
+//        GitHub gitHub = authToken();
+//        GHRepository repository = gitHub.getRepository(repoName);
+//        return convertRepository(repository);
+//    }
 
     @Override
     public List<String> getBranches(String repoName) throws IOException {
@@ -115,19 +115,19 @@ public class GithubApiServiceImpl implements GithubApiService {
         return branchName;
     }
 
-    @Override
-    public GithubBranchResponse getBranch(String repoName, String branchName) throws IOException {
-        GitHub gitHub = authToken();
-        GHBranch branch = gitHub.getRepository(repoName).getBranch(branchName);
-        return convertBranch(branch);
-    }
-
-    @Override
-    public GithubContentResponse getReadme(String repoName) throws IOException {
-        GitHub gitHub = authToken();
-        GHContent content = gitHub.getRepository(repoName).getReadme();
-        return convertContent(content);
-    }
+//    @Override
+//    public GithubBranchResponse getBranch(String repoName, String branchName) throws IOException {
+//        GitHub gitHub = authToken();
+//        GHBranch branch = gitHub.getRepository(repoName).getBranch(branchName);
+//        return convertBranch(branch);
+//    }
+//
+//    @Override
+//    public GithubContentResponse getReadme(String repoName) throws IOException {
+//        GitHub gitHub = authToken();
+//        GHContent content = gitHub.getRepository(repoName).getReadme();
+//        return convertContent(content);
+//    }
 
     @Override
     public GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException {
@@ -170,7 +170,7 @@ public class GithubApiServiceImpl implements GithubApiService {
 
 //    ============ private Function ===============
 
-    private GitHub authToken() throws IOException {
+    public GitHub authToken() throws IOException {
         GitHub gitHub = GitHub.connectUsingOAuth(token);
         return gitHub;
     }
@@ -183,13 +183,13 @@ public class GithubApiServiceImpl implements GithubApiService {
         return response;
     }
 
-    private GithubUserResponse convertCommitter(GitUser user) {
-        GithubUserResponse response = new GithubUserResponse();
-        response.setDate(user.getDate());
-        response.setName(user.getName());
-        response.setEmail(user.getEmail());
-        return response;
-    }
+//    private GithubUserResponse convertCommitter(GitUser user) {
+//        GithubUserResponse response = new GithubUserResponse();
+//        response.setDate(user.getDate());
+//        response.setName(user.getName());
+//        response.setEmail(user.getEmail());
+//        return response;
+//    }
 
     private GithubRepoResponse convertRepository(GHRepository repository) {
         GithubRepoResponse response = new GithubRepoResponse();
@@ -201,13 +201,13 @@ public class GithubApiServiceImpl implements GithubApiService {
         return response;
     }
 
-    private GithubBranchResponse convertBranch(GHBranch branch) {
-        GithubBranchResponse response = new GithubBranchResponse();
-        response.setName(branch.getName());
-        response.setSha(branch.getSHA1());
-        response.setRepoName(branch.getOwner().getName());
-        return response;
-    }
+//    private GithubBranchResponse convertBranch(GHBranch branch) {
+//        GithubBranchResponse response = new GithubBranchResponse();
+//        response.setName(branch.getName());
+//        response.setSha(branch.getSHA1());
+//        response.setRepoName(branch.getOwner().getName());
+//        return response;
+//    }
 
     private GithubContentResponse convertContent(GHContent content) throws IOException {
         GithubContentResponse response = new GithubContentResponse();
@@ -226,11 +226,11 @@ public class GithubApiServiceImpl implements GithubApiService {
         return response;
     }
 
-    private GithubContentUpdateResponse convertContentUpdate(GHContentUpdateResponse updateResponse) {
-        GithubContentUpdateResponse response = new GithubContentUpdateResponse();
-        response = oMapper.convertValue(updateResponse, GithubContentUpdateResponse.class);
-        return response;
-    }
+//    private GithubContentUpdateResponse convertContentUpdate(GHContentUpdateResponse updateResponse) {
+//        GithubContentUpdateResponse response = new GithubContentUpdateResponse();
+//        response = oMapper.convertValue(updateResponse, GithubContentUpdateResponse.class);
+//        return response;
+//    }
 
     private GithubCommitResponse convertCommit(GHCommit commit) throws IOException {
         GithubCommitResponse response = new GithubCommitResponse();

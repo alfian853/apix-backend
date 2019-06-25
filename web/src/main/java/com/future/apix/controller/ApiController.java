@@ -65,12 +65,6 @@ public class ApiController {
         return updateService.doQuery(id, query);
     }
 
-    // digunakan untuk mendapatkan semua apiProject (sementara)
-    @GetMapping("/all")
-    public List<ApiProject> findAll(){
-        return apiDataService.findAll();
-    }
-
     // digunakan untuk mendapatkan apiProject (filter by host, basePath, dan info)
     @GetMapping("/all/info")
     public List<ApiProject> findAllProjects() {return apiDataService.findAllProjects(); }

@@ -115,9 +115,24 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                     body.setIn("formData");
                     body.setName("formData");
                     body.getSchemaLazily().setType("object");
-                    HashMap<String, Object> schema = toStrObjMap(parameter.get("schema"));
-                    HashMap<String, Object> properties = toStrObjMap(schema.get("properties"));
-                    body.getSchemaLazily().setProperties(oMapper.convertValue(properties, HashMap.class));
+                    if(parameter.get("type").equals("object")){
+                        HashMap<String, Object> schema = toStrObjMap(parameter.get("schema"));
+                        HashMap<String, Object> properties = toStrObjMap(schema.get("properties"));
+                        Schema newSchema = new Schema();
+                        newSchema.setName(parameter.get("name").toString());
+                        newSchema.setType("object");
+                        newSchema.setProperties(oMapper.convertValue(properties, HashMap.class));
+                        body.getSchemaLazily().getPropertiesLazily().put(parameter.get("name").toString(),newSchema);
+                    }
+                    else{
+                        Schema newSchema = new Schema();
+                        String newName = parameter.get("name").toString();
+                        newSchema.setName(newName);
+                        newSchema.setType(parameter.get("type").toString());
+                        body.getSchemaLazily().getPropertiesLazily().put(newName, newSchema);
+                    }
+
+
                 }
                 else if(input.equals("path")){
                     if(pathOfMethod.getPathVariables().containsKey(parameter.get("name"))){

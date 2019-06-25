@@ -39,7 +39,6 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>) obj;
             if(pair.getKey().equals("$ref") || pair.getKey().equals("ref")){
                 String ref = (String) pair.getValue();
-                System.out.println(ref.split("/")[2]);
                 ref = ref.split("/",3)[2];
                 pair.setValue(this.refDefinitions.get(ref));
             }
@@ -285,6 +284,12 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                     ApiSection section = project.getSections().get(tag.get("name"));
                     section.setSignature(UUID.randomUUID().toString());
                     section.setInfo(oMapper.convertValue(tag, Tag.class));
+                }
+            }
+            else{
+                project.getSections().entrySet();
+                for(Map.Entry<String, ApiSection> section : project.getSections().entrySet()){
+                    section.getValue().setInfo(Tag.builder().name(section.getKey()).build());
                 }
             }
             /* End of Append Tags */

@@ -57,7 +57,6 @@ public class Swagger2ExportCommandTest {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
 
         ApiProject project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
-        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(project));
         Optional<ApiProject> optionalApiProject = Optional.of(project);
         ProjectOasSwagger2 oasSwagger2 = new ProjectOasSwagger2();
         oasSwagger2.setOasFileName("Petstore API_1.0.0_123.json");

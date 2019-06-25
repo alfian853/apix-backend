@@ -61,6 +61,9 @@ public class Schema implements Mappable {
     /**if datatype = {Integer,Number}**/
     String format;
 
+    /**if datatype = {File}**/
+    String extension;
+
     /** if enum in List **/
     @Field("enum")
     @JsonProperty("enum")

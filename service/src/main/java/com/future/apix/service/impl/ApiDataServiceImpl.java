@@ -33,10 +33,10 @@ public class ApiDataServiceImpl implements ApiDataService {
                 .orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
     }
 
-//    @Override
-//    public List<ApiProject> findAll() {
-//        return apiRepository.findAll();
-//    }
+    @Override
+    public List<ApiProject> findAll() {
+        return apiRepository.findAll();
+    }
 
     @Override
     public List<ApiProject> findAllProjects() {

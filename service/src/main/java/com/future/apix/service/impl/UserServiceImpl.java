@@ -91,7 +91,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RequestResponse deleteUser(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new DataNotFoundException("User does not exists!"));
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new DataNotFoundException("User does not exists!"));
         userRepository.deleteById(id);
         return RequestResponse.success("User has been deleted!");
     }

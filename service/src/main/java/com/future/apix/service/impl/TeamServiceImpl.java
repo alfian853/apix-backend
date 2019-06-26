@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TeamServiceImpl implements TeamService {
@@ -46,9 +47,11 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public Team getTeamByName(String name) {
-        Team team = teamRepository.findByName(name);
-        if (team != null) { return team; }
-        else throw new DataNotFoundException("Team is not found!");
+//        Team team = teamRepository.findByName(name);
+//        if (team != null) { return team; }
+//        else throw new DataNotFoundException("Team is not found!");
+        return Optional.ofNullable(teamRepository.findByName(name))
+            .orElseThrow(() -> new DataNotFoundException("Team is not found!"));
     }
 
     @Override

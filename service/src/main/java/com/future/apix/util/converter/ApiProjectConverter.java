@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Mappable;
 import com.future.apix.entity.apidetail.OperationDetail;
+import com.future.apix.entity.apidetail.Tag;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -53,7 +55,10 @@ public class ApiProjectConverter {
         swaggerOas2.put("info",info);
         swaggerOas2.put("host",project.getHost());
         swaggerOas2.put("basePath",project.getBasePath());
+        swaggerOas2.put("externalDocs", project.getExternalDocs());
         swaggerOas2.put("schema",project.getSchema());
+        List<Tag> tags = new LinkedList<>();
+        swaggerOas2.put("tags", tags);
         LinkedHashMap<String,Object> paths = new LinkedHashMap<>();
         swaggerOas2.put("paths",paths);
 
@@ -72,7 +77,8 @@ public class ApiProjectConverter {
 
 
         project.getSections().forEach((sectionName,apiSection) -> {
-
+            apiSection.getInfo().setSignature(null);
+            tags.add(apiSection.getInfo());
             apiSection.getPaths().forEach((pathName, pathData) -> {
 
                 LinkedHashMap<String, Object> pathDataMap = new LinkedHashMap<>();
@@ -91,27 +97,39 @@ public class ApiProjectConverter {
 
                     methodDataMap.put("summary",methodData.getSummary());
                     methodDataMap.put("description",methodData.getDescription());
-                    methodDataMap.put("operationId",methodData.getOperationId());
-                    methodDataMap.put("deprecated",methodData.getDeprecated());
-                    methodDataMap.put("consumes",methodData.getConsumes());
+                    if(methodData.getOperationId() != null){
+                        methodDataMap.put("operationId",methodData.getOperationId());
+                    }
+                    if(methodData.getDeprecated() != null){
+                        methodDataMap.put("deprecated",methodData.getDeprecated());
+                    }
+                    if(methodData.getConsumes() != null){
+                        methodDataMap.put("consumes",methodData.getConsumes());
+                    }
                     methodDataMap.put("produces",methodData.getProduces());
                     methodDataMap.put("tags", Collections.singletonList(sectionName));
                     LinkedList<Object> parameters = new LinkedList<>();
-                    methodDataMap.put("parameters",parameters);
 
                     OperationDetail body = methodData.getRequest();
 
                     //push body to parameters
-                    if(!body.getIn().equals("")){
-                        LinkedHashMap<String,Object> param = new LinkedHashMap<>();
-                        param.put("in",body.getIn());
-                        param.put("name",body.getName());
-                        param.put("required",body.isRequired());
-                        param.put("schema",body.getSchemaLazily());
-                        param.put("type",body.getType());
-                        param.put("description",body.getDescription());
-                        this.replaceRefWithId(param, definitionIdToName);
-                        parameters.add(param);
+                    if(!StringUtils.isEmpty(body.getIn())){
+                        if(body.getIn().equals("formData")){
+                            body.getSchema().getProperties().values().forEach(schema -> {
+                                schema.setIn("formData");
+                                parameters.add(schema);
+                            });
+                        }
+                        else{
+                            LinkedHashMap<String,Object> param = new LinkedHashMap<>();
+                            param.put("in",body.getIn());
+                            param.put("name",body.getName());
+                            param.put("required",body.isRequired());
+                            param.put("schema",body.getSchema());
+                            param.put("description",body.getDescription());
+                            this.replaceRefWithId(param, definitionIdToName);
+                            parameters.add(param);
+                        }
                     }
 
                     //push queryParams to parameters
@@ -121,7 +139,7 @@ public class ApiProjectConverter {
                         param.put("in","query");
                         LinkedHashMap<String, Object> queryMap = mapper.convertValue(query,LinkedHashMap.class);
                         queryMap.forEach(param::put);
-//                        this.replaceRefWithId(param, definitionIdToName);
+                        this.replaceRefWithId(param, definitionIdToName);
                         parameters.add(param);
                     });
 
@@ -132,11 +150,13 @@ public class ApiProjectConverter {
                         param.put("in","header");
                         LinkedHashMap<String, Object> headerMap = mapper.convertValue(header,LinkedHashMap.class);
                         headerMap.forEach(param::put);
-//                        this.replaceRefWithId(param, definitionIdToName);
+                        this.replaceRefWithId(param, definitionIdToName);
                         parameters.add(param);
                     });
 
-
+                    if(parameters.size() > 0){
+                        methodDataMap.put("parameters",parameters);
+                    }
                     LinkedHashMap<String,Object> responses = new LinkedHashMap<>();
                     methodDataMap.put("responses",responses);
 
@@ -152,7 +172,9 @@ public class ApiProjectConverter {
 
                 });//close method
 
-                pathDataMap.put("parameters",variables);
+                if(variables.size() > 0){
+                    pathDataMap.put("parameters",variables);
+                }
                 this.replaceRefWithId(pathDataMap, definitionIdToName);
                 paths.put(pathName,pathDataMap);
 

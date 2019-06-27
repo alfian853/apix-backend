@@ -45,6 +45,8 @@ public class Swagger2ExportCommandTest {
     @Spy
     ApiProjectConverter apiProjectConverter;
 
+    private HashSet<String> ignoredField = new HashSet<>(Arrays.asList("definitions","_signature","$ref","required","security","externalDocs"));;
+
     @Before
     public void init() throws URISyntaxException {
         command.setObjectMapper(mapper);
@@ -55,8 +57,13 @@ public class Swagger2ExportCommandTest {
     @Test
     public void oasFileExistButNotUpToDateTest() throws URISyntaxException, IOException {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
-
-        ApiProject project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
+        HashMap<String, Object> temp = mapper.readValue(Files.readAllBytes(Paths.get(uri)), HashMap.class);
+//        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(temp));
+        ApiProject project = mapper.convertValue(temp, ApiProject.class);
+//        System.out.println(project.getSections().get("user").getPaths().get("/user/createWithList").getMethods().get("post").getRequest().getSchema());
+//        mapper.writerWithDefaultPrettyPrinter().writeValue(
+//                new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()
+//        );
         Optional<ApiProject> optionalApiProject = Optional.of(project);
         ProjectOasSwagger2 oasSwagger2 = new ProjectOasSwagger2();
         oasSwagger2.setOasFileName("Petstore API_1.0.0_123.json");
@@ -75,8 +82,7 @@ public class Swagger2ExportCommandTest {
 
         HashMap<String, Object> mapResult = mapper.readValue(Files.readAllBytes(Paths.get(uriResult)),HashMap.class);
         HashMap<String, Object> mapExpected = mapper.readValue(Files.readAllBytes(Paths.get(uriExpected)),HashMap.class);
-        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected,
-                new HashSet<>(Arrays.asList("definitions","_signature","$ref","required"))));
+        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected, this.ignoredField));
     }
 
     @Test
@@ -94,8 +100,7 @@ public class Swagger2ExportCommandTest {
 
         HashMap<String, Object> mapResult = mapper.readValue(Files.readAllBytes(Paths.get(uriResult)),HashMap.class);
         HashMap<String, Object> mapExpected = mapper.readValue(Files.readAllBytes(Paths.get(uriExpected)),HashMap.class);
-        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected,
-                new HashSet<>(Arrays.asList("definitions","_signature","$ref","required"))));
+        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected, this.ignoredField));
     }
     @Test
     public void oasFileNotExistButUpToDateTest() throws URISyntaxException, IOException {
@@ -120,17 +125,15 @@ public class Swagger2ExportCommandTest {
 
         HashMap<String, Object> mapResult = mapper.readValue(Files.readAllBytes(Paths.get(uriResult)),HashMap.class);
         HashMap<String, Object> mapExpected = mapper.readValue(Files.readAllBytes(Paths.get(uriExpected)),HashMap.class);
-        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected,
-                new HashSet<>(Arrays.asList("definitions","_signature","$ref","required"))));
+        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected, this.ignoredField));
     }
-
     @Test
     public void oasFileExistAndUpToDateTest() throws URISyntaxException, IOException {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         ApiProject project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
         Optional<ApiProject> optionalApiProject = Optional.of(project);
         ProjectOasSwagger2 oasSwagger2 = new ProjectOasSwagger2();
-        oasSwagger2.setOasFileName("Petstore API_1.0.0_123.json");
+        oasSwagger2.setOasFileName("swagger-oas.json");
 
         Date date = new Date();
         oasSwagger2.setOasFileProjectUpdateDate(date);
@@ -147,8 +150,7 @@ public class Swagger2ExportCommandTest {
 
         HashMap<String, Object> mapResult = mapper.readValue(Files.readAllBytes(Paths.get(uriResult)),HashMap.class);
         HashMap<String, Object> mapExpected = mapper.readValue(Files.readAllBytes(Paths.get(uriExpected)),HashMap.class);
-        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected,
-                new HashSet<>(Arrays.asList("definitions","_signature","$ref","required"))));
+        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected, this.ignoredField));
     }
 
 }

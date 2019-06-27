@@ -1,5 +1,6 @@
 package com.future.apix.entity.apidetail;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.future.apix.entity.Mappable;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProjectInfo implements Mappable {
 
     //for validation of edition

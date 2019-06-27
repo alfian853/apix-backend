@@ -17,5 +17,5 @@ public class ApiSection implements Mappable {
     @Field("_signature")
     @JsonProperty("_signature")
     String signature = UUID.randomUUID().toString();
-    Tag info;
+    Tag info = new Tag();
 }

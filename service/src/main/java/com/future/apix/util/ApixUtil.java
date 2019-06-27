@@ -18,8 +18,30 @@ public class ApixUtil {
     }
 
     public static boolean isEqualArray(List<Object> arr1,List<Object> arr2,Set<String> ignoredField){
-        arr1.sort(Comparator.comparing(Object::toString));
-        arr2.sort(Comparator.comparing(Object::toString));
+        Comparator comparator = (o1, o2) -> {
+            if(o1 instanceof String){
+                return ((String) o1).compareTo((String) o2);
+            }
+            else if(o1 instanceof Integer || o1 instanceof Double){
+                return ((Double) o1).compareTo((Double) o2);
+            }
+            else if(o1 instanceof Mappable || o1 instanceof Map){
+                HashMap<String, Object> o1m = mapper.convertValue(o1, HashMap.class);
+                HashMap<String, Object> o2m = mapper.convertValue(o2, HashMap.class);
+                String key = "name";
+                if(!o1m.containsKey(key)){
+                    key = "ref";
+                }
+                return o1m.get(key).toString().compareTo(o2m.get(key).toString());
+            }
+            else if(o1 instanceof List){
+                throw new RuntimeException("can't compare nested array");
+            }
+            throw new RuntimeException("can't compare array elements");
+        };
+        arr1.sort(comparator);
+        arr2.sort(comparator);
+        if(arr1.size() != arr2.size())return false;
         int len = arr1.size();
         for(int i = 0; i < len; ++i){
             Object val1 = arr1.get(i);
@@ -36,6 +58,10 @@ public class ApixUtil {
             }
             else if(val1 instanceof Map){
                 if(!isEqualObject(toStrObjMap(val1), toStrObjMap(val2), ignoredField)){
+                    System.out.println("rrr");
+                    System.out.println(arr1);
+                    System.out.println(arr2);
+
                     return false;
                 }
             }
@@ -43,6 +69,7 @@ public class ApixUtil {
                 HashMap<String, Object> tmp1 = mapper.convertValue(val1, HashMap.class);
                 HashMap<String, Object> tmp2 = mapper.convertValue(val2, HashMap.class);
                 if(!isEqualObject(tmp1, tmp2, ignoredField)){
+                    System.out.println("xx");
                     return false;
                 }
             }

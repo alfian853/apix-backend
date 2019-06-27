@@ -16,7 +16,7 @@ public class BodyValidator {
 
     public static boolean isValid(OperationDetail requestBody) {
         if(requestBody.getIn() == null){
-            System.out.println(requestBody);
+            return true;
         }
         return requestBody.getIn().equals("formData") ||
                 (requestBody.getSchemaLazily() != null && SchemaValidator.isValid(requestBody.getSchemaLazily()));

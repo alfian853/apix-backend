@@ -26,8 +26,8 @@ public class ApiMethodData implements Mappable {
     String summary,description,operationId;
     Boolean deprecated;
 
-    List<String> consumes = Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);
-    List<String> produces = Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);
+    List<String> consumes;
+    List<String> produces;//= Collections.singletonList(MediaType.APPLICATION_JSON_VALUE);
 
     @Valid
     OperationDetail request = new OperationDetail();

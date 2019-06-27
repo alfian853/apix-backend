@@ -46,11 +46,9 @@ public class Swagger2ImportCommandTest {
 
     @Test
     public void importTest() throws URISyntaxException {
-        URI uri = null;
-        uri = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
+        URI uri = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
         File testFile = new File(uri.getPath());
         MockMultipartFile multipartFile = null;
-        System.out.println(testFile.getPath());
         try {
             multipartFile = new MockMultipartFile("filename.json", "filename.json",
                     "application/json", Files.readAllBytes(Paths.get(uri))

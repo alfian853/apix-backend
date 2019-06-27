@@ -95,19 +95,26 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                 this.replaceRefWithId(parameter);
                 String input = (String) parameter.get("in");
                 if(input.equals("query")){
+                    Schema query = oMapper.convertValue(parameter, Schema.class);
+                    query.setIn("query");
+                    query.setDescription((String) parameter.get("description"));
                     methodData.getRequest().getQueryParamsLazily().put(
-                            (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
+                            (String) parameter.get("name"), query
                     );
                 }
                 else if(input.equals("header")){
+                    Schema header = oMapper.convertValue(parameter, Schema.class);
+                    header.setIn("header");
+                    header.setDescription((String) parameter.get("description"));
                     methodData.getRequest().getHeadersLazily().put(
-                            (String) parameter.get("name"),oMapper.convertValue(parameter, Schema.class)
+                            (String) parameter.get("name"), header
                     );
                 }
                 else if(input.equals("body")){
                     OperationDetail body = methodData.getRequest();
                     body.setIn("body");
                     body.setName("body");
+                    body.setDescription((String) parameter.get("description"));
                     body.setSchema(oMapper.convertValue(parameter.get("schema"), Schema.class));
                 }
                 else if(input.equals("formData")){
@@ -129,6 +136,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                         String newName = parameter.get("name").toString();
                         newSchema.setName(newName);
                         newSchema.setType(parameter.get("type").toString());
+                        newSchema.setDescription(parameter.get("description").toString());
                         body.getSchemaLazily().getPropertiesLazily().put(newName, newSchema);
                     }
 
@@ -271,7 +279,6 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
                 this.setLinkData(project, pair);
 
             }
-
             /* End of Copy Paths Operation**/
 
             /* Append Description of Sections from Tags */
@@ -279,16 +286,12 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             if(tags != null){
                 for (Object tagObj : tags) {
                     HashMap<String, Object> tag = toStrObjMap(tagObj);
-                    if(!tag.containsKey("externalDocs")){
-                        tag.put("externalDocs",new Contact());
-                    }
                     ApiSection section = project.getSections().get(tag.get("name"));
                     section.setInfo(oMapper.convertValue(tag, Tag.class));
                     section.getInfo().setSignature(UUID.randomUUID().toString());
                 }
             }
             /* End of Append Tags */
-
 
 
             /* Security Definitions Operation */

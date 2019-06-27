@@ -73,7 +73,8 @@ public class ApiDataServiceImpl implements ApiDataService {
         ProjectCreateResponse response = new ProjectCreateResponse();
         response.setStatusToSuccess();
         response.setMessage("Project has been created!");
-        response.setApiProject(project);
+//        response.setApiProject(project);
+        response.setProjectId(project.getId());
         return response;
     }
 

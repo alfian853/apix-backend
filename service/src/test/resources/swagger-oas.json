@@ -64,8 +64,78 @@
             "name": "body",
             "description": "Pet object that needs to be added to the store",
             "required": true,
-            "schema": {
-              "$ref": "#/definitions/Pet"
+            "schema" : {
+              "type" : "object",
+              "required" : true,
+              "properties" : {
+                "qnumber" : {
+                  "type" : "number",
+                  "required" : false,
+                  "description" : "qnumber desc",
+                  "example" : "22",
+                  "format" : "double",
+                  "maximum" : 3,
+                  "minimum" : 2,
+                  "enum" : [ "1.0", "2.0", "3.0" ],
+                  "default" : 22.0
+                },
+                "qstring" : {
+                  "type" : "string",
+                  "required" : false,
+                  "description" : "qstring desc",
+                  "example" : "example1",
+                  "pattern" : "qweasd",
+                  "maxLength" : 3,
+                  "enum" : [ "string1", "string2" ],
+                  "default" : "eq"
+                },
+                "qinteger" : {
+                  "type" : "integer",
+                  "required" : false,
+                  "format" : "int32"
+                },
+                "qboolean" : {
+                  "type" : "boolean",
+                  "required" : false,
+                  "example" : "true",
+                  "default" : true
+                },
+                "qarray" : {
+                  "type" : "array",
+                  "required" : false,
+                  "description" : "desc1",
+                  "items" : {
+                    "type" : "array",
+                    "required" : false,
+                    "description" : "desc2",
+                    "items" : {
+                      "type" : "array",
+                      "required" : false,
+                      "description" : "desc3",
+                      "items" : {
+                        "type" : "string",
+                        "required" : false,
+                        "description" : "strdesc",
+                        "example" : "exa1",
+                        "pattern" : "daasdad",
+                        "maxLength" : 6,
+                        "minLength" : 5,
+                        "enum" : [ "asd", "qwe" ],
+                        "default" : "default"
+                      },
+                      "example" : "5",
+                      "maxItems" : 5,
+                      "minItems" : 4
+                    },
+                    "example" : "2",
+                    "maxItems" : 4,
+                    "minItems" : 3
+                  },
+                  "example" : "1",
+                  "maxItems" : 3,
+                  "minItems" : 1
+                }
+              }
             }
           }
         ],

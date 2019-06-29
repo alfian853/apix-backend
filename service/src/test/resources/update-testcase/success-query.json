@@ -5,7 +5,7 @@
         "/pet": {
           "methods": {
             "post": {
-              "_signature": "99e2a608-19ec-48cb-8478-359c16140572",
+              "_signature": "bae5d755-842a-4bec-be54-8e565507f3fe",
               "request": {
                 "schema": {
                   "type": "object",

@@ -1,12 +1,14 @@
 package com.future.apix.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.request.GithubContentsRequest;
-import com.future.apix.response.github.*;
+import com.future.apix.response.github.GithubCommitResponse;
+import com.future.apix.response.github.GithubContentResponse;
+import com.future.apix.response.github.GithubRepoResponse;
+import com.future.apix.response.github.GithubUserResponse;
 import com.future.apix.service.CommandExecutorService;
 import com.future.apix.service.GithubApiService;
 import com.future.apix.service.command.Swagger2ExportCommand;
@@ -17,24 +19,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
 public class GithubApiServiceImpl implements GithubApiService {
-
-    @Value("${apix.github.token}")
-    private String token;
 
     @Value("${apix.export_oas.directory}")
     private String EXPORT_DIR;
@@ -47,6 +42,9 @@ public class GithubApiServiceImpl implements GithubApiService {
 
     @Autowired
     private OasSwagger2Repository oasRepository;
+
+    @Autowired
+    private GitHub gitHub;
 
 //    private static GitHub gitHub;
 
@@ -61,10 +59,8 @@ public class GithubApiServiceImpl implements GithubApiService {
 //        GitHub gitHub = authToken();
 //        return gitHub.isCredentialValid();
 //    }
-
     @Override
     public GithubUserResponse getMyself() throws IOException {
-        GitHub gitHub = authToken();
         GHMyself self = gitHub.getMyself();
         return convertUser(self);
     }
@@ -78,7 +74,6 @@ public class GithubApiServiceImpl implements GithubApiService {
 
     @Override
     public List<GithubRepoResponse> getMyselfRepositories() throws IOException {
-        GitHub gitHub = authToken();
         PagedIterable<GHRepository> repositories = gitHub.getMyself().listRepositories();
         List<GithubRepoResponse> repoList = new ArrayList<>();
 
@@ -101,17 +96,12 @@ public class GithubApiServiceImpl implements GithubApiService {
 
     @Override
     public List<String> getBranches(String repoName) throws IOException {
-        GitHub gitHub = authToken();
-//        List<GithubBranchResponse> branchList = new ArrayList<>();
         List<String> branchName = new ArrayList<>();
         Map<String, GHBranch> branches = gitHub.getRepository(repoName).getBranches();
         for (Map.Entry<String, GHBranch> entry : branches.entrySet()){
-//            GithubBranchResponse response = convertBranch(entry.getValue());
-//            branchList.add(response);
-            if (entry.getKey() != "master") branchName.add(entry.getKey());
+            if (!Objects.equals(entry.getKey(), "master")) branchName.add(entry.getKey());
             // exclude master, since it is default branch
         }
-//        return branchList;
         return branchName;
     }
 
@@ -131,7 +121,6 @@ public class GithubApiServiceImpl implements GithubApiService {
 
     @Override
     public GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException {
-        GitHub gitHub = authToken();
         if (ref == null || ref.length() <= 0) ref = "master";
         GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, ref);
         if (content.isFile()) {
@@ -144,7 +133,6 @@ public class GithubApiServiceImpl implements GithubApiService {
 
     @Override
     public GithubCommitResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException {
-        GitHub gitHub = authToken();
         if (request.getBranch() == null || request.getBranch().length() <= 0) request.setBranch("master");
         GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, request.getBranch());
         if (content.isFile()) {
@@ -170,11 +158,6 @@ public class GithubApiServiceImpl implements GithubApiService {
 
 //    ============ private Function ===============
 
-    public GitHub authToken() throws IOException {
-        GitHub gitHub = GitHub.connectUsingOAuth(token);
-        return gitHub;
-    }
-
     private GithubUserResponse convertUser(GHUser user) throws IOException {
         GithubUserResponse response = new GithubUserResponse();
         response.setId(user.getId());
@@ -182,7 +165,6 @@ public class GithubApiServiceImpl implements GithubApiService {
         response.setName(user.getName());
         return response;
     }
-
 //    private GithubUserResponse convertCommitter(GitUser user) {
 //        GithubUserResponse response = new GithubUserResponse();
 //        response.setDate(user.getDate());

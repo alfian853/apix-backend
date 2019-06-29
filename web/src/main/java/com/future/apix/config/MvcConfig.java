@@ -30,16 +30,6 @@ public class MvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
-    @Bean
-    ObjectMapper getObjectMapper(){
-        return new ObjectMapper();
-    }
-
-    @Bean
-    ApiProjectConverter getApiProjectConverter(){
-        return new ApiProjectConverter();
-    }
-
 //    https://www.baeldung.com/spring-mvc-content-negotiation-json-xml
 //    https://spring.io/blog/2013/05/11/content-negotiation-using-spring-mvc/
 //    https://stackoverflow.com/questions/41262661/spring-changing-media-type-on-uri-with-au-at-the-end

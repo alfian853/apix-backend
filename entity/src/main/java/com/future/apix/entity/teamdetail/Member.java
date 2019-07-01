@@ -3,8 +3,10 @@ package com.future.apix.entity.teamdetail;
 import com.future.apix.entity.Mappable;
 import lombok.*;
 
-@NoArgsConstructor @AllArgsConstructor
-@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Member implements Mappable {
 
     String username;

@@ -11,4 +11,7 @@ public interface UserRepository extends MongoRepository<User, String> {
     User findByUsernameAndTeamsIn(String username, List<String> teams);
 
     List<User> findByTeams(String team);
+
+    @Query(value = "{}", fields = "{password: 0, authorities: 0}")
+    List<User> findAll();
 }

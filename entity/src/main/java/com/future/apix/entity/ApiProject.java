@@ -10,10 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @Document("ApiProjects")
@@ -37,7 +34,7 @@ public class ApiProject implements Serializable, Mappable {
     HashMap<String, SecurityScheme> securityDefinitions = new HashMap<>();
     Contact externalDocs;
 
-    List<String> teams;
+    List<String> teams = new ArrayList<>();
     // String teams; // jika 1 project hanya 1 repo -> kalau ada yang gabungan, berarti harus buat team baru
     Github githubProject;
 

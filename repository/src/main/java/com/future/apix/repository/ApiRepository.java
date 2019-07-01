@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ApiRepository extends MongoRepository<ApiProject, String>{
 
-    @Query(value = "{}", fields = "{_id: 1, basePath: 1, host: 1, info: 1, updatedAt: 1}")
+    @Query(value = "{}", fields = "{_id: 1, basePath: 1, host: 1, info: 1, teams: 1, updatedAt: 1}")
     List<ApiProject> findAllProjects();
 
     // List of Projects with users

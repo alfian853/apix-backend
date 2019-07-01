@@ -83,6 +83,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public RequestResponse grantTeamAccess(String name, List<Member> members) {
+        if (members.size() == 0) throw new DataNotFoundException("There is no member to be granted!");
         String failedName = "";
         Team team = teamRepository.findByName(name);
         if (team != null) {

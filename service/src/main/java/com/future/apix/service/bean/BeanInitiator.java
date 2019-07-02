@@ -28,6 +28,12 @@ public class BeanInitiator {
 
     @Bean
     public GitHub authToken() throws IOException {
-        return GitHub.connectUsingOAuth(token);
+        GitHub git = null;
+        try{
+            git = GitHub.connectUsingOAuth(token);
+        }
+        finally {
+            return git;
+        }
     }
 }

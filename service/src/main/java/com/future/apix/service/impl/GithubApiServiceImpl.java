@@ -43,7 +43,7 @@ public class GithubApiServiceImpl implements GithubApiService {
     @Autowired
     private OasSwagger2Repository oasRepository;
 
-    @Autowired
+    @Autowired(required = false)
     private GitHub gitHub;
 
 //    private static GitHub gitHub;

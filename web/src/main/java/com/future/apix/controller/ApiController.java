@@ -44,7 +44,7 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/{id}/export")
+    @PostMapping("/{id}/export")
     public RequestResponse exportToOas(@PathVariable("id")String id, @RequestParam("type") String type){
         if(type.equals("oas-swagger2")){
             return commandExecutor.execute(Swagger2ExportCommand.class,id);
@@ -88,7 +88,7 @@ public class ApiController {
         return apiDataService.createProject(request);
     }
 
-    @GetMapping("/{id}/codegen")
+    @PostMapping("/{id}/codegen")
     public Object getCodegen(@PathVariable("id") String id){
         return commandExecutor.execute(Swagger2CodegenCommand.class, id);
     }

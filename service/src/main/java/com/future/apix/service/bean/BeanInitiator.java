@@ -1,5 +1,6 @@
 package com.future.apix.service.bean;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.util.converter.ApiProjectConverter;
 import org.kohsuke.github.GitHub;
@@ -17,7 +18,7 @@ public class BeanInitiator {
 
     @Bean
     ObjectMapper getObjectMapper(){
-        return new ObjectMapper();
+        return new ObjectMapper().configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     }
 
     @Bean

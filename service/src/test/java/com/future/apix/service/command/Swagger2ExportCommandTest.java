@@ -58,12 +58,7 @@ public class Swagger2ExportCommandTest {
     public void oasFileExistButNotUpToDateTest() throws URISyntaxException, IOException {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         HashMap<String, Object> temp = mapper.readValue(Files.readAllBytes(Paths.get(uri)), HashMap.class);
-//        System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(temp));
         ApiProject project = mapper.convertValue(temp, ApiProject.class);
-//        System.out.println(project.getSections().get("user").getPaths().get("/user/createWithList").getMethods().get("post").getRequest().getSchema());
-//        mapper.writerWithDefaultPrettyPrinter().writeValue(
-//                new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()
-//        );
         Optional<ApiProject> optionalApiProject = Optional.of(project);
         ProjectOasSwagger2 oasSwagger2 = new ProjectOasSwagger2();
         oasSwagger2.setOasFileName("Petstore API_1.0.0_123.json");
@@ -106,9 +101,15 @@ public class Swagger2ExportCommandTest {
     public void oasFileNotExistButUpToDateTest() throws URISyntaxException, IOException {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         ApiProject project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
+
+        uri = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
+        HashMap<String, Object> swagger = mapper.readValue(Files.readAllBytes(Paths.get(uri)), HashMap.class);
+
+
         Optional<ApiProject> optionalApiProject = Optional.of(project);
         ProjectOasSwagger2 oasSwagger2 = new ProjectOasSwagger2();
         oasSwagger2.setOasFileName("not-exist-path.json");
+        oasSwagger2.setOasSwagger2(swagger);
 
         Date date = new Date();
         oasSwagger2.setOasFileProjectUpdateDate(date);
@@ -119,14 +120,12 @@ public class Swagger2ExportCommandTest {
 
         DownloadResponse downloadResponse = command.executeCommand("12345");
         URI uriResult = getClass().getClassLoader().getResource(downloadResponse.getFileUrl()).toURI();
-        URI uriExpected = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
 
-        verify(apiProjectConverter,times(1)).convertToOasSwagger2(any(ApiProject.class));
-
+        verifyNoMoreInteractions(apiProjectConverter);
         HashMap<String, Object> mapResult = mapper.readValue(Files.readAllBytes(Paths.get(uriResult)),HashMap.class);
-        HashMap<String, Object> mapExpected = mapper.readValue(Files.readAllBytes(Paths.get(uriExpected)),HashMap.class);
-        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected, this.ignoredField));
+        Assert.assertTrue(ApixUtil.isEqualObject(mapResult, swagger, this.ignoredField));
     }
+
     @Test
     public void oasFileExistAndUpToDateTest() throws URISyntaxException, IOException {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
@@ -146,7 +145,7 @@ public class Swagger2ExportCommandTest {
         URI uriResult = getClass().getClassLoader().getResource(downloadResponse.getFileUrl()).toURI();
         URI uriExpected = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
 
-        verify(apiProjectConverter,times(0)).convertToOasSwagger2(any(ApiProject.class));
+        verifyNoMoreInteractions(apiProjectConverter);
 
         HashMap<String, Object> mapResult = mapper.readValue(Files.readAllBytes(Paths.get(uriResult)),HashMap.class);
         HashMap<String, Object> mapExpected = mapper.readValue(Files.readAllBytes(Paths.get(uriExpected)),HashMap.class);

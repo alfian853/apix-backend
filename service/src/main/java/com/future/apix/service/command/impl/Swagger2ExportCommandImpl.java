@@ -90,7 +90,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
 
         try{
-            boolean notExistOrExpired = false;
             boolean fileExist = false;
             boolean expired = false;
 
@@ -108,7 +107,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                 }
             }
 
-            if(expired){
+            if( expired || (!fileExist && swagger2.getOasSwagger2() == null) ){
                 LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
                 swagger2.setOasSwagger2(oasHashMap);
 
@@ -123,7 +122,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
             }
             else if(!fileExist){
                 mapper.writerWithDefaultPrettyPrinter().writeValue(
-                    new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()
+                        new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()
                 );
                 swagger2.setOasFileName(newFileName);
             }

@@ -47,9 +47,6 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public Team getTeamByName(String name) {
-//        Team team = teamRepository.findByName(name);
-//        if (team != null) { return team; }
-//        else throw new DataNotFoundException("Team is not found!");
         return Optional.ofNullable(teamRepository.findByName(name))
             .orElseThrow(() -> new DataNotFoundException("Team is not found!"));
     }
@@ -61,7 +58,7 @@ public class TeamServiceImpl implements TeamService {
 
         if(existTeam == null) { /* Add team to team creator*/
             User creator = userRepository.findByUsername(team.getCreator());
-            creator.getTeams().add(team.getName());
+            if (!creator.getTeams().contains(team.getName())) creator.getTeams().add(team.getName());
             userRepository.save(creator);
 
             Team createTeam = teamRepository.save(team);
@@ -71,13 +68,11 @@ public class TeamServiceImpl implements TeamService {
             // Add team to each of User
             for (Member member: createTeam.getMembers()) {
                 User user = userRepository.findByUsername(member.getUsername());
-                user.getTeams().add(createTeam.getName());
+                if (!user.getTeams().contains(createTeam.getName())) user.getTeams().add(createTeam.getName());
                 userRepository.save(user);
             }
-
             return response;
         }
-
         else throw new DuplicateEntryException("Team name is already exists!");
     }
 
@@ -92,7 +87,7 @@ public class TeamServiceImpl implements TeamService {
                 User user = userRepository.findByUsername(memberName);
                 if (user == null) failedName += memberName + ", ";
                 else if (user!=null && !user.getTeams().contains(name)) { // update in User if not yet belong to team
-                    user.getTeams().add(name);
+                    if (!user.getTeams().contains(name)) user.getTeams().add(name);
                     userRepository.save(user);
                 }
                 int idx = team.getMembers().indexOf(member);

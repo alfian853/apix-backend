@@ -75,13 +75,6 @@ public class ApiController {
         return apiDataService.deleteById(id);
     }
 
-    /*
-    @GetMapping(value = "/bebek",
-                params = {"name"}
-    )
-    public List<ApiProject> findByUser(@RequestParam("name") String username) {return apiDataService.findByUser(username); }
-    */
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectCreateResponse createProject(@Valid @RequestBody ProjectCreateRequest request) {
@@ -91,5 +84,12 @@ public class ApiController {
     @PostMapping("/{id}/codegen")
     public Object getCodegen(@PathVariable("id") String id){
         return commandExecutor.execute(Swagger2CodegenCommand.class, id);
+    }
+
+    @PostMapping("/{id}/assign")
+    public RequestResponse assignTeamToProject(
+            @PathVariable("id") String id,
+            String teamName){
+        return apiDataService.grantTeamAccess(id, teamName);
     }
 }

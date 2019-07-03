@@ -1,7 +1,6 @@
 package com.future.apix.service;
 
 import com.future.apix.entity.ApiProject;
-import com.future.apix.entity.apidetail.ProjectInfo;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
@@ -25,4 +24,6 @@ public interface  ApiDataService {
 
     // create new Project
     ProjectCreateResponse createProject(ProjectCreateRequest request);
+
+    RequestResponse grantTeamAccess(String id, String teamName);
 }

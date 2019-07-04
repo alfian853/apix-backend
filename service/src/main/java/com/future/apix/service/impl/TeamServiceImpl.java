@@ -33,7 +33,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public List<Team> getTeams() {
-       return teamRepository.findAll();
+        return teamRepository.findAll();
     }
 
     @Override
@@ -74,6 +74,28 @@ public class TeamServiceImpl implements TeamService {
             return response;
         }
         else throw new DuplicateEntryException("Team name is already exists!");
+    }
+
+    @Override
+    public RequestResponse editTeam(Team team) {
+        Team existTeam = teamRepository.findByName(team.getName());
+        RequestResponse response = new RequestResponse();
+        if (existTeam != null){
+            for(Member member : team.getMembers()){
+                Boolean memberAvailable = false;
+                for(Member existMember: existTeam.getMembers()){
+                    if (existMember.equals(member)) memberAvailable =true;
+                }
+                if(!memberAvailable) {
+                    existTeam.getMembers().add(member);
+                }
+            }
+            teamRepository.save(existTeam);
+            response.setStatusToSuccess();
+            response.setMessage("Members have been invited!");
+            return response;
+        }
+        else throw new DataNotFoundException("Team does not exists!");
     }
 
     @Override

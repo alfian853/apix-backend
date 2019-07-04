@@ -32,15 +32,20 @@ public class TeamController {
         return teamService.getMyTeam(auth);
     }
 
-    @GetMapping("/{name}")
-    public Team getTeamByName(@PathVariable("name") String name) {
-        return teamService.getTeamByName(name);
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public RequestResponse createTeam(@RequestBody @Valid Team team) {
         return teamService.createTeam(team);
+    }
+
+    @PutMapping
+    public RequestResponse editTeam(@RequestBody @Valid Team team){
+        return teamService.editTeam(team);
+    }
+
+    @GetMapping("/{name}")
+    public Team getTeamByName(@PathVariable("name") String name) {
+        return teamService.getTeamByName(name);
     }
 
     @PutMapping("/{name}")

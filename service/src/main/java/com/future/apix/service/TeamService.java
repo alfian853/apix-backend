@@ -15,6 +15,8 @@ public interface TeamService {
 
     RequestResponse createTeam(Team team);
 
+    RequestResponse editTeam(Team team);
+
     List<Team> getMyTeam(Authentication authentication);
 
     RequestResponse grantTeamAccess(String name, List<Member> members);

@@ -70,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-resources/**",
                         "/webjars/**",
                         "/github/**",
-                        "/egithub/**")
+                        "/download/**")
                 .permitAll()
                 .anyRequest().authenticated()
                 .and()

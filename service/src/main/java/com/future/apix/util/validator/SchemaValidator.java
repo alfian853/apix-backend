@@ -48,8 +48,8 @@ public class SchemaValidator {
             return res;
         }
         else if( type == DataType.NUMBER){
-            boolean res =!formatIsNull && NumberFormatValidator.isValid(schema.getFormat())
-                    && propertiesIsEmpty && itemsIsEmpty && patternIsNull;
+            boolean res = formatIsNull || (!formatIsNull && NumberFormatValidator.isValid(schema.getFormat())
+                    && propertiesIsEmpty && itemsIsEmpty && patternIsNull);
             if(!res){
                 System.out.println("invalid number");
                 System.out.println(schema);
@@ -59,6 +59,12 @@ public class SchemaValidator {
         else if(type == DataType.ARRAY){
             boolean res = !itemsIsEmpty && (schema.getItems().getType() != null || schema.getItems().getRef() != null)
                     && formatIsNull && propertiesIsEmpty;
+            System.out.println("itemIsEmpty:" + itemsIsEmpty);
+            System.out.println("getType: " + schema.getItems().getType());
+            System.out.println("getRef: " + schema.getItems().getRef());
+            System.out.println("formatIsNull: " + formatIsNull);
+            System.out.println("propertiesIsEmpty: " + propertiesIsEmpty);
+            System.out.println("\n");
             if(!res){
                 System.out.println("invalid array");
                 System.out.println(schema);
@@ -67,6 +73,12 @@ public class SchemaValidator {
         }
         else if(type == DataType.OBJECT){
             boolean res = !propertiesIsEmpty && formatIsNull && itemsIsEmpty && isValid(schema.getProperties()) && defaultIsNull;
+            System.out.println("itemIsEmpty:" + itemsIsEmpty);
+            System.out.println("defaultIsNull: " + defaultIsNull);
+            System.out.println("isValid: " + isValid(schema.getProperties()));
+            System.out.println("formatIsNull: " + formatIsNull);
+            System.out.println("propertiesIsEmpty: " + propertiesIsEmpty);
+            System.out.println("\n");
             if(!res){
                 System.out.println("invalid object");
                 System.out.println(schema);
@@ -88,6 +100,7 @@ public class SchemaValidator {
     public static boolean isValid(HashMap<String,Schema> schemas){
         if(schemas == null)return true;
         for (Map.Entry<String,Schema> pair : schemas.entrySet()) {
+//            System.out.println(pair);
             if (!isValid(pair.getValue())) {
                 return false;
             }

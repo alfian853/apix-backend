@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import sun.misc.Request;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -94,7 +98,15 @@ public class DefaultControllerAdvice {
         return new ResponseEntity<>(RequestResponse.failed(exception.getMessage()),
                 new HttpHeaders(),
                 HttpStatus.UNAUTHORIZED);
+    }
 
+    @ExceptionHandler(value = {MaxUploadSizeExceededException.class})
+    public ResponseEntity<RequestResponse> handleMaxSizeException(MaxUploadSizeExceededException ex,
+        HttpServletRequest req, HttpServletResponse res) {
+        ex.printStackTrace();
+        return new ResponseEntity<>(RequestResponse.failed(ex.getMessage()),
+            new HttpHeaders(),
+            HttpStatus.BAD_REQUEST);
     }
 
 }

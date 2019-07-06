@@ -3,6 +3,7 @@ package com.future.apix.controller;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.request.ProjectCreateRequest;
+import com.future.apix.request.ProjectImportRequest;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
@@ -34,9 +35,15 @@ public class ApiController {
     ApiDataUpdateService updateService;
 
     @PostMapping("/import")
-    public RequestResponse importFromFile(@RequestParam("file")MultipartFile file, @RequestParam("type") String type){
+    public RequestResponse importFromFile(@RequestParam("file")MultipartFile file,
+                                          @RequestParam("type") String type,
+                                          @RequestParam("team") String team
+    ){
         if(type.equals("oas-swagger2")){
-            return (commandExecutor.execute(Swagger2ImportCommand.class, file) == null)?
+            ProjectImportRequest request = new ProjectImportRequest();
+            request.setFile(file);
+            request.setTeam(team);
+            return (commandExecutor.execute(Swagger2ImportCommand.class, request) == null)?
                     RequestResponse.failed() : RequestResponse.success();
         }
         else{
@@ -81,7 +88,7 @@ public class ApiController {
         return apiDataService.createProject(request);
     }
 
-    @PostMapping("/{id}/codegen")
+    @GetMapping("/{id}/codegen")
     public Object getCodegen(@PathVariable("id") String id){
         return commandExecutor.execute(Swagger2CodegenCommand.class, id);
     }

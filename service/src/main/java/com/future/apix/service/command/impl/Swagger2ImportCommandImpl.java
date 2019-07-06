@@ -3,9 +3,13 @@ package com.future.apix.service.command.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.future.apix.entity.ApiProject;
+import com.future.apix.entity.Team;
 import com.future.apix.entity.apidetail.*;
+import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.TeamRepository;
+import com.future.apix.request.ProjectImportRequest;
 import com.future.apix.service.command.Swagger2ImportCommand;
 import com.future.apix.util.validator.BodyValidator;
 import com.future.apix.util.validator.SchemaValidator;
@@ -23,6 +27,8 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
     @Autowired
     private ApiRepository apiRepository;
 
+    @Autowired
+    private TeamRepository teamRepository;
 
     @Autowired
     private ObjectMapper oMapper;
@@ -218,9 +224,14 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
 
 
     @Override
-    public ApiProject executeCommand(MultipartFile file) {
+    public ApiProject executeCommand(ProjectImportRequest request) {
 
         HashMap<String,Object> json = null;
+        MultipartFile file = request.getFile();
+        Team team = Optional.ofNullable(teamRepository.findByName(request.getTeam()))
+                .orElseThrow(() -> new DataNotFoundException("Team does not exists!"));
+        if (Optional.of(file).isPresent()) System.out.println("File is exists!");
+
         try {
             json = oMapper.readValue(file.getInputStream(), HashMap.class);
             ApiProject project = new ApiProject();
@@ -229,6 +240,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             project.setHost((String) json.get("host"));
             project.setSchema((List<String>) json.get("schema"));
             project.setExternalDocs(oMapper.convertValue(json.get("externalDocs"), Contact.class));
+            project.getTeams().add(request.getTeam()); // add team
 
             /* Copy Definitions Operation*/
             HashMap<String,Object> definitionsJson = toStrObjMap(json.get("definitions"));

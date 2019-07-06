@@ -61,17 +61,18 @@ public class ApiDataServiceImpl implements ApiDataService {
 
     @Override
     public List<ApiProject> findByUser(String teamName) {
-//        User user = userRepository.findByUsername(username);
-//        return apiRepository.findByUsersIn(user);
         return apiRepository.findByTeamsIn(teamName);
     }
 
     @Override
     public ProjectCreateResponse createProject(ProjectCreateRequest request) {
+        Team existTeam = Optional.ofNullable(teamRepository.findByName(request.getTeam()))
+                .orElseThrow(() -> new DataNotFoundException("Team does not exists!"));
         ApiProject project = new ApiProject();
         project.setBasePath(request.getBasePath());
         project.setHost(request.getHost());
         project.setInfo(oMapper.convertValue(request.getInfo(), ProjectInfo.class));
+        project.getTeams().add(request.getTeam());
         project.setGithubProject(new Github());
         project.getInfo().setSignature(UUID.randomUUID().toString());
         project.getGithubProject().setSignature(UUID.randomUUID().toString());
@@ -81,7 +82,6 @@ public class ApiDataServiceImpl implements ApiDataService {
         ProjectCreateResponse response = new ProjectCreateResponse();
         response.setStatusToSuccess();
         response.setMessage("Project has been created!");
-//        response.setApiProject(project);
         response.setProjectId(project.getId());
         return response;
     }

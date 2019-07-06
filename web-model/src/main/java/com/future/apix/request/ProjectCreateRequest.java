@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ProjectCreateRequest {
     String basePath, host;
+    String team;
 
     @Data
     @Builder

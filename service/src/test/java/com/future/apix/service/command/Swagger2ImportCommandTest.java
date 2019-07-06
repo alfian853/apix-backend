@@ -3,6 +3,7 @@ package com.future.apix.service.command;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.repository.ApiRepository;
+import com.future.apix.request.ProjectImportRequest;
 import com.future.apix.service.command.impl.Swagger2ImportCommandImpl;
 import com.future.apix.util.ApixUtil;
 import com.google.gson.Gson;
@@ -56,7 +57,8 @@ public class Swagger2ImportCommandTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ApiProject result = command.executeCommand(multipartFile);
+        ProjectImportRequest request = new ProjectImportRequest("", multipartFile);
+        ApiProject result = command.executeCommand(request);
 
         uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         ApiProject expectedResult = null;

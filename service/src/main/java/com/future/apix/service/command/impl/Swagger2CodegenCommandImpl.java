@@ -59,6 +59,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
 
     }
 
+    @Autowired
     public Swagger2CodegenCommandImpl(Environment e) {
         this.CODEGEN_URL = e.getProperty("apix.codegen.relative_url");
         this.CODEGEN_RESULT_DIR = e.getProperty("apix.codegen.directory");
@@ -117,7 +118,6 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                     FileSystemUtils.deleteRecursively(new File(resultDir.getPath()));
                 }
                 resultDir.mkdir();
-
                 ProcessBuilder pb = new ProcessBuilder(
                         "java",
                         "-jar",CODEGEN_JAR,"generate",

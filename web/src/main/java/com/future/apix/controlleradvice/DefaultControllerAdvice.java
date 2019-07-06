@@ -1,7 +1,6 @@
-package com.future.apix.controller.controlleradvice;
+package com.future.apix.controlleradvice;
 
 import com.future.apix.exception.*;
-import com.future.apix.response.MethodArgumentInvalidResponse;
 import com.future.apix.response.RequestResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -9,20 +8,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import sun.misc.Request;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 @ControllerAdvice

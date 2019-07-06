@@ -4,6 +4,7 @@ import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.request.ProjectImportRequest;
+import com.future.apix.response.DownloadResponse;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
@@ -88,14 +89,14 @@ public class ApiController {
     }
 
     @GetMapping("/{id}/codegen")
-    public Object getCodegen(@PathVariable("id") String id){
+    public DownloadResponse getCodegen(@PathVariable("id") String id){
         return commandExecutor.execute(Swagger2CodegenCommand.class, id);
     }
 
     @PostMapping("/{id}/assign")
     public RequestResponse assignTeamToProject(
             @PathVariable("id") String id,
-            String teamName){
+            @RequestParam("teamName") String teamName){
         return apiDataService.grantTeamAccess(id, teamName);
     }
 }

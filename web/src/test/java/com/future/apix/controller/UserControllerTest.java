@@ -1,9 +1,7 @@
 package com.future.apix.controller;
 
 import com.future.apix.config.filter.CorsFilter;
-import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
-import com.future.apix.entity.User;
-import com.future.apix.response.RequestResponse;
+import com.future.apix.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.UserService;
 import org.junit.Before;
@@ -13,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 

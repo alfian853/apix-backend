@@ -2,6 +2,7 @@ package com.future.apix.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,8 +23,10 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Document("Users")
-@JsonIgnoreProperties(value = {"enabled", "accountNonExpired", "accountNonLocked", "credentialsNonExpired"})
+@JsonIgnoreProperties(value = {"enabled", "accountNonExpired",
+        "accountNonLocked", "credentialsNonExpired", "authorities"})
 public class User implements UserDetails {
     @Id
     String id;
@@ -50,6 +53,15 @@ public class User implements UserDetails {
         this.teams = teams;
     }
 
+    public User(String id, String username, String password, List<String> roles, List<String> teams, Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+        this.teams = teams;
+        this.authorities = authorities;
+    }
+
     @Transient
     private boolean enabled = true;
     @Transient
@@ -58,12 +70,13 @@ public class User implements UserDetails {
     private boolean accountNonLocked = true;
     @Transient
     private boolean credentialsNonExpired = true;
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         /* // dipakai jika String role
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-
         grantedAuthorities.add( new SimpleGrantedAuthority(getRole()) );
         return grantedAuthorities;
         */

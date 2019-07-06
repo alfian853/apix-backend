@@ -3,9 +3,8 @@ package com.future.apix.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.config.filter.CorsFilter;
 import com.future.apix.config.jwt.JwtTokenProvider;
-import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
+import com.future.apix.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.User;
-import com.future.apix.repository.UserRepository;
 import com.future.apix.request.AuthenticationRequest;
 import com.future.apix.service.UserService;
 import org.junit.Before;
@@ -53,6 +52,8 @@ public class AuthControllerTest {
     @InjectMocks
     private AuthController authController;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     private static final String USER_ID = "test-id";
     private static final String USER_USERNAME = "username";
     private static final String USER_PASSWORD = new BCryptPasswordEncoder().encode("password");
@@ -80,7 +81,7 @@ public class AuthControllerTest {
 
         mvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(request)))
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.message", is("User is authenticated!")))
@@ -99,17 +100,9 @@ public class AuthControllerTest {
 
         mvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(request)))
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.message", is("Invalid username or password!")));
-    }
-
-    private static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e){
-            throw new RuntimeException(e);
-        }
     }
 }

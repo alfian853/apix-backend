@@ -2,7 +2,7 @@ package com.future.apix.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.config.filter.CorsFilter;
-import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
+import com.future.apix.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.entity.teamdetail.Member;
@@ -13,14 +13,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
@@ -48,6 +44,8 @@ public class TeamControllerTest {
 
     @InjectMocks
     TeamController teamController;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String TEAM_ID = "test-id";
     private static final String TEAM_NAME = "TeamTest";
@@ -118,7 +116,7 @@ public class TeamControllerTest {
 
         mvc.perform(post("/teams")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(TEAM)))
+                .content(objectMapper.writeValueAsString(TEAM)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.message", is("Team is created!")));
@@ -130,7 +128,7 @@ public class TeamControllerTest {
         when(teamService.editTeam(any())).thenReturn(RequestResponse.success("Members have been invited!"));
         mvc.perform(put("/teams")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(TEAM)))
+                .content(objectMapper.writeValueAsString(TEAM)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.message", is("Members have been invited!")));
@@ -159,18 +157,10 @@ public class TeamControllerTest {
 
         mvc.perform(put("/teams/{name}", "TeamTest")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(TEAM_MEMBER)))
+                .content(objectMapper.writeValueAsString(TEAM_MEMBER)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.message", is("Team members grant have been updated!")));
         verify(teamService, times(1)).grantTeamAccess(TEAM_NAME, TEAM_MEMBER);
-    }
-
-    private static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e){
-            throw new RuntimeException(e);
-        }
     }
 }

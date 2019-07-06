@@ -20,36 +20,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-/*
-    @GetMapping("/profile")
-    public ResponseEntity currentUser(@AuthenticationPrincipal UserDetails userDetails) {
-        Map<Object, Object> model = new HashMap<>();
-
-        model.put("username", userDetails.getUsername());
-        model.put("roles", userDetails.getAuthorities()
-                .stream()
-                .map(a -> ((GrantedAuthority) a).getAuthority())
-                .collect(toList())
-        );
-
-        return ResponseEntity.ok(model);
-    }
-
-    @GetMapping("/principal") // Retrieve all user data in class User (in ['principal'])
-    public ResponseEntity getPrincipal(Principal user){
-        return ResponseEntity.ok(user);
-    }
-*/
-
     @GetMapping("/profile")
     public UserProfileResponse getAuth(Authentication authentication) {
         return userService.userProfile(authentication);
     }
-
-//    @GetMapping("/teamsIn")
-//    public RequestResponse isTeamIn( Principal user, @RequestBody List<String> userTeam) {
-//        return userService.checkUserTeams(user.getName(), userTeam);
-//    }
-
 
 }

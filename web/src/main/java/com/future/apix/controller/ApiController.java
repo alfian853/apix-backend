@@ -37,8 +37,7 @@ public class ApiController {
     @PostMapping("/import")
     public RequestResponse importFromFile(@RequestParam("file")MultipartFile file,
                                           @RequestParam("type") String type,
-                                          @RequestParam("team") String team
-    ){
+                                          @RequestParam("team") String team){
         if(type.equals("oas-swagger2")){
             ProjectImportRequest request = new ProjectImportRequest();
             request.setFile(file);

@@ -123,7 +123,7 @@ public class TeamServiceImpl implements TeamService {
                 response.setMessage("Members: " + failedName + "is failed to updated!");
             } else {
                 response.setStatusToSuccess();
-                response.setMessage("Team members grant has been updated!");
+                response.setMessage("Team members grant have been updated!");
             }
             return response;
         }

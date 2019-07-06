@@ -50,7 +50,6 @@ public class UserServiceTest {
     @Before
     public void setUp(){
         userOpt = Optional.of(USER);
-//        serviceMock.setoMapper(new ObjectMapper());
     }
 
     /*
@@ -97,7 +96,7 @@ public class UserServiceTest {
         UserProfileResponse response = serviceMock.userProfile(authentication);
         Assert.assertNotNull(response);
         Assert.assertTrue(response.getSuccess());
-        Assert.assertEquals("User is authenticated", response.getMessage());
+        Assert.assertEquals("User is authenticated!", response.getMessage());
         Assert.assertEquals("test", response.getUsername());
         Assert.assertEquals(Arrays.asList("ROLE_USER", "ROLE_ADMIN"), response.getRoles());
         Assert.assertEquals(Arrays.asList("TeamTest"), response.getTeams());
@@ -135,5 +134,29 @@ public class UserServiceTest {
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("User is created!", response.getMessage());
     }
+
+    /*
+        User getUser(String username)
+     */
+    @Test
+    public void getUser_fail(){
+        try {
+            serviceMock.getUser(USER_USERNAME);
+        } catch (InvalidAuthenticationException e) {
+            Assert.assertEquals("User is not registered!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void getUser_success(){
+        when(userRepository.findByUsername(anyString())).thenReturn(USER);
+        User user = serviceMock.getUser(USER_USERNAME);
+        Assert.assertEquals(USER_ID, user.getId());
+        Assert.assertEquals(USER_USERNAME, user.getUsername());
+        Assert.assertEquals(USER_PASSWORD, user.getPassword());
+        Assert.assertEquals(USER_ROLES, user.getRoles());
+        Assert.assertEquals(USER_TEAMS, user.getTeams());
+    }
+
 
 }

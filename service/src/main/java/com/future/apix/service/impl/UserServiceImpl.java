@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,41 +30,19 @@ public class UserServiceImpl implements UserService {
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-//    public void setoMapper(ObjectMapper oMapper) {
-//            this.oMapper = oMapper;
-//    }
-
     @Override
     public UserProfileResponse userProfile (Authentication authentication) {
         UserProfileResponse response;
         if (authentication != null) {
             response = oMapper.convertValue(authentication.getPrincipal(), UserProfileResponse.class);
             response.setStatusToSuccess();
-            response.setMessage("User is authenticated");
+            response.setMessage("User is authenticated!");
             return response;
         }
         else throw new InvalidAuthenticationException("User is not authenticated!");
 
     }
 
-    /**
-     *
-     * @param username
-     * @param teams
-     * @return
-     */
-//    @Override
-//    public RequestResponse checkUserTeams(String username, List<String> teams) {
-//        User user = userRepository.findByUsernameAndTeamsIn(username, teams);
-//        if (user != null) return RequestResponse.success("User is belonged to team");
-//        return RequestResponse.failed("User is not belonged to team!");
-//    }
-
-    /**
-     *
-     * @param user
-     * @return
-     */
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public RequestResponse createUser(User user) {
@@ -97,16 +76,11 @@ public class UserServiceImpl implements UserService {
         return RequestResponse.success("User has been deleted!");
     }
 
-//    @Override
-//    public List<UserProfileResponse> getUsersByTeam(String team) {
-//        List<User> users = userRepository.findByTeams(team);
-//        List<UserProfileResponse> profileResponses = new ArrayList<>();
-//        for (User user: users) {
-//            UserProfileResponse response = new UserProfileResponse();
-//            response = oMapper.convertValue(user, UserProfileResponse.class);
-//            profileResponses.add(response);
-//            response.setStatusToSuccess();
-//        }
-//        return profileResponses;
-//    }
+    @Override
+    public User getUser(String username) {
+        User user = Optional.ofNullable(userRepository.findByUsername(username))
+                .orElseThrow(() -> new InvalidAuthenticationException("User is not registered!"));
+        return user;
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.future.apix.controlleradvice;
+package com.future.apix.controller.controlleradvice;
 
 import com.future.apix.exception.*;
 import com.future.apix.response.RequestResponse;
@@ -27,13 +27,7 @@ public class DefaultControllerAdvice {
     public ResponseEntity<RequestResponse> DefaultExceptionHandler(Exception exception){
 
         RequestResponse response = new RequestResponse();
-        if(exception instanceof DataIntegrityViolationException){
-            DataIntegrityViolationException e = (DataIntegrityViolationException) exception;
-            response.setMessage(Objects.requireNonNull(e.getRootCause()).getMessage());
-        }
-        else{
-            response.setMessage(exception.getMessage());
-        }
+        response.setMessage(exception.getMessage());
         exception.printStackTrace();
         response.setStatusToFailed();
         if(response.getMessage() == null){

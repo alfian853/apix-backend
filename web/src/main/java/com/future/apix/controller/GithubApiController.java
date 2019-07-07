@@ -36,10 +36,12 @@ public class GithubApiController {
         return githubService.getMyself();
     }
 
+
 //    @GetMapping("/user/{username}")
 //    public GithubUserResponse getUser(@PathVariable("username") String username) throws IOException {
 //        return githubService.getUser(username);
 //    }
+
 
     @GetMapping("/user/repos")
     public List<GithubRepoResponse> getMyselfRepositories() throws IOException {

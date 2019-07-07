@@ -2,10 +2,10 @@ package com.future.apix.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.config.filter.CorsFilter;
-import com.future.apix.controlleradvice.DefaultControllerAdvice;
+import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.ApiProject;
+import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.DataNotFoundException;
-import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.response.ProjectCreateResponse;
@@ -14,8 +14,6 @@ import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiDataUpdateService;
 import com.future.apix.service.CommandExecutorService;
-import com.future.apix.service.command.Swagger2ExportCommand;
-import com.future.apix.service.command.Swagger2ImportCommand;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
@@ -185,7 +182,18 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.message", is("")))
                 .andExpect(jsonPath("$.new_signature", is("_signature")));
+    }
 
+    @Test
+    public void doApiDataQuery_conflict() throws Exception {
+        when(updateService.doQuery(anyString(), any())).thenThrow(new ConflictException("Edition Conflict!, Please refresh the tab"));
+        mvc.perform(put("/projects/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(new HashMap<String, Object>())))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.message", is("Edition Conflict!, Please refresh the tab")));
+        verify(updateService, times(1)).doQuery(anyString(),any());
     }
 
     @Test

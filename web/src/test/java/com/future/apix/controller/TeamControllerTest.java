@@ -2,7 +2,7 @@ package com.future.apix.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.config.filter.CorsFilter;
-import com.future.apix.controlleradvice.DefaultControllerAdvice;
+import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.entity.teamdetail.Member;

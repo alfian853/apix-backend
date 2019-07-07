@@ -1,7 +1,8 @@
 package com.future.apix.controller;
 
 import com.future.apix.config.filter.CorsFilter;
-import com.future.apix.controlleradvice.DefaultControllerAdvice;
+import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
+import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.UserService;
 import org.junit.Before;
@@ -53,7 +54,7 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getAuth() throws Exception {
+    public void getAuth_success() throws Exception {
         UserProfileResponse response = new UserProfileResponse();
         response.setStatusToSuccess();
         response.setMessage("User is authenticated!");
@@ -73,5 +74,16 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.teams[0]", is("TeamTest")));
         verify(userService, times(1)).userProfile(any());
     }
+
+    @Test
+    public void getAuth_failed() throws Exception {
+        when(userService.userProfile(any())).thenThrow(new InvalidAuthenticationException("User is not authenticated!"));
+        mvc.perform(get("/user/profile"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success", is(false)))
+                .andExpect(jsonPath("$.message", is("User is not authenticated!")));
+        verify(userService, times(1)).userProfile(any());
+    }
+
 
 }

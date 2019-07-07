@@ -1,4 +1,4 @@
-package com.future.apix.controlleradvice;
+package com.future.apix.controller.controlleradvice;
 
 import com.future.apix.response.MethodArgumentInvalidResponse;
 import org.springframework.core.Ordered;

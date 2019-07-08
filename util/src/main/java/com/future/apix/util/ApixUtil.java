@@ -8,6 +8,9 @@ import java.util.*;
 
 public class ApixUtil {
 
+    /*
+        Tujuannya digunakan dalam unit test untuk compare hasil awal dan hasil update
+     */
     private static ObjectMapper mapper = new ObjectMapper();
 
     public static HashMap<String,Object> toStrObjMap(Object object){

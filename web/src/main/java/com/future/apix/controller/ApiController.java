@@ -1,7 +1,9 @@
 package com.future.apix.controller;
 
 import com.future.apix.command.QueryExecutorCommand;
+import com.future.apix.command.model.ExportRequest;
 import com.future.apix.command.model.QueryExecutorRequest;
+import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.request.ProjectCreateRequest;
@@ -50,9 +52,14 @@ public class ApiController {
     }
 
     @PostMapping("/{id}/export")
-    public RequestResponse exportToOas(@PathVariable("id")String id, @RequestParam("type") String type){
+    public RequestResponse exportToOas(@PathVariable("id")String id,
+                                       @RequestParam("type") String type,
+                                       @RequestParam("format") FileFormat format){
         if(type.equals("oas-swagger2")){
-            return commandExecutor.executeCommand(Swagger2ExportCommand.class,id);
+            System.out.println("CONTROLLER FORMAT: " + format);
+            ExportRequest request = new ExportRequest(id, format);
+            System.out.println("EXPORT REQUEST CONTROLLER: " +  request.getFormat());
+            return commandExecutor.executeCommand(Swagger2ExportCommand.class,request);
         }
         else{
             throw new InvalidRequestException("oas format is not supported");

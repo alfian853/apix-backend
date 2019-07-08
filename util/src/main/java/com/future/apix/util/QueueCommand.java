@@ -1,6 +1,6 @@
 package com.future.apix.util;
 
-public interface QueueCommand<T> {
+public interface QueueCommand<RESPONSE, REQUEST> {
     //please apply "synchronized" to the implementation method
-    T execute();
+    RESPONSE execute(REQUEST request);
 }

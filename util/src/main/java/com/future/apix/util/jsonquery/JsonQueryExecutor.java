@@ -47,6 +47,7 @@ public class JsonQueryExecutor {
                         (HashMap<String, Object>) pair.getValue());
 
                 //if no operation in new child, then remove the child
+                // jika tidak ada "_actions" pada field tersebut
                 if (!hasUpdateChild && hasCreatingNew) {
                     target.remove(pair.getKey());
                 }

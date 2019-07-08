@@ -1,6 +1,8 @@
 package com.future.apix.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.command.model.ExportRequest;
+import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.OasSwagger2Repository;
@@ -139,7 +141,8 @@ public class GithubApiServiceImpl implements GithubApiService {
             String existSha = DigestUtils.sha256Hex(content.read());
 
             String projectId = request.getProjectId();
-            commandExecutor.executeCommand(Swagger2ExportCommand.class, projectId);
+            ExportRequest exportFormat = new ExportRequest(projectId, FileFormat.JSON);
+            commandExecutor.executeCommand(Swagger2ExportCommand.class, exportFormat);
             String oasPath = oasRepository.findProjectOasSwagger2ByProjectId(projectId).orElseThrow(DataNotFoundException::new).getOasFileName();
             Path path = Paths.get(EXPORT_DIR + oasPath);
             String readContent = readFromFile(path);

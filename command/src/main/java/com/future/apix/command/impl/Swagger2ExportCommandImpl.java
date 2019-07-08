@@ -1,7 +1,10 @@
 package com.future.apix.command.impl;
 
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.future.apix.command.Swagger2ExportCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.command.model.ExportRequest;
+import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.exception.DataNotFoundException;
@@ -16,6 +19,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,6 +36,8 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
     @Autowired
     private ObjectMapper mapper;
 
+    private YAMLMapper yamlMapper = new YAMLMapper();
+
     public void setObjectMapper(ObjectMapper mapper) {
         this.mapper = mapper;
     }
@@ -42,7 +48,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
     private String EXPORT_URL;
     private String EXPORT_DIR;
 
-    private static HashMap<String, QueueCommand<DownloadResponse>> pools = new HashMap<>();
+    private static HashMap<String, QueueCommand<DownloadResponse, ExportRequest>> pools = new HashMap<>();
 
     public Swagger2ExportCommandImpl() {
     }
@@ -57,45 +63,51 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
     @Autowired
     public Swagger2ExportCommandImpl(Environment env) {
-        this.EXPORT_URL = env.getProperty("com.future.apix.export_oas.relative_url");
-        this.EXPORT_DIR = env.getProperty("com.future.apix.export_oas.directory");
+        this.EXPORT_URL = env.getProperty("apix.export_oas.relative_url");
+        this.EXPORT_DIR = env.getProperty("apix.export_oas.directory");
     }
 
     @Override
-    public DownloadResponse execute(String projectId) {
+    public DownloadResponse execute(ExportRequest exportRequest) {
+        String projectId = exportRequest.getProjectId();
         if(!pools.containsKey(projectId)){
             pools.put(
                     projectId,
-                    new QueueCommand<DownloadResponse>() {
+                    new QueueCommand<DownloadResponse, ExportRequest>() {
                         @Override
-                        synchronized public DownloadResponse execute() {
-                            return generateOasFile(projectId);
+                        synchronized public DownloadResponse execute(ExportRequest request) {
+                            return generateOasFile(request);
                         }
                     }
             );
         }
-        return pools.get(projectId).execute();
+        return pools.get(projectId).execute(exportRequest);
     }
 
-    private DownloadResponse generateOasFile(String projectId){
+    private DownloadResponse generateOasFile(ExportRequest request){
+        String projectId = request.getProjectId();
         ApiProject project = apiRepository.findById(projectId).orElseThrow(DataNotFoundException::new);
 
         ProjectOasSwagger2 swagger2 = swagger2Repository.findProjectOasSwagger2ByProjectId(projectId)
                 .orElse(new ProjectOasSwagger2());
 
         String newFileName = project.getInfo().getTitle()+"_"
-                + project.getInfo().getVersion() +"_"+ projectId +".json";
+                + project.getInfo().getVersion() +"_"+ projectId;
+        swagger2.setOasFileName(newFileName);
+        String newFileNameWithFormat = newFileName + "." + request.getFormat().toString().toLowerCase();
 
         DownloadResponse response = new DownloadResponse();
-
+        System.out.println("FORMAT: " + request.getFormat().toString());
 
         try{
             boolean fileExist = false;
             boolean expired = false;
+            String oasFileName = swagger2.getOasFileName() + "." + request.getFormat().toString().toLowerCase();
 
             //if not generated yet
+            /*
             if(swagger2.getOasFileName() != null){
-                File testFile = new File(EXPORT_DIR + swagger2.getOasFileName());
+                File testFile = new File(EXPORT_DIR + oasFileName);
                 //if not the latest version
                 if(swagger2.getOasFileProjectUpdateDate().before(project.getUpdatedAt())){
                     Files.deleteIfExists(testFile.toPath());
@@ -106,28 +118,45 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                     fileExist = true;
                 }
             }
+             */
+            System.out.println(EXPORT_DIR + oasFileName);
+            File testFile = new File(EXPORT_DIR + oasFileName);
+            if(testFile.exists()) {
+                System.out.println("FILE EXISTS");
+                fileExist = true;
 
+                //if not the latest version
+                if (swagger2.getOasFileProjectUpdateDate().before(project.getUpdatedAt())) {
+                    System.out.println("FILE NOT UPDATED!");
+                    Files.deleteIfExists(testFile.toPath());
+                    expired = true;
+                } // but the file is deleted
+            }
+
+            // not the latest update and file is available
             if( expired || (!fileExist && swagger2.getOasSwagger2() == null) ){
+                System.out.println("NOT THE LATEST UPDATE!");
                 LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
                 swagger2.setOasSwagger2(oasHashMap);
 
-                mapper.writerWithDefaultPrettyPrinter().writeValue(
-                    new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()
-                );
+                writeFile(newFileNameWithFormat, request.getFormat(), swagger2.getOasSwagger2());
+
                 swagger2.setProjectId(projectId);
                 swagger2.setOasFileName(newFileName);
                 swagger2.setOasFileProjectUpdateDate(project.getUpdatedAt());
 
                 swagger2Repository.save(swagger2);
             }
+            // if file is deleted, but the project still exist
             else if(!fileExist){
-                mapper.writerWithDefaultPrettyPrinter().writeValue(
-                        new File(EXPORT_DIR + newFileName), swagger2.getOasSwagger2()
-                );
+                System.out.println("FILE NOT EXISTS! jadi buat baru");
+                writeFile(newFileNameWithFormat, request.getFormat(), swagger2.getOasSwagger2());
+
                 swagger2.setOasFileName(newFileName);
             }
             else{
-                response.fileUrl(EXPORT_URL + swagger2.getOasFileName());
+                System.out.println("FILE EXIST! sudah ada di " + EXPORT_DIR + oasFileName);
+                response.setFileUrl(EXPORT_DIR + oasFileName);
                 response.setStatusToSuccess();
                 response.setMessage("File export already exists!");
             }
@@ -136,11 +165,28 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
             e.printStackTrace();
             throw new DefaultRuntimeException("internal server error!");
         }
-        response.fileUrl(EXPORT_URL + swagger2.getOasFileName());
+        response.fileUrl(EXPORT_URL + swagger2.getOasFileName() + "." + request.getFormat());
         response.setStatusToSuccess();
         response.setMessage("File has been exported!");
 
         return response;
+    }
+
+    private void writeFile(String newFileNameWithFormat, FileFormat format, HashMap<String, Object> swagger)
+        throws IOException {
+
+        File file = new File(EXPORT_DIR + newFileNameWithFormat);
+        if (format.toString().equals("JSON")) {
+            System.out.println("WRITE FILE TO JSON");
+            mapper.writerWithDefaultPrettyPrinter()
+                .writeValue(file, swagger);
+        }
+        else if (format.toString().equals("YAML")) {
+            System.out.println("WRITE FILE TO YAML");
+            yamlMapper.writerWithDefaultPrettyPrinter()
+                .writeValue(file, swagger);
+        }
+//        return file;
     }
 
 }

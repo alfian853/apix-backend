@@ -2,6 +2,8 @@ package com.future.apix.command.impl;
 
 import com.future.apix.command.Swagger2CodegenCommand;
 import com.future.apix.command.Swagger2ExportCommand;
+import com.future.apix.command.model.ExportRequest;
+import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.exception.DataNotFoundException;
@@ -30,7 +32,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
     @Autowired
     Swagger2ExportCommand swagger2ExportCommand;
 
-    private static HashMap<String, QueueCommand<DownloadResponse>> pools = new HashMap<>();
+    private static HashMap<String, QueueCommand<DownloadResponse, String>> pools = new HashMap<>();
 
     private String CODEGEN_URL;
 
@@ -60,35 +62,33 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
 
     @Autowired
     public Swagger2CodegenCommandImpl(Environment e) {
-        this.CODEGEN_URL = e.getProperty("com.future.apix.codegen.relative_url");
-        this.CODEGEN_RESULT_DIR = e.getProperty("com.future.apix.codegen.directory");
-        this.CODEGEN_JAR = e.getProperty("com.future.apix.codegen.swagger_cli_jar");
-        this.OAS_DIR = e.getProperty("com.future.apix.export_oas.directory");
+        this.CODEGEN_URL = e.getProperty("apix.codegen.relative_url");
+        this.CODEGEN_RESULT_DIR = e.getProperty("apix.codegen.directory");
+        this.CODEGEN_JAR = e.getProperty("apix.codegen.swagger_cli_jar");
+        this.OAS_DIR = e.getProperty("apix.export_oas.directory");
     }
 
     @Override
     public DownloadResponse execute(String projectId) {
-
         if(!pools.containsKey(projectId)){
             pools.put(
                 projectId,
-                new QueueCommand<DownloadResponse>() {
+                new QueueCommand<DownloadResponse, String>() {
                     @Override
-                    synchronized public DownloadResponse execute() {
-                        return generateSourceCode(projectId);
+                    synchronized public DownloadResponse execute(String id) {
+                        return generateSourceCode(id);
                     }
                 }
             );
         }
-        return pools.get(projectId).execute();
+        return pools.get(projectId).execute(projectId);
     }
 
     private DownloadResponse generateSourceCode(String projectId){
-
         ApiProject project = apiRepository.findById(projectId).orElseThrow(DataNotFoundException::new);
 
         //make sure the oas file is the latest version
-        swagger2ExportCommand.execute(projectId);
+        swagger2ExportCommand.execute(new ExportRequest(projectId, FileFormat.JSON));
 
         ProjectOasSwagger2 swagger2 = swagger2Repository.findProjectOasSwagger2ByProjectId(projectId).get();
 
@@ -100,9 +100,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                 );
 
         if(notExistOrExpired){
-            String baseName = swagger2.getOasFileName().substring(
-                    0, swagger2.getOasFileName().length()-5
-            );
+            String baseName = swagger2.getOasFileName();
             File resultDir = new File(
                     CODEGEN_RESULT_DIR + baseName
             );
@@ -120,7 +118,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                 ProcessBuilder pb = new ProcessBuilder(
                         "java",
                         "-jar",CODEGEN_JAR,"generate",
-                        "-i",OAS_DIR + swagger2.getOasFileName(),
+                        "-i",OAS_DIR + swagger2.getOasFileName() + ".json" ,
                         "-l","spring","-o", CODEGEN_RESULT_DIR + baseName
                 );
                 pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);

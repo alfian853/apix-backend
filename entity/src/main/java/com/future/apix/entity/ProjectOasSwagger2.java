@@ -19,7 +19,7 @@ public class ProjectOasSwagger2 {
     //will be manually updated
     Date oasFileProjectUpdateDate;
 
-    String oasFileName;
+    String oasFileName; // without file extension
 
     Date generatedCodesProjectUpdatedDate;
 

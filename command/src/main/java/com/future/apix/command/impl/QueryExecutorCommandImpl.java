@@ -95,13 +95,13 @@ public class QueryExecutorCommandImpl implements QueryExecutorCommand {
             response.setNewSignature((String) pointer.getQueryField().get("_signature"));
         }
 
-        /** karna pointer.getTargetField() me-return object yang didalam @target(bukan hasil clone),
-         * maka tidak perlu di menge-set hasil query kedalam @target
-         **/
         project = mapper.convertValue(target, ApiProject.class);
 
         apiRepository.save(project);
 
         return response;
+        /** karna pointer.getTargetField() me-return object yang didalam @target(bukan hasil clone),
+         * maka tidak perlu di menge-set hasil query kedalam @target
+         **/
     }
 }

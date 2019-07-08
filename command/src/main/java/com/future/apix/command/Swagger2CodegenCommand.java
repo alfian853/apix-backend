@@ -1,4 +1,4 @@
-package com.future.apix.service.command;
+package com.future.apix.command;
 
 import com.future.apix.response.DownloadResponse;
 

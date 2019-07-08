@@ -1,5 +1,6 @@
-package com.future.apix.service.command.impl;
+package com.future.apix.command.impl;
 
+import com.future.apix.command.Swagger2ImportCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.future.apix.entity.ApiProject;
@@ -10,7 +11,6 @@ import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.request.ProjectImportRequest;
-import com.future.apix.service.command.Swagger2ImportCommand;
 import com.future.apix.util.validator.BodyValidator;
 import com.future.apix.util.validator.SchemaValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -224,7 +224,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
 
 
     @Override
-    public ApiProject executeCommand(ProjectImportRequest request) {
+    public ApiProject execute(ProjectImportRequest request) {
 
         HashMap<String,Object> json = null;
         MultipartFile file = request.getFile();

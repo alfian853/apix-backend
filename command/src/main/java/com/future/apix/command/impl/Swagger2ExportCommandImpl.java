@@ -1,5 +1,6 @@
-package com.future.apix.service.command.impl;
+package com.future.apix.command.impl;
 
+import com.future.apix.command.Swagger2ExportCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
@@ -8,7 +9,6 @@ import com.future.apix.exception.DefaultRuntimeException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.response.DownloadResponse;
-import com.future.apix.service.command.Swagger2ExportCommand;
 import com.future.apix.util.QueueCommand;
 import com.future.apix.util.converter.ApiProjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +57,12 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
     @Autowired
     public Swagger2ExportCommandImpl(Environment env) {
-        this.EXPORT_URL = env.getProperty("apix.export_oas.relative_url");
-        this.EXPORT_DIR = env.getProperty("apix.export_oas.directory");
+        this.EXPORT_URL = env.getProperty("com.future.apix.export_oas.relative_url");
+        this.EXPORT_DIR = env.getProperty("com.future.apix.export_oas.directory");
     }
 
     @Override
-    public DownloadResponse executeCommand(String projectId) {
+    public DownloadResponse execute(String projectId) {
         if(!pools.containsKey(projectId)){
             pools.put(
                     projectId,

@@ -1,4 +1,4 @@
-package com.future.apix.service.command;
+package com.future.apix.command;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
@@ -6,7 +6,7 @@ import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.response.DownloadResponse;
-import com.future.apix.service.command.impl.Swagger2ExportCommandImpl;
+import com.future.apix.command.impl.Swagger2ExportCommandImpl;
 import com.future.apix.util.ApixUtil;
 import com.future.apix.util.converter.ApiProjectConverter;
 import org.junit.Assert;
@@ -69,7 +69,7 @@ public class Swagger2ExportCommandTest {
         when(apiRepository.findById(any())).thenReturn(optionalApiProject);
         when(swagger2Repository.findProjectOasSwagger2ByProjectId(anyString())).thenReturn(Optional.of(oasSwagger2));
 
-        DownloadResponse downloadResponse = command.executeCommand("123");
+        DownloadResponse downloadResponse = command.execute("123");
         URI uriResult = getClass().getClassLoader().getResource(downloadResponse.getFileUrl()).toURI();
         URI uriExpected = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
 
@@ -87,7 +87,7 @@ public class Swagger2ExportCommandTest {
         Optional<ApiProject> optionalApiProject = Optional.of(project);
         when(apiRepository.findById(any())).thenReturn(optionalApiProject);
 
-        DownloadResponse downloadResponse = command.executeCommand("1234");
+        DownloadResponse downloadResponse = command.execute("1234");
         URI uriResult = getClass().getClassLoader().getResource(downloadResponse.getFileUrl()).toURI();
         URI uriExpected = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
 
@@ -118,7 +118,7 @@ public class Swagger2ExportCommandTest {
         when(apiRepository.findById(any())).thenReturn(optionalApiProject);
         when(swagger2Repository.findProjectOasSwagger2ByProjectId(anyString())).thenReturn(Optional.of(oasSwagger2));
 
-        DownloadResponse downloadResponse = command.executeCommand("12345");
+        DownloadResponse downloadResponse = command.execute("12345");
         URI uriResult = getClass().getClassLoader().getResource(downloadResponse.getFileUrl()).toURI();
 
         verifyNoMoreInteractions(apiProjectConverter);
@@ -141,7 +141,7 @@ public class Swagger2ExportCommandTest {
         when(apiRepository.findById(any())).thenReturn(optionalApiProject);
         when(swagger2Repository.findProjectOasSwagger2ByProjectId(anyString())).thenReturn(Optional.of(oasSwagger2));
 
-        DownloadResponse downloadResponse = command.executeCommand("123456");
+        DownloadResponse downloadResponse = command.execute("123456");
         URI uriResult = getClass().getClassLoader().getResource(downloadResponse.getFileUrl()).toURI();
         URI uriExpected = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
 

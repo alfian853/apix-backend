@@ -11,7 +11,7 @@ import com.future.apix.response.github.GithubRepoResponse;
 import com.future.apix.response.github.GithubUserResponse;
 import com.future.apix.service.CommandExecutorService;
 import com.future.apix.service.GithubApiService;
-import com.future.apix.service.command.Swagger2ExportCommand;
+import com.future.apix.command.Swagger2ExportCommand;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.github.*;
@@ -139,7 +139,7 @@ public class GithubApiServiceImpl implements GithubApiService {
             String existSha = DigestUtils.sha256Hex(content.read());
 
             String projectId = request.getProjectId();
-            commandExecutor.execute(Swagger2ExportCommand.class, projectId);
+            commandExecutor.executeCommand(Swagger2ExportCommand.class, projectId);
             String oasPath = oasRepository.findProjectOasSwagger2ByProjectId(projectId).orElseThrow(DataNotFoundException::new).getOasFileName();
             Path path = Paths.get(EXPORT_DIR + oasPath);
             String readContent = readFromFile(path);

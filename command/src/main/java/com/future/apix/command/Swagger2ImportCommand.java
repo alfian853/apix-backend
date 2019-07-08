@@ -1,9 +1,7 @@
-package com.future.apix.service.command;
+package com.future.apix.command;
 
 import com.future.apix.entity.ApiProject;
 import com.future.apix.request.ProjectImportRequest;
-import com.future.apix.response.RequestResponse;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface Swagger2ImportCommand extends Command<ApiProject, ProjectImportRequest> {
 

@@ -9,6 +9,8 @@
         <module>repository</module>
         <module>service</module>
         <module>web-model</module>
+      <module>command</module>
+        <module>util</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -17,9 +19,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.future</groupId>
-    <artifactId>apix</artifactId>
+    <artifactId>future-apix</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>apix</name>
+    <name>com.future.apix</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>

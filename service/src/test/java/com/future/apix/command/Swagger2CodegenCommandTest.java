@@ -1,4 +1,4 @@
-package com.future.apix.service.command;
+package com.future.apix.command;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
@@ -6,7 +6,7 @@ import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.service.CommandExecutorService;
-import com.future.apix.service.command.impl.Swagger2CodegenCommandImpl;
+import com.future.apix.command.impl.Swagger2CodegenCommandImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class Swagger2CodegenCommandTest {
     OasSwagger2Repository swagger2Repository;
 
     @Mock
-    CommandExecutorService executorService;
+    Swagger2ExportCommand swagger2ExportCommand;
 
     private ApiProject project;
 
@@ -84,7 +84,7 @@ public class Swagger2CodegenCommandTest {
         oasSwagger2.setGeneratedCodesProjectUpdatedDate(date);
 
         when(swagger2Repository.findProjectOasSwagger2ByProjectId(anyString())).thenReturn(Optional.of(oasSwagger2));
-        command.executeCommand("123");
+        command.execute("123");
         verify(swagger2Repository, times(0)).save(any());
     }
 
@@ -99,7 +99,7 @@ public class Swagger2CodegenCommandTest {
 
         when(swagger2Repository.findProjectOasSwagger2ByProjectId(anyString())).thenReturn(Optional.of(oasSwagger2));
         Files.deleteIfExists(Paths.get(CODEGEN_RESULT_DIR+ CODE_FILE_NAME));
-        command.executeCommand("1234");
+        command.execute("1234");
         verify(swagger2Repository, times(1)).save(any());
         Assert.assertTrue(Files.exists(Paths.get(CODEGEN_RESULT_DIR+ CODE_FILE_NAME)));
     }
@@ -115,8 +115,8 @@ public class Swagger2CodegenCommandTest {
 
         when(swagger2Repository.findProjectOasSwagger2ByProjectId(anyString())).thenReturn(Optional.of(oasSwagger2));
         Files.deleteIfExists(Paths.get(CODEGEN_RESULT_DIR+ CODE_FILE_NAME));
-        command.executeCommand("12345");
-       verify(swagger2Repository, times(1)).save(any());
+        command.execute("12345");
+        verify(swagger2Repository, times(1)).save(any());
         Assert.assertTrue(Files.exists(Paths.get(CODEGEN_RESULT_DIR+ CODE_FILE_NAME)));
     }
 

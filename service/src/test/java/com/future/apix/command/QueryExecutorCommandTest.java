@@ -1,13 +1,13 @@
-package com.future.apix.service;
+package com.future.apix.command;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.command.impl.QueryExecutorCommandImpl;
+import com.future.apix.command.model.QueryExecutorRequest;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.response.ProjectUpdateResponse;
-import com.future.apix.response.RequestResponse;
-import com.future.apix.service.impl.ApiDataUpdateImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,10 +28,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApiDataUpdateTest {
+public class QueryExecutorCommandTest {
 
     @InjectMocks
-    ApiDataUpdateImpl dataUpdate;
+    QueryExecutorCommandImpl dataUpdate;
 
     @Spy
     ObjectMapper mapper;
@@ -56,7 +54,7 @@ public class ApiDataUpdateTest {
         URI uri = getClass().getClassLoader().getResource("update-testcase/success-query.json").toURI();
         HashMap<String,Object> query = mapper.readValue(Files.readAllBytes(Paths.get(uri)), HashMap.class);
 
-        ProjectUpdateResponse response = dataUpdate.doQuery("123", query);
+        ProjectUpdateResponse response = dataUpdate.execute(new QueryExecutorRequest("123", query));
         Assert.assertTrue(response.isSuccess());
     }
 
@@ -65,7 +63,7 @@ public class ApiDataUpdateTest {
         URI uri = getClass().getClassLoader().getResource("update-testcase/none-signature-query.json").toURI();
         HashMap<String,Object> query = mapper.readValue(Files.readAllBytes(Paths.get(uri)), HashMap.class);
 
-        ProjectUpdateResponse response = dataUpdate.doQuery("123", query);
+        ProjectUpdateResponse response = dataUpdate.execute(new QueryExecutorRequest("123", query));
         Assert.assertTrue(response.isSuccess());
     }
 
@@ -74,7 +72,7 @@ public class ApiDataUpdateTest {
         URI uri = getClass().getClassLoader().getResource("update-testcase/signature-not-match-query.json").toURI();
         HashMap<String,Object> query = mapper.readValue(Files.readAllBytes(Paths.get(uri)), HashMap.class);
 
-        ProjectUpdateResponse response = dataUpdate.doQuery("123", query);
+        ProjectUpdateResponse response = dataUpdate.execute(new QueryExecutorRequest("123", query));
         Assert.assertTrue(response.isSuccess());
     }
 

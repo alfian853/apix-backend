@@ -2,16 +2,12 @@ package com.future.apix.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
-import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.DataNotFoundException;
-import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.response.ProjectCreateResponse;
-import com.future.apix.response.ProjectUpdateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.impl.ApiDataServiceImpl;
-import com.future.apix.service.impl.ApiDataUpdateImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +23,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,7 +120,7 @@ public class ApiDataTest {
                 )
                 .build();
 
-//        URI uri = getClass().getClassLoader().getResource("apix-oas-create.json").toURI();
+//        URI uri = getClass().getClassLoader().getResource("com.future.apix-oas-create.json").toURI();
 //        ApiProject projectTest = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
 
         when(apiRepository.save(any(ApiProject.class))).thenReturn(project);

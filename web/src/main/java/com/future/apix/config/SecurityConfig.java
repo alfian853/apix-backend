@@ -77,7 +77,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .apply(new JwtConfigurer(jwtTokenProvider))
                 .and()
-                .addFilterBefore(corsFilter, ChannelProcessingFilter.class);
+                .addFilterBefore(corsFilter, ChannelProcessingFilter.class)
+
+        ;
 
 
     }

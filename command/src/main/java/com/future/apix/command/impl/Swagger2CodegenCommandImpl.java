@@ -1,14 +1,13 @@
-package com.future.apix.service.command.impl;
+package com.future.apix.command.impl;
 
+import com.future.apix.command.Swagger2CodegenCommand;
+import com.future.apix.command.Swagger2ExportCommand;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.response.DownloadResponse;
-import com.future.apix.service.CommandExecutorService;
-import com.future.apix.service.command.Swagger2CodegenCommand;
-import com.future.apix.service.command.Swagger2ExportCommand;
 import com.future.apix.util.QueueCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -29,7 +28,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
     OasSwagger2Repository swagger2Repository;
 
     @Autowired
-    CommandExecutorService executorService;
+    Swagger2ExportCommand swagger2ExportCommand;
 
     private static HashMap<String, QueueCommand<DownloadResponse>> pools = new HashMap<>();
 
@@ -61,14 +60,14 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
 
     @Autowired
     public Swagger2CodegenCommandImpl(Environment e) {
-        this.CODEGEN_URL = e.getProperty("apix.codegen.relative_url");
-        this.CODEGEN_RESULT_DIR = e.getProperty("apix.codegen.directory");
-        this.CODEGEN_JAR = e.getProperty("apix.codegen.swagger_cli_jar");
-        this.OAS_DIR = e.getProperty("apix.export_oas.directory");
+        this.CODEGEN_URL = e.getProperty("com.future.apix.codegen.relative_url");
+        this.CODEGEN_RESULT_DIR = e.getProperty("com.future.apix.codegen.directory");
+        this.CODEGEN_JAR = e.getProperty("com.future.apix.codegen.swagger_cli_jar");
+        this.OAS_DIR = e.getProperty("com.future.apix.export_oas.directory");
     }
 
     @Override
-    public DownloadResponse executeCommand(String projectId) {
+    public DownloadResponse execute(String projectId) {
 
         if(!pools.containsKey(projectId)){
             pools.put(
@@ -89,7 +88,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
         ApiProject project = apiRepository.findById(projectId).orElseThrow(DataNotFoundException::new);
 
         //make sure the oas file is the latest version
-        executorService.execute(Swagger2ExportCommand.class,projectId);
+        swagger2ExportCommand.execute(projectId);
 
         ProjectOasSwagger2 swagger2 = swagger2Repository.findProjectOasSwagger2ByProjectId(projectId).get();
 

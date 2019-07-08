@@ -1,5 +1,7 @@
 package com.future.apix.controller;
 
+import com.future.apix.command.QueryExecutorCommand;
+import com.future.apix.command.model.QueryExecutorRequest;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.request.ProjectCreateRequest;
@@ -8,11 +10,10 @@ import com.future.apix.response.DownloadResponse;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
-import com.future.apix.service.ApiDataUpdateService;
 import com.future.apix.service.CommandExecutorService;
-import com.future.apix.service.command.Swagger2CodegenCommand;
-import com.future.apix.service.command.Swagger2ExportCommand;
-import com.future.apix.service.command.Swagger2ImportCommand;
+import com.future.apix.command.Swagger2CodegenCommand;
+import com.future.apix.command.Swagger2ExportCommand;
+import com.future.apix.command.Swagger2ImportCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +33,6 @@ public class ApiController {
     @Autowired
     CommandExecutorService commandExecutor;
 
-    @Autowired
-    ApiDataUpdateService updateService;
-
     @PostMapping("/import")
     public RequestResponse importFromFile(@RequestParam("file")MultipartFile file,
                                           @RequestParam("type") String type,
@@ -43,7 +41,7 @@ public class ApiController {
             ProjectImportRequest request = new ProjectImportRequest();
             request.setFile(file);
             request.setTeam(team);
-            return (commandExecutor.execute(Swagger2ImportCommand.class, request) == null)?
+            return (commandExecutor.executeCommand(Swagger2ImportCommand.class, request) == null)?
                     RequestResponse.failed() : RequestResponse.success();
         }
         else{
@@ -54,7 +52,7 @@ public class ApiController {
     @PostMapping("/{id}/export")
     public RequestResponse exportToOas(@PathVariable("id")String id, @RequestParam("type") String type){
         if(type.equals("oas-swagger2")){
-            return commandExecutor.execute(Swagger2ExportCommand.class,id);
+            return commandExecutor.executeCommand(Swagger2ExportCommand.class,id);
         }
         else{
             throw new InvalidRequestException("oas format is not supported");
@@ -69,7 +67,8 @@ public class ApiController {
 
     @PutMapping("/{id}")
     public RequestResponse doApiDataQuery(@PathVariable("id")String id,@RequestBody HashMap<String,Object> query){
-        return updateService.doQuery(id, query);
+        return commandExecutor.executeCommand(QueryExecutorCommand.class,
+            new QueryExecutorRequest(id, query));
     }
 
     // digunakan untuk mendapatkan apiProject (filter by host, basePath, dan info)
@@ -90,7 +89,7 @@ public class ApiController {
 
     @GetMapping("/{id}/codegen")
     public DownloadResponse getCodegen(@PathVariable("id") String id){
-        return commandExecutor.execute(Swagger2CodegenCommand.class, id);
+        return commandExecutor.executeCommand(Swagger2CodegenCommand.class, id);
     }
 
     @PostMapping("/{id}/assign")

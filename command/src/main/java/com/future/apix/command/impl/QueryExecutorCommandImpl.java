@@ -1,24 +1,25 @@
-package com.future.apix.service.impl;
+package com.future.apix.command.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.command.QueryExecutorCommand;
+import com.future.apix.command.model.QueryExecutorRequest;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.response.ProjectUpdateResponse;
-import com.future.apix.service.ApiDataUpdateService;
 import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Service
-public class ApiDataUpdateImpl implements ApiDataUpdateService {
+@Component
+public class QueryExecutorCommandImpl implements QueryExecutorCommand {
 
     @Data
     private class SignaturePointer {
@@ -61,27 +62,29 @@ public class ApiDataUpdateImpl implements ApiDataUpdateService {
         return null;
 
     }
-
     @Override
-    public ProjectUpdateResponse doQuery(String id, HashMap<String, Object> query) {
+    public ProjectUpdateResponse execute(QueryExecutorRequest request) {
 
-        ApiProject project = apiRepository.findById(id).orElseThrow(DataNotFoundException::new);
+        ApiProject project = apiRepository.findById(request.getId()).orElseThrow(DataNotFoundException::new);
 
         HashMap<String, Object> target = mapper.convertValue(project, HashMap.class);
 
         //validasi signature
-        SignaturePointer pointer = getSignaturePointer(target, query);
+        SignaturePointer pointer = getSignaturePointer(target, request.getQuery());
         if(pointer == null){
             throw new InvalidRequestException("signature not found!");
         }
+        if(pointer.getTargetField() == null || pointer.getQueryField() == null){
+            throw new InvalidRequestException("Invalid Edition Path!");
+        }
         if(!pointer.getQueryField().get("_signature").equals(
                 pointer.getTargetField().get("_signature"))){
-            throw new ConflictException("Edition Conflict!, Please refresh the tab");
+            throw new ConflictException("Edition Conflict!");
         }
 
         ProjectUpdateResponse response = new ProjectUpdateResponse();
         response.setStatusToSuccess();
-        
+
         if( queryExecutor.executeQuery(pointer.getTargetField(), pointer.getQueryField()) ){
             //generate signature baru setelah kontennya berhasil diupdate
             String newSignature = UUID.randomUUID().toString();

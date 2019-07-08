@@ -1,6 +1,8 @@
 package com.future.apix.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.config.MvcConfig;
+import com.future.apix.config.SecurityTestConfig;
 import com.future.apix.config.filter.CorsFilter;
 import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.ApiProject;
@@ -14,6 +16,7 @@ import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiDataUpdateService;
 import com.future.apix.service.CommandExecutorService;
+import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,11 +26,13 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -40,10 +45,9 @@ import java.util.Optional;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -111,7 +115,7 @@ public class ApiControllerTest {
 
     @Test
     public void importFromFile_typeNotEqual() throws Exception {
-        when(commandExecutor.execute(any(), any())).thenReturn(new ApiProject());
+//        when(commandExecutor.execute(any(), any())).thenReturn(new ApiProject());
         MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
         mvc.perform(multipart("/projects/import")
                 .file("file", jsonFile.getBytes())
@@ -121,8 +125,32 @@ public class ApiControllerTest {
                 .andExpect(jsonPath("$.success", is(false)))
                 .andExpect(jsonPath("$.message", is("oas format is not supported")));
         verify(commandExecutor, times(0)).execute(any(),any());
+    }
+
+    /*
+    @Test
+    public void importFromFile_uploadFileSizeExceeded() throws Exception {
+//        byte[] bytes = new byte[1024 * 1024 * 10];
+        URI uri = getClass().getClassLoader().getResource("stoplight.json").toURI();
+        System.out.println(uri);
+        byte[] project = FileUtils.readFileToByteArray(new File(uri));
+        MockMultipartFile jsonFile = new MockMultipartFile("json", "stoplight.json", "application/json", project);
+
+        mvc.perform(multipart("/projects/import")
+            .file("file", jsonFile.getBytes())
+            .param("type", "not-oas")
+            .param("team", "team")
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+        )
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.success", is(false)))
+            .andDo(print());
+//            .andExpect(jsonPath("$.message", is("oas format is not supported")));
+        verify(commandExecutor, times(0)).execute(any(),any());
 
     }
+
+     */
 
     @Test
     public void exportToOas_success() throws Exception {
@@ -142,7 +170,7 @@ public class ApiControllerTest {
 
     @Test
     public void exportToOas_typeNotEqual() throws Exception {
-        when(commandExecutor.execute(any(), any())).thenReturn(new DownloadResponse());
+//        when(commandExecutor.execute(any(), any())).thenReturn(new DownloadResponse());
         mvc.perform(post("/projects/{id}/export", 1)
         .param("type", "not-oas"))
                 .andExpect(status().isBadRequest())

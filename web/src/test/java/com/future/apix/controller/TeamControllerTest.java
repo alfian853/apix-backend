@@ -17,7 +17,9 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.PrintingResultHandler;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +33,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -111,7 +114,7 @@ public class TeamControllerTest {
     }
 
     @Test
-    public void createTeam_test() throws Exception {
+    public void createTeam_success() throws Exception {
         when(teamService.createTeam(TEAM)).thenReturn(RequestResponse.success("Team is created!"));
 
         mvc.perform(post("/teams")

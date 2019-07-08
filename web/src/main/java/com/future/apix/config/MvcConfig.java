@@ -48,11 +48,14 @@ public class MvcConfig implements WebMvcConfigurer {
                 .mediaType("json", MediaType.APPLICATION_JSON);
     }
 
+    /*
 //    https://www.baeldung.com/spring-maxuploadsizeexceeded
     @Bean
     public MultipartResolver multipartResolver(){
         CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-        multipartResolver.setMaxUploadSize(5242880);
+        multipartResolver.setMaxUploadSize(512000); // 500kB
         return multipartResolver;
     }
+
+     */
 }

@@ -16,8 +16,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
 
-import java.io.File;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Component
 public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
@@ -55,6 +59,8 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
     private String CODEGEN_RESULT_DIR;
     private String CODEGEN_JAR;
     private String OAS_DIR;
+//    private List<String> fileList = new ArrayList<String>();
+    private List<File> fileList = new ArrayList<>();
 
     public Swagger2CodegenCommandImpl(){
 
@@ -125,13 +131,23 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                 pb.redirectError(ProcessBuilder.Redirect.INHERIT);
                 pb.start().waitFor();
 
-
+                /*
                 pb = new ProcessBuilder(
                         "zip","-r",baseName+".zip",
                         baseName
                 );
                 pb.directory(new File(CODEGEN_RESULT_DIR));
                 pb.start().waitFor();
+                */
+
+//                http://www.avajava.com/tutorials/lessons/how-do-i-zip-a-directory-and-all-its-contents.html
+                System.out.println("\nBaseName: " + baseName);
+                File directoryToZip = new File(CODEGEN_RESULT_DIR + baseName);
+                System.out.println("--- GEtting references to all files in: " + directoryToZip.getCanonicalPath());
+                getAllFiles(directoryToZip, fileList);
+                System.out.println("-- Creating zip file");
+                writeZipFile(directoryToZip, fileList);
+                System.out.println("-- Done");
 
                 FileSystemUtils.deleteRecursively(new File(CODEGEN_RESULT_DIR +baseName));
 
@@ -151,6 +167,58 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
 
         response.setStatusToSuccess();
         return response;
+    }
+
+//    http://www.avajava.com/tutorials/lessons/how-do-i-zip-a-directory-and-all-its-contents.html
+    public static void getAllFiles(File dir, List<File> fileList1) {
+        try {
+            File[] files = dir.listFiles();
+            for (File file : files) {
+                fileList1.add(file);
+                if(file.isDirectory()){
+                    System.out.println("\ndirectory= " + file.getCanonicalPath());
+                    getAllFiles(file, fileList1);
+                } else {
+                    System.out.println("\t\tFile= " + file.getCanonicalPath());
+                }
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeZipFile(File directoryToZip, List<File> fileList1){
+        try {
+            FileOutputStream fos = new FileOutputStream(directoryToZip.getCanonicalPath() + ".zip");
+            System.out.println("Writing Zip File to: " + directoryToZip.getCanonicalPath());
+            ZipOutputStream zos = new ZipOutputStream(fos);
+            for (File file : fileList1) {
+                if(!file.isDirectory()) {
+                    addToZip(directoryToZip, file, zos);
+                }
+            }
+            zos.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();;
+        }
+    }
+
+    public static void addToZip(File directoryToZip, File file, ZipOutputStream zos) throws FileNotFoundException, IOException {
+        FileInputStream fis = new FileInputStream(file);
+        String zipFilePath = file.getCanonicalPath().substring(directoryToZip.getCanonicalPath().length() + 1,
+                file.getCanonicalPath().length());
+        System.out.println("Writing " + zipFilePath + " to zip file! AVAJAVA");
+        ZipEntry zipEntry = new ZipEntry(zipFilePath);
+        zos.putNextEntry(zipEntry);
+
+        byte[] bytes = new byte[1024];
+        int length;
+        while((length = fis.read(bytes)) >= 0) {
+            zos.write(bytes, 0, length);
+        }
+        zos.closeEntry();
+        fis.close();
     }
 
 }

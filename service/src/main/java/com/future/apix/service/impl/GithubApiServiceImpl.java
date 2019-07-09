@@ -144,7 +144,7 @@ public class GithubApiServiceImpl implements GithubApiService {
             ExportRequest exportFormat = new ExportRequest(projectId, FileFormat.JSON);
             commandExecutor.executeCommand(Swagger2ExportCommand.class, exportFormat);
             String oasPath = oasRepository.findProjectOasSwagger2ByProjectId(projectId).orElseThrow(DataNotFoundException::new).getOasFileName();
-            Path path = Paths.get(EXPORT_DIR + oasPath);
+            Path path = Paths.get(EXPORT_DIR + oasPath + "." + FileFormat.JSON.toString().toLowerCase());
             String readContent = readFromFile(path);
 //            System.out.println("Content\n" + readContent);
 

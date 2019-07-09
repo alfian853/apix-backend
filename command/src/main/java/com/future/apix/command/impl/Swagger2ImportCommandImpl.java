@@ -241,6 +241,7 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
             project.setSchema((List<String>) json.get("schema"));
             project.setExternalDocs(oMapper.convertValue(json.get("externalDocs"), Contact.class));
             project.getTeams().add(request.getTeam()); // add team
+            project.setGithubProject(new Github());
 
             /* Copy Definitions Operation*/
             HashMap<String,Object> definitionsJson = toStrObjMap(json.get("definitions"));

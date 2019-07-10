@@ -3,6 +3,7 @@ package com.future.apix.service.bean;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.util.converter.ApiProjectConverter;
+import com.future.apix.util.converter.SwaggerToApixOasConverter;
 import org.kohsuke.github.GitHub;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -26,6 +27,8 @@ public class BeanInitiator {
         return new ApiProjectConverter();
     }
 
+    @Bean
+    SwaggerToApixOasConverter getSwaggerToApixOasConverter() {return new SwaggerToApixOasConverter(); }
 
     @Bean
     public GitHub authToken() throws IOException {

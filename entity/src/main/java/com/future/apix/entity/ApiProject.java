@@ -34,8 +34,11 @@ public class ApiProject implements Serializable, Mappable {
     HashMap<String, SecurityScheme> securityDefinitions = new HashMap<>();
     Contact externalDocs;
 
-    List<String> teams = new ArrayList<>();
+    List<String> teams = new ArrayList<>(); // list of invited team member
     // String teams; // jika 1 project hanya 1 repo -> kalau ada yang gabungan, berarti harus buat team baru
+
+    Team projectOwner; // only 1 team own the project and only team owner can change list of teams
+
     Github githubProject;
 
     @CreatedDate

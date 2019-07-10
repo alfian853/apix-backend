@@ -5,7 +5,9 @@ import com.future.apix.config.SecurityTestConfig;
 import com.future.apix.config.filter.CorsFilter;
 import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.User;
+import com.future.apix.request.UserCreateRequest;
 import com.future.apix.response.RequestResponse;
+import com.future.apix.response.UserCreateResponse;
 import com.future.apix.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
@@ -104,13 +106,18 @@ public class AdminControllerTest {
 //    @WithMockUser(username = "user", roles = {"ADMIN"})
     @WithUserDetails("admin")
     public void createUser_success() throws Exception {
-        when(userService.createUser(USER)).thenReturn(RequestResponse.success("User is created!"));
+        UserCreateRequest request = new UserCreateRequest("username", "password", "password", USER_ROLES);
+        UserCreateResponse response = new UserCreateResponse();
+        response.setStatusToSuccess(); response.setMessage("User is created!");
+        response.setMessage(USER_ID);
+        when(userService.createUser(request)).thenReturn(response);
         mvc.perform(post("/admin/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(USER)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.message", is("User is created!")));
+                .andExpect(jsonPath("$.message", is("User is created!")))
+                .andExpect(jsonPath("$.new_user", is("test-id")));
     }
 
     @Test

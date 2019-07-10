@@ -9,10 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.http.MediaType;
 
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -33,6 +30,6 @@ public class ApiMethodData implements Mappable {
     OperationDetail request = new OperationDetail();
 
     //responseBody sama seperti request
-    HashMap<String, OperationDetail> responses = new HashMap<>();
+    Map<String, OperationDetail> responses = new HashMap<>();
 
 }

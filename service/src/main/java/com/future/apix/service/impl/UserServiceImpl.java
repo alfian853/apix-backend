@@ -5,8 +5,11 @@ import com.future.apix.entity.User;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
+import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.UserRepository;
+import com.future.apix.request.UserCreateRequest;
 import com.future.apix.response.RequestResponse;
+import com.future.apix.response.UserCreateResponse;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,25 +43,29 @@ public class UserServiceImpl implements UserService {
             return response;
         }
         else throw new InvalidAuthenticationException("User is not authenticated!");
-
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public RequestResponse createUser(User user) {
-        User exist = userRepository.findByUsername(user.getUsername());
+    public UserCreateResponse createUser(UserCreateRequest request) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new InvalidRequestException("Password does not match!");
+        }
+        User exist = userRepository.findByUsername(request.getUsername());
         if (exist == null) {
             User newUser = new User();
-            newUser.setUsername(user.getUsername());
-            newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-            newUser.setTeams(user.getTeams());
-            newUser.setRoles(user.getRoles());
-            userRepository.save(newUser);
+            newUser.setUsername(request.getUsername());
+            newUser.setPassword(passwordEncoder.encode(request.getPassword()));
+            newUser.setRoles(request.getRoles());
+            newUser = userRepository.save(newUser);
 
-            RequestResponse response = new RequestResponse();
-            return response.success("User is created!");
-        }
-        else {
+            UserCreateResponse response = new UserCreateResponse();
+            response.setStatusToSuccess();
+            response.setMessage("User is created!");
+            System.out.println("User id: " + newUser.getId());
+            response.setUserId(newUser.getId());
+            return response;
+        } else {
             throw new DuplicateEntryException("Username is already exists!");
         }
     }
@@ -71,7 +78,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public RequestResponse deleteUser(String id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new DataNotFoundException("User does not exists!"));
+                .orElseThrow(() -> new DataNotFoundException("User does not exists!"));
         userRepository.deleteById(id);
         return RequestResponse.success("User has been deleted!");
     }

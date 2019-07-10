@@ -1,7 +1,9 @@
 package com.future.apix.controller;
 
 import com.future.apix.entity.User;
+import com.future.apix.request.UserCreateRequest;
 import com.future.apix.response.RequestResponse;
+import com.future.apix.response.UserCreateResponse;
 import com.future.apix.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,8 +28,8 @@ public class AdminController {
     @PostMapping("/users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public RequestResponse createUser(@Valid @RequestBody User user) {
-        return userService.createUser(user);
+    public UserCreateResponse createUser(@Valid @RequestBody UserCreateRequest request) {
+        return userService.createUser(request);
     }
 
     @DeleteMapping("/users/{id}")

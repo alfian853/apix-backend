@@ -1,6 +1,7 @@
 package com.future.apix.service;
 
 import com.future.apix.request.GithubContentsRequest;
+import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.github.*;
 import org.kohsuke.github.*;
 
@@ -24,4 +25,6 @@ public interface GithubApiService {
     GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException;
 
     GithubCommitResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException;
+
+    ProjectCreateResponse pullFileContent(String repoName, String contentPath, String ref, String projectId) throws IOException;
 }

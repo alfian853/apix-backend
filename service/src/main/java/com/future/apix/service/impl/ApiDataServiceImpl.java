@@ -66,13 +66,14 @@ public class ApiDataServiceImpl implements ApiDataService {
 
     @Override
     public ProjectCreateResponse createProject(ProjectCreateRequest request) {
-        Team existTeam = Optional.ofNullable(teamRepository.findByName(request.getTeam()))
+        Team team = Optional.ofNullable(teamRepository.findByName(request.getTeam()))
                 .orElseThrow(() -> new DataNotFoundException("Team does not exists!"));
         ApiProject project = new ApiProject();
         project.setBasePath(request.getBasePath());
         project.setHost(request.getHost());
         project.setInfo(oMapper.convertValue(request.getInfo(), ProjectInfo.class));
-        project.getTeams().add(request.getTeam());
+        project.setProjectOwner(team);
+        project.getTeams().add(team.getName());
         project.setGithubProject(new Github());
         project.getInfo().setSignature(UUID.randomUUID().toString());
         project.getGithubProject().setSignature(UUID.randomUUID().toString());

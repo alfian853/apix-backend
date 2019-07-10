@@ -93,7 +93,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
         String newFileName = project.getInfo().getTitle()+"_"
                 + project.getInfo().getVersion() +"_"+ projectId;
-        swagger2.setOasFileName(newFileName);
         String newFileNameWithFormat = newFileName + "." + request.getFormat().toString().toLowerCase();
 
         DownloadResponse response = new DownloadResponse();
@@ -159,13 +158,14 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                 response.setFileUrl(EXPORT_DIR + oasFileName);
                 response.setStatusToSuccess();
                 response.setMessage("File export already exists!");
+                return response;
             }
         }
         catch (Exception e){
             e.printStackTrace();
             throw new DefaultRuntimeException("internal server error!");
         }
-        response.fileUrl(EXPORT_URL + swagger2.getOasFileName() + "." + request.getFormat());
+        response.fileUrl(EXPORT_URL + swagger2.getOasFileName() + "." + request.getFormat().toString().toLowerCase());
         response.setStatusToSuccess();
         response.setMessage("File has been exported!");
 

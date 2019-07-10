@@ -91,21 +91,17 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
         ProjectOasSwagger2 swagger2 = swagger2Repository.findProjectOasSwagger2ByProjectId(projectId)
                 .orElse(new ProjectOasSwagger2());
 
-        String newNonFormatFileName = project.getInfo().getTitle()+"_"
-                + project.getInfo().getVersion() +"_"+ projectId;
-        String newFileNameWithFormat = newNonFormatFileName + "." + request.getFormat().toString().toLowerCase();
-
         DownloadResponse response = new DownloadResponse();
         System.out.println("FORMAT: " + request.getFormat().toString());
 
         try{
             boolean fileExist = false;
             boolean expired = false;
-            String oasFileName = newNonFormatFileName + "." + request.getFormat().toString().toLowerCase();
-
+            String targetFilePath = swagger2.getOasFileName()
+                    + "." + request.getFormat().toString().toLowerCase();
             //if not generated yet
             if(swagger2.getOasFileName() != null){
-                File testFile = new File(EXPORT_DIR + swagger2.getOasFileName());
+                File testFile = new File(EXPORT_DIR + targetFilePath);
                 //if not the latest version
                 if(swagger2.getOasFileProjectUpdateDate().before(project.getUpdatedAt())){
                     Files.deleteIfExists(testFile.toPath());
@@ -123,8 +119,12 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                 LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
                 swagger2.setOasSwagger2(oasHashMap);
 
-                writeFile(newFileNameWithFormat, request.getFormat(), swagger2.getOasSwagger2());
+                String newNonFormatFileName = project.getInfo().getTitle()+"_"
+                        + project.getInfo().getVersion() +"_"+ projectId;
 
+                targetFilePath = newNonFormatFileName + "." + request.getFormat().toString().toLowerCase();
+
+                writeFile(newNonFormatFileName, request.getFormat(), swagger2.getOasSwagger2());
                 swagger2.setProjectId(projectId);
                 swagger2.setOasFileName(newNonFormatFileName);
                 swagger2.setOasFileProjectUpdateDate(project.getUpdatedAt());
@@ -134,39 +134,30 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
             // if file is deleted, but the project still exist
             else if(!fileExist){
                 System.out.println("FILE NOT EXISTS! jadi buat baru");
-                writeFile(newFileNameWithFormat, request.getFormat(), swagger2.getOasSwagger2());
-
-                swagger2.setOasFileName(newNonFormatFileName);
+                writeFile(swagger2.getOasFileName(), request.getFormat(), swagger2.getOasSwagger2());
             }
-            else{
-                System.out.println("FILE EXIST! sudah ada di " + EXPORT_DIR + oasFileName);
-                response.setFileUrl(EXPORT_DIR + oasFileName);
-                response.setStatusToSuccess();
-                response.setMessage("File export already exists!");
-                return response;
-            }
+            response.setFileUrl(EXPORT_URL + targetFilePath);
+            response.setStatusToSuccess();
         }
         catch (Exception e){
             e.printStackTrace();
             throw new DefaultRuntimeException("internal server error!");
         }
-        response.fileUrl(EXPORT_URL + swagger2.getOasFileName() + "." + request.getFormat().toString().toLowerCase());
-        response.setStatusToSuccess();
-        response.setMessage("File has been exported!");
 
         return response;
     }
 
-    private void writeFile(String newFileNameWithFormat, FileFormat format, HashMap<String, Object> swagger)
+    private void writeFile(String newFileName, FileFormat format, HashMap<String, Object> swagger)
         throws IOException {
 
-        File file = new File(EXPORT_DIR + newFileNameWithFormat);
         if (format.toString().equals("JSON")) {
+            File file = new File(EXPORT_DIR + newFileName + ".json");
             System.out.println("WRITE FILE TO JSON");
             mapper.writerWithDefaultPrettyPrinter()
                 .writeValue(file, swagger);
         }
         else if (format.toString().equals("YAML")) {
+            File file = new File(EXPORT_DIR + newFileName + ".yaml");
             System.out.println("WRITE FILE TO YAML");
             yamlMapper.writerWithDefaultPrettyPrinter()
                 .writeValue(file, swagger);

@@ -93,11 +93,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
         String newNonFormatFileName = project.getInfo().getTitle()+"_"
                 + project.getInfo().getVersion() +"_"+ projectId;
-<<<<<<< Updated upstream
-        String newFileNameWithFormat = newFileName + "." + request.getFormat().toString().toLowerCase();
-=======
         String newFileNameWithFormat = newNonFormatFileName + "." + request.getFormat().toString().toLowerCase();
->>>>>>> Stashed changes
 
         DownloadResponse response = new DownloadResponse();
         System.out.println("FORMAT: " + request.getFormat().toString());

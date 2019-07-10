@@ -3,6 +3,7 @@ package com.future.apix.command;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.TeamRepository;
 import com.future.apix.request.ProjectImportRequest;
 import com.future.apix.command.impl.Swagger2ImportCommandImpl;
 import com.future.apix.util.ApixUtil;
@@ -26,8 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class Swagger2ImportCommandTest {
@@ -37,7 +37,10 @@ public class Swagger2ImportCommandTest {
     private Swagger2ImportCommandImpl command;
 
     @Mock
-    private ApiRepository repository;
+    private ApiRepository apiRepository;
+
+    @Mock
+    private TeamRepository teamRepository;
 
     @Before
     public void init(){
@@ -68,7 +71,7 @@ public class Swagger2ImportCommandTest {
             e.printStackTrace();
         }
 
-        verify(repository, times(1)).save(any());
+        verify(apiRepository, times(1)).save(any());
         HashMap<String, Object> obj1 = mapper.convertValue(result, HashMap.class);
         HashMap<String, Object> obj2 = mapper.convertValue(expectedResult, HashMap.class);
         Assert.assertTrue(ApixUtil.isEqualObject(obj1, obj2,

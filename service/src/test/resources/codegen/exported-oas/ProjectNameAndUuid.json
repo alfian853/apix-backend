@@ -446,11 +446,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "type": "object",
-              "additionalProperties": {
-                "type": "integer",
-                "format": "int32"
-              }
+              "type": "object"
             }
           }
         },

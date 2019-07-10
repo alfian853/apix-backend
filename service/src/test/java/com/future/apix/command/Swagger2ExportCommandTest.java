@@ -63,7 +63,7 @@ public class Swagger2ExportCommandTest {
         ApiProject project = mapper.convertValue(temp, ApiProject.class);
         Optional<ApiProject> optionalApiProject = Optional.of(project);
         ProjectOasSwagger2 oasSwagger2 = new ProjectOasSwagger2();
-        oasSwagger2.setOasFileName("Petstore API_1.0.0_123.json");
+        oasSwagger2.setOasFileName("Petstore API_1.0.0_123");
 
         oasSwagger2.setOasFileProjectUpdateDate(new Date(new Date().getTime()-1));
         project.setUpdatedAt(new Date());
@@ -110,7 +110,7 @@ public class Swagger2ExportCommandTest {
 
         Optional<ApiProject> optionalApiProject = Optional.of(project);
         ProjectOasSwagger2 oasSwagger2 = new ProjectOasSwagger2();
-        oasSwagger2.setOasFileName("not-exist-path.json");
+        oasSwagger2.setOasFileName("not-exist-path");
         oasSwagger2.setOasSwagger2(swagger);
 
         Date date = new Date();
@@ -130,27 +130,33 @@ public class Swagger2ExportCommandTest {
 
     @Test
     public void oasFileExistAndUpToDateTest() throws URISyntaxException, IOException {
+
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         ApiProject project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
         Optional<ApiProject> optionalApiProject = Optional.of(project);
+        when(apiRepository.findById(any())).thenReturn(optionalApiProject);
+
         ProjectOasSwagger2 oasSwagger2 = new ProjectOasSwagger2();
-        oasSwagger2.setOasFileName("swagger-oas.json");
+        oasSwagger2.setOasFileName("swagger-oas");
+
+
+        URI uriExpected = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
+        HashMap<String, Object> mapExpected = mapper.readValue(Files.readAllBytes(Paths.get(uriExpected)),HashMap.class);
+        oasSwagger2.setOasSwagger2(mapExpected);
 
         Date date = new Date();
         oasSwagger2.setOasFileProjectUpdateDate(date);
         project.setUpdatedAt(date);
 
-        when(apiRepository.findById(any())).thenReturn(optionalApiProject);
         when(swagger2Repository.findProjectOasSwagger2ByProjectId(anyString())).thenReturn(Optional.of(oasSwagger2));
 
         DownloadResponse downloadResponse = command.execute(new ExportRequest("123456",FileFormat.JSON));
+
         URI uriResult = getClass().getClassLoader().getResource(downloadResponse.getFileUrl()).toURI();
-        URI uriExpected = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
+        HashMap<String, Object> mapResult = mapper.readValue(Files.readAllBytes(Paths.get(uriResult)),HashMap.class);
 
         verifyNoMoreInteractions(apiProjectConverter);
 
-        HashMap<String, Object> mapResult = mapper.readValue(Files.readAllBytes(Paths.get(uriResult)),HashMap.class);
-        HashMap<String, Object> mapExpected = mapper.readValue(Files.readAllBytes(Paths.get(uriExpected)),HashMap.class);
         Assert.assertTrue(ApixUtil.isEqualObject(mapResult, mapExpected, this.ignoredField));
     }
 

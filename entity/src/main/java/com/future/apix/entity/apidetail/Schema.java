@@ -54,7 +54,7 @@ public class Schema implements Mappable {
 
     public Schema getItems() {
         if(this.items != null){
-            if(this.items.getType() != null) return this.items;
+            if(this.items.getType() != null || this.items.ref != null) return this.items;
             else{
                 items.setType("object");
                 return items;

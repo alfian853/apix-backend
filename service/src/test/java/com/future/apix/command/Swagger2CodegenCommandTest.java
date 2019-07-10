@@ -1,12 +1,11 @@
 package com.future.apix.command;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.command.impl.Swagger2CodegenCommandImpl;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.OasSwagger2Repository;
-import com.future.apix.service.CommandExecutorService;
-import com.future.apix.command.impl.Swagger2CodegenCommandImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +19,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Date;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -46,7 +46,7 @@ public class Swagger2CodegenCommandTest {
 
     private String CODEGEN_JAR, CODEGEN_RESULT_DIR,OAS_DIR;
 
-    private String OAS_FILE_NAME = "ProjectNameAndUuid.json";
+    private String OAS_FILE_NAME = "ProjectNameAndUuid";
     private String CODE_FILE_NAME = "ProjectNameAndUuid.zip";
 
 

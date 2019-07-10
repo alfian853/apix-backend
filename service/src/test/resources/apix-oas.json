@@ -39,11 +39,7 @@
                   "description" : "successful operation",
                   "required" : false,
                   "schema" : {
-                    "type" : "object",
-                    "additionalProperties" : {
-                      "type" : "integer",
-                      "format" : "int32"
-                    }
+                    "type" : "object"
                   }
                 }
               }
@@ -71,7 +67,7 @@
                 "queryParams" : {},
                 "headers" : {},
                 "schema" : {
-                  "ref" : "#/definitions/5ca7e792-fc98-4b90-9a71-101779fe7154"
+                  "$ref" : "#/definitions/5ca7e792-fc98-4b90-9a71-101779fe7154"
                 }
               },
               "responses" : {
@@ -79,7 +75,7 @@
                   "description" : "successful operation",
                   "required" : false,
                   "schema" : {
-                    "ref" : "#/definitions/5ca7e792-fc98-4b90-9a71-101779fe7154"
+                    "$ref" : "#/definitions/5ca7e792-fc98-4b90-9a71-101779fe7154"
                   }
                 },
                 "400" : {
@@ -113,7 +109,7 @@
                   "description" : "successful operation",
                   "required" : false,
                   "schema" : {
-                    "ref" : "#/definitions/5ca7e792-fc98-4b90-9a71-101779fe7154"
+                    "$ref" : "#/definitions/5ca7e792-fc98-4b90-9a71-101779fe7154"
                   }
                 },
                 "400" : {
@@ -197,7 +193,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
+                    "$ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
                   }
                 }
               },
@@ -290,7 +286,7 @@
                 "queryParams" : {},
                 "headers" : {},
                 "schema" : {
-                  "ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
+                  "$ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
                 }
               },
               "responses" : {
@@ -325,7 +321,7 @@
                 "schema" : {
                   "type" : "array",
                   "items" : {
-                    "ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
+                    "$ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
                   }
                 }
               },
@@ -361,7 +357,7 @@
                   "description" : "successful operation",
                   "required" : false,
                   "schema" : {
-                    "ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
+                    "$ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
                   }
                 },
                 "400" : {
@@ -416,7 +412,7 @@
                 "queryParams" : {},
                 "headers" : {},
                 "schema" : {
-                  "ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
+                  "$ref" : "#/definitions/e982911b-5f7d-49ae-aac0-4a468f1391e7"
                 }
               },
               "responses" : {
@@ -519,7 +515,7 @@
                   "schema" : {
                     "type" : "array",
                     "items" : {
-                      "ref" : "#/definitions/b85eaff2-ae79-4e76-af59-176738f62eec"
+                      "$ref" : "#/definitions/b85eaff2-ae79-4e76-af59-176738f62eec"
                     }
                   }
                 },
@@ -573,7 +569,7 @@
                   "description" : "successful operation",
                   "required" : false,
                   "schema" : {
-                    "ref" : "#/definitions/f10dd269-c650-44fa-91b6-ffd570901c7e"
+                    "$ref" : "#/definitions/f10dd269-c650-44fa-91b6-ffd570901c7e"
                   }
                 }
               }
@@ -715,7 +711,7 @@
                 "queryParams" : {},
                 "headers" : {},
                 "schema" : {
-                  "ref" : "#/definitions/b85eaff2-ae79-4e76-af59-176738f62eec"
+                  "$ref" : "#/definitions/b85eaff2-ae79-4e76-af59-176738f62eec"
                 }
               },
               "responses" : {
@@ -772,7 +768,7 @@
                   "schema" : {
                     "type" : "array",
                     "items" : {
-                      "ref" : "#/definitions/b85eaff2-ae79-4e76-af59-176738f62eec"
+                      "$ref" : "#/definitions/b85eaff2-ae79-4e76-af59-176738f62eec"
                     }
                   }
                 },
@@ -848,7 +844,7 @@
                   "description" : "successful operation",
                   "required" : false,
                   "schema" : {
-                    "ref" : "#/definitions/b85eaff2-ae79-4e76-af59-176738f62eec"
+                    "$ref" : "#/definitions/b85eaff2-ae79-4e76-af59-176738f62eec"
                   }
                 },
                 "400" : {
@@ -1017,12 +1013,12 @@
             "format" : "int64"
           },
           "category" : {
-            "ref" : "#/definitions/7a36fc66-4417-4eac-9e02-444721c4a9ce"
+            "$ref" : "#/definitions/7a36fc66-4417-4eac-9e02-444721c4a9ce"
           },
           "tags" : {
             "type" : "array",
             "items" : {
-              "ref" : "#/definitions/7e4fa958-54c6-4589-bb03-00e4d6277711"
+              "$ref" : "#/definitions/7e4fa958-54c6-4589-bb03-00e4d6277711"
             },
             "xml" : {
               "name" : "tag",

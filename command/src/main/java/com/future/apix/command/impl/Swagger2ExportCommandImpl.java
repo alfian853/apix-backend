@@ -91,9 +91,13 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
         ProjectOasSwagger2 swagger2 = swagger2Repository.findProjectOasSwagger2ByProjectId(projectId)
                 .orElse(new ProjectOasSwagger2());
 
-        String newFileName = project.getInfo().getTitle()+"_"
+        String newNonFormatFileName = project.getInfo().getTitle()+"_"
                 + project.getInfo().getVersion() +"_"+ projectId;
+<<<<<<< Updated upstream
         String newFileNameWithFormat = newFileName + "." + request.getFormat().toString().toLowerCase();
+=======
+        String newFileNameWithFormat = newNonFormatFileName + "." + request.getFormat().toString().toLowerCase();
+>>>>>>> Stashed changes
 
         DownloadResponse response = new DownloadResponse();
         System.out.println("FORMAT: " + request.getFormat().toString());
@@ -101,12 +105,11 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
         try{
             boolean fileExist = false;
             boolean expired = false;
-            String oasFileName = swagger2.getOasFileName() + "." + request.getFormat().toString().toLowerCase();
+            String oasFileName = newNonFormatFileName + "." + request.getFormat().toString().toLowerCase();
 
             //if not generated yet
-            /*
             if(swagger2.getOasFileName() != null){
-                File testFile = new File(EXPORT_DIR + oasFileName);
+                File testFile = new File(EXPORT_DIR + swagger2.getOasFileName());
                 //if not the latest version
                 if(swagger2.getOasFileProjectUpdateDate().before(project.getUpdatedAt())){
                     Files.deleteIfExists(testFile.toPath());
@@ -117,23 +120,9 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                     fileExist = true;
                 }
             }
-             */
-            System.out.println(EXPORT_DIR + oasFileName);
-            File testFile = new File(EXPORT_DIR + oasFileName);
-            if(testFile.exists()) {
-                System.out.println("FILE EXISTS");
-                fileExist = true;
-
-                //if not the latest version
-                if (swagger2.getOasFileProjectUpdateDate().before(project.getUpdatedAt())) {
-                    System.out.println("FILE NOT UPDATED!");
-                    Files.deleteIfExists(testFile.toPath());
-                    expired = true;
-                } // but the file is deleted
-            }
 
             // not the latest update and file is available
-            if( expired || (!fileExist && swagger2.getOasSwagger2() == null) ){
+            if( expired || swagger2.getOasSwagger2() == null ){
                 System.out.println("NOT THE LATEST UPDATE!");
                 LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
                 swagger2.setOasSwagger2(oasHashMap);
@@ -141,7 +130,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                 writeFile(newFileNameWithFormat, request.getFormat(), swagger2.getOasSwagger2());
 
                 swagger2.setProjectId(projectId);
-                swagger2.setOasFileName(newFileName);
+                swagger2.setOasFileName(newNonFormatFileName);
                 swagger2.setOasFileProjectUpdateDate(project.getUpdatedAt());
 
                 swagger2Repository.save(swagger2);
@@ -151,7 +140,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                 System.out.println("FILE NOT EXISTS! jadi buat baru");
                 writeFile(newFileNameWithFormat, request.getFormat(), swagger2.getOasSwagger2());
 
-                swagger2.setOasFileName(newFileName);
+                swagger2.setOasFileName(newNonFormatFileName);
             }
             else{
                 System.out.println("FILE EXIST! sudah ada di " + EXPORT_DIR + oasFileName);

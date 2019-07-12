@@ -10,5 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class ProjectImportRequest {
     String team;
+    Boolean isNewTeam; // true if create new team
     MultipartFile file;
 }

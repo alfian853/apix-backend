@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 public class ProjectCreateRequest {
     String basePath, host;
     String team;
+    Boolean isNewTeam; // true if create new team
 
     @Data
     @Builder

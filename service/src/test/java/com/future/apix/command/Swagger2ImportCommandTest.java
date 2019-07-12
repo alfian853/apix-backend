@@ -59,7 +59,7 @@ public class Swagger2ImportCommandTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ProjectImportRequest request = new ProjectImportRequest("", multipartFile);
+        ProjectImportRequest request = new ProjectImportRequest("", false, multipartFile);
         ApiProject result = command.execute(request);
 
         uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();

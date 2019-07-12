@@ -51,6 +51,9 @@ public class UserServiceImpl implements UserService {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new InvalidRequestException("Password does not match!");
         }
+        if (request.getUsername().length() < 4) {
+            throw new InvalidRequestException("Username is too short!");
+        }
         User exist = userRepository.findByUsername(request.getUsername());
         if (exist == null) {
             User newUser = new User();

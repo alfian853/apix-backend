@@ -122,7 +122,7 @@ public class ApiProjectConverter {
                         }
                         else{
                             LinkedHashMap<String,Object> param = new LinkedHashMap<>();
-                            param.put("in",body.getIn());
+                            param.put("in","body");
                             param.put("name",body.getName());
                             param.put("required",body.isRequired());
                             param.put("schema",body.getSchema());

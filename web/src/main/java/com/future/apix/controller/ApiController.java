@@ -38,10 +38,12 @@ public class ApiController {
     @PostMapping("/import")
     public RequestResponse importFromFile(@RequestParam("file")MultipartFile file,
                                           @RequestParam("type") String type,
-                                          @RequestParam("team") String team){
+                                          @RequestParam("team") String team,
+                                          @RequestParam("isNewTeam") Boolean isNewTeam) {
         if(type.equals("oas-swagger2")){
             ProjectImportRequest request = new ProjectImportRequest();
             request.setFile(file);
+            request.setIsNewTeam(isNewTeam);
             request.setTeam(team);
             return (commandExecutor.executeCommand(Swagger2ImportCommand.class, request) == null)?
                     RequestResponse.failed() : RequestResponse.success();

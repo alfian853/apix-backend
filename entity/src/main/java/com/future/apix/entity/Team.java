@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class Team {
     @NotEmpty(message = "Team creator name must not be empty")
     private String creator; // person who create the team and give access to member
 
-    private List<Member> members;
+    private List<Member> members = new ArrayList<>();
 
     @CreatedDate
     Date createdAt;

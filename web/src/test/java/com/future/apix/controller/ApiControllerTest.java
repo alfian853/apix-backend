@@ -16,6 +16,7 @@ import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.ProjectUpdateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
+import com.future.apix.service.ApiTeamService;
 import com.future.apix.service.CommandExecutorService;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,6 +57,9 @@ public class ApiControllerTest {
 
     @Mock
     private ApiDataService apiDataService;
+
+    @Mock
+    private ApiTeamService apiTeamService;
 
     @Mock
     private CommandExecutorService commandExecutor;
@@ -272,13 +276,13 @@ public class ApiControllerTest {
 
     @Test
     public void assignTeamToProject() throws Exception {
-        when(apiDataService.grantTeamAccess(anyString(), anyString())).thenReturn(RequestResponse.success("Team has been assigned to project!"));
+        when(apiTeamService.grantTeamAccess(anyString(), any())).thenReturn(RequestResponse.success("Team has been assigned to project!"));
         mvc.perform(post("/projects/{id}/assign", 1)
                 .param("teamName", "team"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.message", is("Team has been assigned to project!")));
-        verify(apiDataService, times(1)).grantTeamAccess(anyString(), anyString());
+        verify(apiTeamService, times(1)).grantTeamAccess(anyString(), any());
     }
 
 }

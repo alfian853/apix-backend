@@ -94,29 +94,6 @@ public class ApiDataServiceImpl implements ApiDataService {
         return response;
     }
 
-    @Override
-    public RequestResponse grantTeamAccess(String id, String teamName) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        RequestResponse response = new RequestResponse();
-        Team team = Optional.ofNullable(teamRepository.findByName(teamName))
-                .orElseThrow(() -> new DataNotFoundException("Team does not exists!"));
-        UserProfileResponse profile = oMapper.convertValue(auth.getPrincipal(), UserProfileResponse.class);
-        System.out.println("Username: " + profile.getUsername());
-        if (profile.getUsername().equals(team.getCreator())) {
-            ApiProject apiProject = apiRepository.findById(id)
-                    .orElseThrow(() -> new DataNotFoundException("Api project does not exists!"));
-            if (!apiProject.getTeams().contains(teamName)) apiProject.getTeams().add(teamName);
-            apiRepository.save(apiProject);
-            response.setStatusToSuccess();
-            response.setMessage("Team has been assigned to project!");
-            return response;
-        }
-        else {
-            throw new InvalidRequestException("You are not this team creator!");
-        }
-    }
-
     private Team setTeam(Boolean isNewTeam, String teamName){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(!isNewTeam) { // if team is exists
@@ -134,7 +111,7 @@ public class ApiDataServiceImpl implements ApiDataService {
             newTeam.getMembers().add(new Member(user.getUsername(), true));
             newTeam.setAccess("private");
             newTeam = teamRepository.save(newTeam);
-            
+
             user.getTeams().add(newTeam.getName());
             userRepository.save(user);
 

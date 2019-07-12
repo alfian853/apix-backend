@@ -24,6 +24,4 @@ public interface  ApiDataService {
 
     // create new Project
     ProjectCreateResponse createProject(ProjectCreateRequest request);
-
-    RequestResponse grantTeamAccess(String id, String teamName);
 }

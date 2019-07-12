@@ -6,12 +6,14 @@ import com.future.apix.command.model.QueryExecutorRequest;
 import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.request.ProjectAssignTeamRequest;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.request.ProjectImportRequest;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
+import com.future.apix.service.ApiTeamService;
 import com.future.apix.service.CommandExecutorService;
 import com.future.apix.command.Swagger2CodegenCommand;
 import com.future.apix.command.Swagger2ExportCommand;
@@ -30,7 +32,10 @@ import java.util.List;
 public class ApiController {
 
     @Autowired
-    ApiDataService apiDataService;
+    private ApiDataService apiDataService;
+
+    @Autowired
+    private ApiTeamService apiTeamService;
 
     @Autowired
     CommandExecutorService commandExecutor;
@@ -104,7 +109,8 @@ public class ApiController {
     @PostMapping("/{id}/assign")
     public RequestResponse assignTeamToProject(
             @PathVariable("id") String id,
-            @RequestParam("teamName") String teamName){
-        return apiDataService.grantTeamAccess(id, teamName);
+            @RequestBody ProjectAssignTeamRequest request
+        ){
+        return apiTeamService.grantTeamAccess(id, request);
     }
 }

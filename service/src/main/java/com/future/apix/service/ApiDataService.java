@@ -11,9 +11,6 @@ public interface  ApiDataService {
 
     ApiProject findById(String id);
 
-    // digunakan untuk mendapatkan semua project dari mongo (sementara saja)
-    List<ApiProject> findAll();
-
     // digunakan untuk mendapatkan field tertentu yang diletakkan pada front page
     List<ApiProject> findAllProjects();
 

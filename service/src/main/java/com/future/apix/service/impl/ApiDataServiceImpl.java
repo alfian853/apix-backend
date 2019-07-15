@@ -48,11 +48,6 @@ public class ApiDataServiceImpl implements ApiDataService {
     }
 
     @Override
-    public List<ApiProject> findAll() {
-        return apiRepository.findAll();
-    }
-
-    @Override
     public List<ApiProject> findAllProjects() {
         return apiRepository.findAllProjects();
     }

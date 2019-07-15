@@ -65,7 +65,6 @@ public class UserServiceImpl implements UserService {
             UserCreateResponse response = new UserCreateResponse();
             response.setStatusToSuccess();
             response.setMessage("User is created!");
-            System.out.println("User id: " + newUser.getId());
             response.setUserId(newUser.getId());
             return response;
         } else {

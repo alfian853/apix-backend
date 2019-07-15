@@ -79,7 +79,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public RequestResponse editTeam(String name, Team team) {
         Team existTeam = Optional.ofNullable(teamRepository.findByName(name))
-            .orElseThrow(() -> new DataNotFoundException("Team does not exists!"));
+            .orElseThrow(() -> new DataNotFoundException("Team does not exist!"));
         RequestResponse response = new RequestResponse();
         for(Member member : team.getMembers()){
             Boolean memberAvailable = false;
@@ -96,39 +96,4 @@ public class TeamServiceImpl implements TeamService {
         response.setMessage("Members have been invited!");
         return response;
     }
-
-    /*
-    @Override
-    public RequestResponse grantTeamAccess(String name, List<Member> members) {
-        if (members.size() == 0) throw new DataNotFoundException("There is no member to be granted!");
-        String failedName = "";
-        Team team = teamRepository.findByName(name);
-        if (team != null) {
-            for (Member member : members) {
-                String memberName = member.getUsername();
-                User user = userRepository.findByUsername(memberName);
-                if (user == null) failedName += memberName + ", ";
-                else if (user!=null && !user.getTeams().contains(name)) { // update in User if not yet belong to team
-                    if (!user.getTeams().contains(name)) user.getTeams().add(name);
-                    userRepository.save(user);
-                }
-                int idx = team.getMembers().indexOf(member);
-                team.getMembers().get(idx).setGrant(!member.getGrant()); // jadi di reverse -> if grant = false jadi TRUE
-            }
-            teamRepository.save(team);
-
-            RequestResponse response = new RequestResponse();
-            if (failedName != "") {
-                response.setStatusToFailed();
-                response.setMessage("Members: " + failedName + "is failed to updated!");
-            } else {
-                response.setStatusToSuccess();
-                response.setMessage("Team members grant have been updated!");
-            }
-            return response;
-        }
-        else throw new DataNotFoundException("Team is not found!");
-    }
-
-     */
 }

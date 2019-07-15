@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
 import com.future.apix.exception.DataNotFoundException;
+import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.TeamRepository;
@@ -58,7 +59,7 @@ public class ApiTeamServiceImpl implements ApiTeamService {
             else throw new InvalidRequestException("Team is already in the project!");
         }
         else {
-            throw new InvalidRequestException("You are unauthorized to grant team!");
+            throw new InvalidAuthenticationException("You are unauthorized to grant team!");
         }
     }
 

@@ -5,6 +5,7 @@ import com.future.apix.entity.User;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
+import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.UserCreateRequest;
 import com.future.apix.response.RequestResponse;
@@ -77,7 +78,7 @@ public class UserServiceTest {
 
     @Test
     public void deleteUser_success(){
-        when(userRepository.findById("test-id")).thenReturn(userOpt);
+        when(userRepository.findById(anyString())).thenReturn(userOpt);
         RequestResponse response = serviceMock.deleteUser("test-id");
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("User has been deleted!", response.getMessage());
@@ -118,8 +119,8 @@ public class UserServiceTest {
 
     @Test
     public void createUser_userAlreadyExist(){
-        when(userRepository.findByUsername(USER_USERNAME)).thenReturn(USER);
-        UserCreateRequest request = new UserCreateRequest("username", "password", "password", USER_ROLES);
+        when(userRepository.findByUsername(anyString())).thenReturn(USER);
+        UserCreateRequest request = new UserCreateRequest("test", "password", "password", USER_ROLES);
         try {
             serviceMock.createUser(request);
         } catch (DuplicateEntryException e) {
@@ -129,12 +130,32 @@ public class UserServiceTest {
 
     @Test
     public void createUser_success(){
-        when(userRepository.findByUsername(USER_USERNAME)).thenReturn(null);
+        when(userRepository.findByUsername(anyString())).thenReturn(null);
         when(userRepository.save(any(User.class))).thenReturn(USER);
         UserCreateRequest request = new UserCreateRequest("username", "password", "password", USER_ROLES);
         RequestResponse response = serviceMock.createUser(request);
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("User is created!", response.getMessage());
+    }
+
+    @Test
+    public void createUser_passwordNotMatch(){
+        UserCreateRequest request = new UserCreateRequest("username", "password", "not-password", USER_ROLES);
+        try {
+            serviceMock.createUser(request);
+        } catch (InvalidRequestException e) {
+            Assert.assertEquals("Password does not match!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void createUser_userLengthNotSufficient(){
+        UserCreateRequest request = new UserCreateRequest("me", "password", "password", USER_ROLES);
+        try {
+            serviceMock.createUser(request);
+        } catch (InvalidRequestException e) {
+            Assert.assertEquals("Username is too short!", e.getMessage());
+        }
     }
 
     /*

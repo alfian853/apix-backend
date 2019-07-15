@@ -49,10 +49,10 @@ public class TeamServiceTest {
 
     private static final String USER_USERNAME = "test";
     private static final List<String> USER_ROLES = new ArrayList<>(Arrays.asList("ROLE_USER", "ROLE_ADMIN"));
-    private static final List<String> USER_TEAMS = new ArrayList<>(Arrays.asList("TeamTest"));
+    private static final List<String> USER_TEAMS = new ArrayList<>(Arrays.asList("TeamExist"));
     private static final User USER = new User("", USER_USERNAME, "", USER_ROLES, USER_TEAMS);
 
-    private static final List<Member> TEAM_MEMBER = Collections.singletonList(new Member(USER_USERNAME, true));
+    private static final List<Member> TEAM_MEMBER = new ArrayList<>(Arrays.asList(new Member(USER_USERNAME, true)));
     private static final Team TEAM = Team.builder()
             .id(TEAM_ID)
             .name(TEAM_NAME)
@@ -165,45 +165,42 @@ public class TeamServiceTest {
     }
 
     /*
-        public RequestResponse grantTeamAccess(String name, List<Member> members)
-
+        public RequestResponse editTeam(String name, Team team)
+     */
     @Test
-    public void grantTeamAccess_teamNotFound(){
+    public void editTeam_teamAlreadyExists(){
+        when(teamRepository.findByName(TEAM_NAME)).thenReturn(null);
         try {
-            serviceMock.grantTeamAccess("not-TeamTest", null);
-        } catch (DataNotFoundException e){
-            Assert.assertEquals("Team is not found!", e.getMessage());
+            serviceMock.editTeam("TeamTest", TEAM);
+        } catch (DataNotFoundException e) {
+            Assert.assertEquals("Team does not exist!", e.getMessage());
         }
     }
 
     @Test
-    public void grantTeamAccess_teamExistAndUserAlreadyInTeam(){
+    public void editTeam_successMemberAlreadyExist(){
         when(teamRepository.findByName(TEAM_NAME)).thenReturn(TEAM);
-        when(userRepository.findByUsername(USER_USERNAME)).thenReturn(USER);
-        RequestResponse response = serviceMock.grantTeamAccess(TEAM_NAME, TEAM_MEMBER);
+        RequestResponse response = serviceMock.editTeam("TeamTest", TEAM);
         Assert.assertTrue(response.getSuccess());
-        Assert.assertEquals("Team members grant has been updated!", response.getMessage());
-    }
-
-
-    @Test
-    public void grantTeamAccess_teamExistAndUserNotInTeamYet(){
-        when(teamRepository.findByName(TEAM_NAME)).thenReturn(TEAM);
-        when(userRepository.findByUsername(USER_USERNAME)).thenReturn(new User("", USER_USERNAME, "", new ArrayList<>(), new ArrayList<>()));
-        RequestResponse response = serviceMock.grantTeamAccess(TEAM_NAME, TEAM_MEMBER);
-        Assert.assertTrue(response.getSuccess());
-        Assert.assertEquals("Team members grant has been updated!", response.getMessage());
+        Assert.assertEquals("Members have been invited!", response.getMessage());
     }
 
     @Test
-    public void grantTeamAccess_teamExistUserNotExist(){
+    public void editTeam_successAddMember(){
         when(teamRepository.findByName(TEAM_NAME)).thenReturn(TEAM);
-        when(userRepository.findByUsername(USER_USERNAME)).thenReturn(null);
-        RequestResponse response = serviceMock.grantTeamAccess(TEAM_NAME, TEAM_MEMBER);
-        Assert.assertFalse(response.getSuccess());
-        System.out.println(response.getMessage());
-//        Assert.assertEquals("Members: " + USER_USERNAME + ", is failed to updated!", response.getMessage());
-    }
+        Team teamNewMember = Team.builder()
+            .id(TEAM_ID)
+            .name(TEAM_NAME)
+            .division(TEAM_DIVISION)
+            .access(TEAM_ACCESS)
+            .creator(TEAM_CREATOR)
+            .members(Arrays.asList(new Member("JohnDoe", false)))
+            .build();
 
-     */
+//        https://stackoverflow.com/questions/5755477/java-list-add-unsupportedoperationexception
+
+        RequestResponse response = serviceMock.editTeam("TeamTest",teamNewMember);
+        Assert.assertTrue(response.getSuccess());
+        Assert.assertEquals("Members have been invited!", response.getMessage());
+    }
 }

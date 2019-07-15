@@ -2,11 +2,16 @@ package com.future.apix.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
+import com.future.apix.entity.Team;
+import com.future.apix.entity.User;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.TeamRepository;
+import com.future.apix.repository.UserRepository;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
+import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.impl.ApiDataServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,21 +19,23 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApiDataTest {
@@ -42,8 +49,29 @@ public class ApiDataTest {
     @Mock
     ApiRepository apiRepository;
 
+    @Mock
+    TeamRepository teamRepository;
+
+    @Mock
+    UserRepository userRepository;
+
     private Optional<ApiProject> optionalApiProject;
     private ApiProject project;
+
+    private static final Team TEAM = Team.builder()
+        .id("test-id")
+        .name("teamTest")
+        .division("division")
+        .access("public")
+        .creator("test")
+        .build();
+
+    private static final String USER_ID = "test-id";
+    private static final String USER_USERNAME = "test";
+    private static final String USER_PASSWORD = new BCryptPasswordEncoder().encode("test");
+    private static final List<String> USER_ROLES = new ArrayList<>(Arrays.asList("ROLE_USER", "ROLE_ADMIN"));
+    private static final List<String> USER_TEAMS = new ArrayList<>(Arrays.asList("TeamTest"));
+    private static final User USER = new User(USER_ID, USER_USERNAME, USER_PASSWORD, USER_ROLES, USER_TEAMS);
 
 
     @Before
@@ -51,8 +79,6 @@ public class ApiDataTest {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
         optionalApiProject = Optional.of(project);
-
-//        when(apiRepository.findById(anyString())).thenReturn(optionalApiProject);
     }
 
     /*
@@ -106,23 +132,57 @@ public class ApiDataTest {
     }
 
     @Test
-    public void createProject_success() throws URISyntaxException, IOException {
+    public void createProject_success_teamExists() {
         ProjectCreateRequest request = ProjectCreateRequest.builder()
-                .basePath("/v2")
-                .host("petstore.swagger.io")
-                .info(
-                        ProjectCreateRequest.ProjectInfo.builder()
-                        .title("Petstore API")
-                        .version("1.0.0")
-//                        .termsOfService("http://swagger.io/terms/")
-//                        .description("This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.")
-                        .build()
-                )
-                .build();
+            .basePath("/v2")
+            .host("petstore.swagger.io")
+            .info(
+                ProjectCreateRequest.ProjectInfo.builder()
+                    .title("Petstore API")
+                    .version("1.0.0")
+                    //                        .termsOfService("http://swagger.io/terms/")
+                    //                        .description("This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.")
+                    .build()
+            )
+            .isNewTeam(false)
+            .team("TeamTest")
+            .build();
+        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
+        when(apiRepository.save(any(ApiProject.class))).thenReturn(project);
+        ProjectCreateResponse response = serviceMock.createProject(request);
+        Assert.assertTrue(response.getSuccess());
+        Assert.assertEquals("Project has been created!", response.getMessage());
+    }
 
-//        URI uri = getClass().getClassLoader().getResource("com.future.apix-oas-create.json").toURI();
-//        ApiProject projectTest = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
+    @Test
+    public void createProject_success_teamNotExists() {
+        ProjectCreateRequest request = ProjectCreateRequest.builder()
+            .basePath("/v2")
+            .host("petstore.swagger.io")
+            .info(
+                ProjectCreateRequest.ProjectInfo.builder()
+                    .title("Petstore API")
+                    .version("1.0.0")
+                    .build()
+            )
+            .isNewTeam(true)
+            .team("TeamTest")
+            .build();
 
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(USER);
+        UserProfileResponse expected = new UserProfileResponse();
+        expected.setStatusToSuccess(); expected.setMessage("User is authenticated");
+        expected.setUsername(USER_USERNAME); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
+//        when(mapper.convertValue(any(), eq(UserProfileResponse.class))).thenReturn(expected);
+        doReturn(expected).when(mapper).convertValue(any(), eq(UserProfileResponse.class));
+
+        when(userRepository.findByUsername(anyString())).thenReturn(USER);
+        when(teamRepository.save(any(Team.class))).thenReturn(TEAM);
         when(apiRepository.save(any(ApiProject.class))).thenReturn(project);
         ProjectCreateResponse response = serviceMock.createProject(request);
         Assert.assertTrue(response.getSuccess());

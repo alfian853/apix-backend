@@ -33,6 +33,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -41,6 +42,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -106,11 +108,11 @@ public class AdminControllerTest {
 //    @WithMockUser(username = "user", roles = {"ADMIN"})
     @WithUserDetails("admin")
     public void createUser_success() throws Exception {
-        UserCreateRequest request = new UserCreateRequest("username", "password", "password", USER_ROLES);
+//        UserCreateRequest request = new UserCreateRequest("username", "password", "password", USER_ROLES);
         UserCreateResponse response = new UserCreateResponse();
         response.setStatusToSuccess(); response.setMessage("User is created!");
-        response.setMessage(USER_ID);
-        when(userService.createUser(request)).thenReturn(response);
+        response.setUserId(USER_ID);
+        when(userService.createUser(any())).thenReturn(response);
         mvc.perform(post("/admin/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(USER)))

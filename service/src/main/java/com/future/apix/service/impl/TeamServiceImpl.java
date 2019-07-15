@@ -77,27 +77,27 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public RequestResponse editTeam(Team team) {
-        Team existTeam = teamRepository.findByName(team.getName());
+    public RequestResponse editTeam(String name, Team team) {
+        Team existTeam = Optional.ofNullable(teamRepository.findByName(name))
+            .orElseThrow(() -> new DataNotFoundException("Team does not exists!"));
         RequestResponse response = new RequestResponse();
-        if (existTeam != null){
-            for(Member member : team.getMembers()){
-                Boolean memberAvailable = false;
-                for(Member existMember: existTeam.getMembers()){
-                    if (existMember.equals(member)) memberAvailable =true;
-                }
-                if(!memberAvailable) {
-                    existTeam.getMembers().add(member);
-                }
+        for(Member member : team.getMembers()){
+            Boolean memberAvailable = false;
+            for(Member existMember: existTeam.getMembers()){
+                if (existMember.equals(member) || existMember.getUsername().equals(member.getUsername()))
+                    memberAvailable = true;
             }
-            teamRepository.save(existTeam);
-            response.setStatusToSuccess();
-            response.setMessage("Members have been invited!");
-            return response;
+            if(!memberAvailable) {
+                existTeam.getMembers().add(member);
+            }
         }
-        else throw new DataNotFoundException("Team does not exists!");
+        teamRepository.save(existTeam);
+        response.setStatusToSuccess();
+        response.setMessage("Members have been invited!");
+        return response;
     }
 
+    /*
     @Override
     public RequestResponse grantTeamAccess(String name, List<Member> members) {
         if (members.size() == 0) throw new DataNotFoundException("There is no member to be granted!");
@@ -129,4 +129,6 @@ public class TeamServiceImpl implements TeamService {
         }
         else throw new DataNotFoundException("Team is not found!");
     }
+
+     */
 }

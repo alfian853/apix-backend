@@ -80,7 +80,6 @@ public class GithubApiController {
 //    }
 
     @GetMapping("/repos/{owner}/{repo}/contents/{path:.+}")
-//            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public GithubContentResponse getFileContent(
 //            https://stackoverflow.com/questions/30548822/spring-mvc-4-application-json-content-type-is-not-being-set-correctly
             // GET ERROR 406 for content since the request uri ends with .[suffix] the requestedMediaTypes be "text/[suffix]"
@@ -94,17 +93,13 @@ public class GithubApiController {
     }
 
     @PostMapping("/repos/{owner}/{repo}/contents/{path:.+}")
-//            produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ProjectCreateResponse pullFileContent(
-//            https://stackoverflow.com/questions/30548822/spring-mvc-4-application-json-content-type-is-not-being-set-correctly
-            // GET ERROR 406 for content since the request uri ends with .[suffix] the requestedMediaTypes be "text/[suffix]"
             @PathVariable("owner") String owner,
             @PathVariable("repo") String repo,
             @PathVariable("path") String contentPath,
             @RequestParam(required = false) String ref,
             @RequestParam("projectId") String projectId
     ) throws IOException {
-//        return githubService.getFileContent(owner + "/" + repo, contentPath, ref);
         return githubService.pullFileContent(owner + "/" + repo, contentPath, ref, projectId);
     }
 

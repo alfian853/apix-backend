@@ -166,7 +166,7 @@ public class TeamServiceTest {
 
     /*
         public RequestResponse grantTeamAccess(String name, List<Member> members)
-     */
+
     @Test
     public void grantTeamAccess_teamNotFound(){
         try {
@@ -184,6 +184,7 @@ public class TeamServiceTest {
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Team members grant has been updated!", response.getMessage());
     }
+
 
     @Test
     public void grantTeamAccess_teamExistAndUserNotInTeamYet(){
@@ -203,4 +204,6 @@ public class TeamServiceTest {
         System.out.println(response.getMessage());
 //        Assert.assertEquals("Members: " + USER_USERNAME + ", is failed to updated!", response.getMessage());
     }
+
+     */
 }

@@ -10,6 +10,7 @@ import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.DataNotFoundException;
+import com.future.apix.request.ProjectAssignTeamRequest;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.response.ProjectCreateResponse;
@@ -77,9 +78,9 @@ public class ApiControllerTest {
     public void init() throws IOException, URISyntaxException {
         MockitoAnnotations.initMocks(this);
         mvc = MockMvcBuilders.standaloneSetup(apiController)
-                .setControllerAdvice(new DefaultControllerAdvice())
-                .addFilter(new CorsFilter())
-                .build();
+            .setControllerAdvice(new DefaultControllerAdvice())
+            .addFilter(new CorsFilter())
+            .build();
 
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
@@ -91,12 +92,13 @@ public class ApiControllerTest {
         when(commandExecutor.executeCommand(any(), any())).thenReturn(project);
         MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
         mvc.perform(multipart("/projects/import")
-                .file("file", jsonFile.getBytes())
-                .param("type", "oas-swagger2")
-                .param("team", "team"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.message", is("")));
+            .file("file", jsonFile.getBytes())
+            .param("type", "oas-swagger2")
+            .param("team", "team")
+        .param("isNewTeam", "false"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.message", is("")));
     }
 
     @Test
@@ -104,24 +106,26 @@ public class ApiControllerTest {
         when(commandExecutor.executeCommand(any(), any())).thenReturn(null);
         MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
         mvc.perform(multipart("/projects/import")
-                .file("file", jsonFile.getBytes())
-                .param("type", "oas-swagger2")
-                .param("team", "team"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.message", is("")));
+            .file("file", jsonFile.getBytes())
+            .param("type", "oas-swagger2")
+            .param("team", "team")
+            .param("isNewTeam", "false"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.message", is("")));
     }
 
     @Test
     public void importFromFile_typeNotEqual() throws Exception {
         MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
         mvc.perform(multipart("/projects/import")
-                .file("file", jsonFile.getBytes())
-                .param("type", "not-oas")
-                .param("team", "team"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.message", is("oas format is not supported")));
+            .file("file", jsonFile.getBytes())
+            .param("type", "not-oas")
+            .param("team", "team")
+            .param("isNewTeam", "false"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.message", is("oas format is not supported")));
         verify(commandExecutor, times(0)).executeCommand(any(),any());
     }
 
@@ -158,22 +162,24 @@ public class ApiControllerTest {
         response.setFileUrl("url");
         when(commandExecutor.executeCommand(any(), any())).thenReturn(response);
         mvc.perform(post("/projects/{id}/export", 1)
-        .param("type", "oas-swagger2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.message", is("File has been exported!")))
-                .andExpect(jsonPath("$.file_url", is("url")));
+            .param("type", "oas-swagger2")
+            .param("format", "JSON"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.message", is("File has been exported!")))
+            .andExpect(jsonPath("$.file_url", is("url")));
         verify(commandExecutor, times(1)).executeCommand(any(),any());
     }
 
     @Test
     public void exportToOas_typeNotEqual() throws Exception {
-//        when(commandExecutor.executeCommand(any(), any())).thenReturn(new DownloadResponse());
+        //        when(commandExecutor.executeCommand(any(), any())).thenReturn(new DownloadResponse());
         mvc.perform(post("/projects/{id}/export", 1)
-        .param("type", "not-oas"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.message", is("oas format is not supported")));
+            .param("type", "not-oas")
+            .param("format", "JSON"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.message", is("oas format is not supported")));
         verify(commandExecutor, times(0)).executeCommand(any(),any());
 
     }
@@ -182,14 +188,14 @@ public class ApiControllerTest {
     public void getById_success() throws Exception {
         when(apiDataService.findById(anyString())).thenReturn(project);
         mvc.perform(get("/projects/{id}", 1))
-                .andExpect(status().isOk());
+            .andExpect(status().isOk());
     }
 
     @Test
     public void getById_failed() throws Exception {
         when(apiDataService.findById(anyString())).thenThrow(new DataNotFoundException("Project does not exists!"));
         mvc.perform(get("/projects/{id}", 1))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -202,23 +208,23 @@ public class ApiControllerTest {
         response.setNewSignature("_signature");
         when(commandExecutor.executeCommand(eq(QueryExecutorCommand.class),any())).thenReturn(response);
         mvc.perform(put("/projects/{id}", 1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(query)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.message", is("")))
-                .andExpect(jsonPath("$.new_signature", is("_signature")));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(query)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.message", is("")))
+            .andExpect(jsonPath("$.new_signature", is("_signature")));
     }
 
     @Test
     public void doApiDataQuery_conflict() throws Exception {
         when(commandExecutor.executeCommand(eq(QueryExecutorCommand.class), any())).thenThrow(new ConflictException("Edition Conflict!, Please refresh the tab"));
         mvc.perform(put("/projects/{id}", 1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(new HashMap<String, Object>())))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.message", is("Edition Conflict!, Please refresh the tab")));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(new HashMap<String, Object>())))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.success", is(false)))
+            .andExpect(jsonPath("$.message", is("Edition Conflict!, Please refresh the tab")));
         verify(commandExecutor, times(1)).executeCommand(eq(QueryExecutorCommand.class) ,any());
     }
 
@@ -226,8 +232,8 @@ public class ApiControllerTest {
     public void findAllProjects_test() throws Exception {
         when(apiDataService.findAllProjects()).thenReturn(Arrays.asList(project));
         mvc.perform(get("/projects/all/info"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)));
         verify(apiDataService, times(1)).findAllProjects();
     }
 
@@ -235,9 +241,9 @@ public class ApiControllerTest {
     public void deleteById_success() throws Exception {
         when(apiDataService.deleteById(anyString())).thenReturn(RequestResponse.success("Project has been deleted!"));
         mvc.perform(delete("/projects/{id}", 1))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.message", is("Project has been deleted!")));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.message", is("Project has been deleted!")));
         verify(apiDataService, times(1)).deleteById(anyString());
     }
 
@@ -251,12 +257,12 @@ public class ApiControllerTest {
         response.setProjectId("1");
         when(apiDataService.createProject(request)).thenReturn(response);
         mvc.perform(post("/projects")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.message", is("Project has been created!")))
-                .andExpect(jsonPath("$.new_project", is("1")));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(request)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.message", is("Project has been created!")))
+            .andExpect(jsonPath("$.new_project", is("1")));
         verify(apiDataService, times(1)).createProject(any());
     }
 
@@ -267,21 +273,36 @@ public class ApiControllerTest {
         response.setFileUrl("url");
         when(commandExecutor.executeCommand(any(), any())).thenReturn(response);
         mvc.perform(get("/projects/{id}/codegen",1))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.message", is("")))
-                .andExpect(jsonPath("$.file_url", is("url")));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.message", is("")))
+            .andExpect(jsonPath("$.file_url", is("url")));
         verify(commandExecutor, times(1)).executeCommand(any(),any());
     }
 
     @Test
     public void assignTeamToProject() throws Exception {
+        ProjectAssignTeamRequest request = new ProjectAssignTeamRequest("grant", "teamName");
         when(apiTeamService.grantTeamAccess(anyString(), any())).thenReturn(RequestResponse.success("Team has been assigned to project!"));
         mvc.perform(post("/projects/{id}/assign", 1)
-                .param("teamName", "team"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.message", is("Team has been assigned to project!")));
+            .contentType(MediaType.APPLICATION_JSON)
+        .content(mapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.message", is("Team has been assigned to project!")));
+        verify(apiTeamService, times(1)).grantTeamAccess(anyString(), any());
+    }
+
+    @Test
+    public void unassignTeamFromProject() throws Exception {
+        ProjectAssignTeamRequest request = new ProjectAssignTeamRequest("ungrant", "teamName");
+        when(apiTeamService.grantTeamAccess(anyString(), any())).thenReturn(RequestResponse.success("Team has been removed from project!"));
+        mvc.perform(post("/projects/{id}/assign", 1)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(mapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.message", is("Team has been removed from project!")));
         verify(apiTeamService, times(1)).grantTeamAccess(anyString(), any());
     }
 

@@ -38,9 +38,9 @@ public class TeamController {
         return teamService.createTeam(team);
     }
 
-    @PutMapping
-    public RequestResponse editTeam(@RequestBody @Valid Team team){
-        return teamService.editTeam(team);
+    @PutMapping("/{name}")
+    public RequestResponse editTeam(@PathVariable("name") String name, @RequestBody @Valid Team team){
+        return teamService.editTeam(name, team);
     }
 
     @GetMapping("/{name}")
@@ -48,8 +48,10 @@ public class TeamController {
         return teamService.getTeamByName(name);
     }
 
+    /*
     @PutMapping("/{name}")
     public RequestResponse grantTeam(@PathVariable("name") String name, @RequestBody List<Member> members) {
         return teamService.grantTeamAccess(name, members);
     }
+     */
 }

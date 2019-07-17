@@ -41,7 +41,7 @@ public class ApiTeamServiceImpl implements ApiTeamService {
         UserProfileResponse profile = oMapper.convertValue(auth.getPrincipal(), UserProfileResponse.class);
         ApiProject apiProject = apiRepository.findById(id)
             .orElseThrow(() -> new DataNotFoundException("Api project does not exists!"));
-        if (profile.getUsername().equals(team.getCreator()) && profile.getUsername().equals(apiProject.getProjectOwner().getCreator())) {
+        if (profile.getUsername().equals(apiProject.getProjectOwner().getCreator())) {
             if (assignType.equals("grant") && !apiProject.getTeams().contains(teamName)) {
                 apiProject.getTeams().add(teamName);
                 apiRepository.save(apiProject);
@@ -59,7 +59,7 @@ public class ApiTeamServiceImpl implements ApiTeamService {
             else throw new InvalidRequestException("Team is already in the project!");
         }
         else {
-            throw new InvalidAuthenticationException("You are unauthorized to grant team!");
+            throw new InvalidRequestException("You are unauthorized to grant team!");
         }
     }
 

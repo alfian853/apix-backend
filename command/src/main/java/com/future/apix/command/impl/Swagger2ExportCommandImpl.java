@@ -12,6 +12,7 @@ import com.future.apix.exception.DefaultRuntimeException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.response.DownloadResponse;
+import com.future.apix.util.JsonUtil;
 import com.future.apix.util.QueueCommand;
 import com.future.apix.util.converter.ApiProjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Component
 public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
@@ -37,6 +39,14 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
     private ObjectMapper mapper;
 
     private YAMLMapper yamlMapper = new YAMLMapper();
+
+    private Map<String,String> map$refTorRef = new HashMap<String, String>(){{
+        this.put("$ref","ref");
+    }};
+
+    private Map<String,String> maprefTor$ref = new HashMap<String, String>(){{
+        this.put("ref","$ref");
+    }};
 
     public void setObjectMapper(ObjectMapper mapper) {
         this.mapper = mapper;
@@ -129,12 +139,17 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                 swagger2.setOasFileName(newNonFormatFileName);
                 swagger2.setOasFileProjectUpdateDate(project.getUpdatedAt());
 
+                //replace '$ref' with 'ref'
+                JsonUtil.remappingKeys(oasHashMap, this.map$refTorRef);
+
                 swagger2Repository.save(swagger2);
             }
             // if file is deleted, but the project still exist
             else if(!fileExist){
                 System.out.println("FILE NOT EXISTS! jadi buat baru");
-                writeFile(swagger2.getOasFileName(), request.getFormat(), swagger2.getOasSwagger2());
+                Map<String, Object> swaggerOas = swagger2.getOasSwagger2();
+                JsonUtil.remappingKeys(swagger2.getOasSwagger2(),maprefTor$ref);
+                writeFile(swagger2.getOasFileName(), request.getFormat(), swaggerOas);
             }
             response.setFileUrl(EXPORT_URL + targetFilePath);
             response.setStatusToSuccess();
@@ -147,7 +162,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
         return response;
     }
 
-    private void writeFile(String newFileName, FileFormat format, HashMap<String, Object> swagger)
+    private void writeFile(String newFileName, FileFormat format, Map<String, Object> swagger)
         throws IOException {
 
         if (format.toString().equals("JSON")) {
@@ -162,7 +177,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
             yamlMapper.writerWithDefaultPrettyPrinter()
                 .writeValue(file, swagger);
         }
-//        return file;
     }
 
 }

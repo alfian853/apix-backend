@@ -58,19 +58,11 @@ public class ApiController {
         }
     }
 
-    @PostMapping("/{id}/export")
+    @GetMapping("/{id}/export")
     public RequestResponse exportToOas(@PathVariable("id")String id,
-                                       @RequestParam("type") String type,
                                        @RequestParam("format") FileFormat format){
-        if(type.equals("oas-swagger2")){
-            System.out.println("CONTROLLER FORMAT: " + format);
-            ExportRequest request = new ExportRequest(id, format);
-            System.out.println("EXPORT REQUEST CONTROLLER: " +  request.getFormat());
-            return commandExecutor.executeCommand(Swagger2ExportCommand.class,request);
-        }
-        else{
-            throw new InvalidRequestException("oas format is not supported");
-        }
+        ExportRequest request = new ExportRequest(id, format);
+        return commandExecutor.executeCommand(Swagger2ExportCommand.class,request);
     }
 
     @GetMapping("/{id}")

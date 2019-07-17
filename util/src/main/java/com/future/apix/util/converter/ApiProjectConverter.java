@@ -1,6 +1,8 @@
 package com.future.apix.util.converter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Mappable;
 import com.future.apix.entity.apidetail.OperationDetail;
@@ -32,15 +34,13 @@ public class ApiProjectConverter {
                 ref = ref.split("/",3)[2];
                 pair.setValue("#/definitions/"+idToName.get(ref));
             }
-            else if(pair.getValue() instanceof HashMap){
-                replaceRefWithId((HashMap<String, Object>) pair.getValue(), idToName);
+            else if(pair.getValue() instanceof Map){
+                replaceRefWithId((LinkedHashMap<String, Object>) pair.getValue(), idToName);
             }
             else if(pair.getValue() instanceof Mappable){
                 HashMap<String, Object> tmp = mapper.convertValue(pair.getValue(), HashMap.class);
                 this.replaceRefWithId(tmp, idToName);
-                pair.setValue(
-                        mapper.convertValue(tmp, pair.getValue().getClass())
-                );
+                pair.setValue(tmp);
             }
         }
     }
@@ -50,7 +50,7 @@ public class ApiProjectConverter {
         LinkedHashMap<String, Object> swaggerOas2 = new LinkedHashMap<>();
 
         swaggerOas2.put("swagger","2.0");
-        HashMap<String,Object> info = mapper.convertValue(project.getInfo(),HashMap.class);
+        LinkedHashMap<String,Object> info = mapper.convertValue(project.getInfo(),LinkedHashMap.class);
         info.remove("_signature");
         swaggerOas2.put("info",info);
         swaggerOas2.put("host",project.getHost());
@@ -70,11 +70,11 @@ public class ApiProjectConverter {
             definitionIdToName.put(key, value.getName());
             value.setName(null);
         });
+
         this.replaceRefWithId(definitions, definitionIdToName);
 
         swaggerOas2.put("definitions", definitions);
         swaggerOas2.put("securityDefinitions",project.getSecurityDefinitions());
-
 
         project.getSections().forEach((sectionName,apiSection) -> {
             apiSection.getInfo().setSignature(null);
@@ -163,7 +163,6 @@ public class ApiProjectConverter {
                     //push responses
                     methodData.getResponses().forEach((httpCode,response)->{
                         LinkedHashMap<String,Object> responseMap = mapper.convertValue(response,LinkedHashMap.class);
-//                        this.replaceRefWithId(responseMap, definitionIdToName);
                         responses.put(
                                 httpCode,
                                 mapper.convertValue(responseMap, OperationDetail.class)
@@ -180,7 +179,12 @@ public class ApiProjectConverter {
 
             });//close path
         });//close section
-
+        swaggerOas2 = mapper.convertValue(
+                swaggerOas2,
+                TypeFactory.defaultInstance().constructMapType(
+                        LinkedHashMap.class,String.class, Object.class
+                )
+        );
         return swaggerOas2;
     }
 }

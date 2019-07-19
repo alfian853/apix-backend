@@ -18,6 +18,9 @@ import com.future.apix.response.RequestResponse;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.ApiDataService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -45,6 +48,16 @@ public class ApiDataServiceImpl implements ApiDataService {
     public ApiProject findById(String id) {
         return apiRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
+    }
+
+    @Override
+    public Page<ApiProject> findAll(Pageable pageable) {
+        return apiRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<ApiProject> findSearch(String search, Pageable pageable){
+        return apiRepository.findBySearch(search, pageable);
     }
 
     @Override

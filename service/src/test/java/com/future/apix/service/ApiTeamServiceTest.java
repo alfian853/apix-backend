@@ -229,7 +229,7 @@ public class ApiTeamServiceTest {
 
         try {
             mock.grantTeamAccess("123", request);
-        } catch (InvalidAuthenticationException e) {
+        } catch (InvalidRequestException e) {
             Assert.assertEquals("You are unauthorized to grant team!", e.getMessage());
         }
     }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.command.model.ExportRequest;
 import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
-import com.future.apix.entity.Team;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
@@ -18,6 +17,7 @@ import com.future.apix.response.github.GithubUserResponse;
 import com.future.apix.service.CommandExecutorService;
 import com.future.apix.service.GithubApiService;
 import com.future.apix.command.Swagger2ExportCommand;
+import com.future.apix.util.LazyObjectWrapper;
 import com.future.apix.util.converter.SwaggerToApixOasConverter;
 import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -58,18 +57,18 @@ public class GithubApiServiceImpl implements GithubApiService {
     @Autowired
     private SwaggerToApixOasConverter converter;
 
-    @Autowired(required = false)
-    private GitHub gitHub;
+    @Autowired
+    private LazyObjectWrapper<GitHub> gitHub;
 
     @Override
     public GithubUserResponse getMyself() throws IOException {
-        GHMyself self = gitHub.getMyself();
+        GHMyself self = gitHub.get().getMyself();
         return convertUser(self);
     }
 
     @Override
     public List<GithubRepoResponse> getMyselfRepositories() throws IOException {
-        PagedIterable<GHRepository> repositories = gitHub.getMyself().listRepositories();
+        PagedIterable<GHRepository> repositories = gitHub.get().getMyself().listRepositories();
         List<GithubRepoResponse> repoList = new ArrayList<>();
 
         Iterator itr = repositories.iterator();
@@ -85,7 +84,7 @@ public class GithubApiServiceImpl implements GithubApiService {
     @Override
     public List<String> getBranches(String repoName) throws IOException {
         List<String> branchName = new ArrayList<>();
-        Map<String, GHBranch> branches = gitHub.getRepository(repoName).getBranches();
+        Map<String, GHBranch> branches = gitHub.get().getRepository(repoName).getBranches();
         for (Map.Entry<String, GHBranch> entry : branches.entrySet()){
             if (!Objects.equals(entry.getKey(), "master")) branchName.add(entry.getKey());
             // exclude master, since it is default branch
@@ -96,7 +95,7 @@ public class GithubApiServiceImpl implements GithubApiService {
     @Override
     public GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException {
         if (ref == null || ref.length() <= 0) ref = "master";
-        GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, ref);
+        GHContent content = gitHub.get().getRepository(repoName).getFileContent(contentPath, ref);
         if (content.isFile()) {
             return convertContent(content);
 
@@ -108,7 +107,7 @@ public class GithubApiServiceImpl implements GithubApiService {
     @Override
     public GithubCommitResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException {
         if (request.getBranch() == null || request.getBranch().length() <= 0) request.setBranch("master");
-        GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, request.getBranch());
+        GHContent content = gitHub.get().getRepository(repoName).getFileContent(contentPath, request.getBranch());
         if (content.isFile()) {
             String existSha = DigestUtils.sha256Hex(content.read());
 
@@ -133,7 +132,7 @@ public class GithubApiServiceImpl implements GithubApiService {
     @Override
     public ProjectCreateResponse pullFileContent(String repoName, String contentPath, String ref, String projectId) throws IOException {
         if (ref == null || ref.length() <= 0) ref = "master";
-        GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, ref);
+        GHContent content = gitHub.get().getRepository(repoName).getFileContent(contentPath, ref);
         if (content.isFile()) {
 //            HashMap<String, Object> json = convertContentToHashMap(content.read());
 //            ApiProject project = converter.convert(json);

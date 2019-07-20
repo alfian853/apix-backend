@@ -1,7 +1,9 @@
 package com.future.apix.controller;
 
 import com.future.apix.entity.Team;
+import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.entity.teamdetail.Member;
+import com.future.apix.request.CreateTeamRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.response.TeamResponse;
 import com.future.apix.response.UserProfileResponse;
@@ -13,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -34,8 +37,9 @@ public class TeamController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RequestResponse createTeam(@RequestBody @Valid Team team) {
-        return teamService.createTeam(team);
+    public RequestResponse createTeam(@RequestBody @Valid CreateTeamRequest teamRequest) {
+        Team newTeam = teamService.createTeam(teamRequest);
+        return RequestResponse.success();
     }
 
     @PutMapping("/{name}")

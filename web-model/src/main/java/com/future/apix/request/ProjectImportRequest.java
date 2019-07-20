@@ -1,5 +1,6 @@
 package com.future.apix.request;
 
+import com.future.apix.entity.Team;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProjectImportRequest {
-    String team;
-    Boolean isNewTeam; // true if create new team
+    Team team;
     MultipartFile file;
 }

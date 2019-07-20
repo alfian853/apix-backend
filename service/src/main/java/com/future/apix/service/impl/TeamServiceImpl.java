@@ -3,14 +3,15 @@ package com.future.apix.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
+import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.entity.teamdetail.Member;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
+import com.future.apix.request.CreateTeamRequest;
 import com.future.apix.response.RequestResponse;
-import com.future.apix.response.TeamResponse;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,28 +53,37 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public RequestResponse createTeam(Team team) {
-        Team existTeam = teamRepository.findByName(team.getName());
-        RequestResponse response = new RequestResponse();
+    public Team createTeam(CreateTeamRequest request){
+        Team existTeam = teamRepository.findByName(request.getTeamName());
 
-        if(existTeam == null) { /* Add team to team creator*/
-            User creator = userRepository.findByUsername(team.getCreator());
-            if (!creator.getTeams().contains(team.getName())) creator.getTeams().add(team.getName());
-            userRepository.save(creator);
-
-            Team createTeam = teamRepository.save(team);
-            response.setStatusToSuccess();
-            response.setMessage("Team is created!");
-
-            // Add team to each of User
-            for (Member member: createTeam.getMembers()) {
-                User user = userRepository.findByUsername(member.getUsername());
-                if (!user.getTeams().contains(createTeam.getName())) user.getTeams().add(createTeam.getName());
-                userRepository.save(user);
+        if(existTeam == null){
+            User teamCreator = Optional.ofNullable(
+                    userRepository.findByUsername(request.getCreator())
+            ).orElseThrow(
+                () -> new DataNotFoundException("user not found!")
+            );
+            if(!teamCreator.getTeams().contains(request.getTeamName())){
+                teamCreator.getTeams().add(request.getTeamName());
+                userRepository.save(teamCreator);
             }
-            return response;
+
+            Team newTeam = new Team();
+            newTeam.setCreator(request.getCreator());
+            newTeam.setAccess(request.getAccess());
+            newTeam.setName(request.getTeamName());
+
+            request.getMembers().forEach(name -> {
+                User user = userRepository.findByUsername(name);
+                if (!user.getTeams().contains(newTeam.getName())) user.getTeams().add(newTeam.getName());
+
+                newTeam.getMembers().add(new Member(name, request.getAccess().equals(TeamAccess.PUBLIC)));
+                userRepository.save(user);
+            });
+
+            teamRepository.save(newTeam);
+            return newTeam;
         }
-        else throw new DuplicateEntryException("Team name is already exists!");
+        throw new DuplicateEntryException("Team name is already exists!");
     }
 
     @Override

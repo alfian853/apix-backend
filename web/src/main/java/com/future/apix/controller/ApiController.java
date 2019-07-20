@@ -5,8 +5,12 @@ import com.future.apix.command.model.ExportRequest;
 import com.future.apix.command.model.QueryExecutorRequest;
 import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
+import com.future.apix.entity.Team;
+import com.future.apix.entity.User;
+import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.request.CreateTeamRequest;
 import com.future.apix.request.ProjectAssignTeamRequest;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.request.ProjectImportRequest;
@@ -19,17 +23,18 @@ import com.future.apix.service.CommandExecutorService;
 import com.future.apix.command.Swagger2CodegenCommand;
 import com.future.apix.command.Swagger2ExportCommand;
 import com.future.apix.command.Swagger2ImportCommand;
+import com.future.apix.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -44,18 +49,38 @@ public class ApiController {
     private ApiTeamService apiTeamService;
 
     @Autowired
+    private TeamService teamService;
+
+    @Autowired
     CommandExecutorService commandExecutor;
 
     @PostMapping("/import")
     public RequestResponse importFromFile(@RequestParam("file")MultipartFile file,
                                           @RequestParam("type") String type,
-                                          @RequestParam("team") String team,
+                                          @RequestParam("team") String teamName,
                                           @RequestParam("isNewTeam") Boolean isNewTeam) {
         if(type.equals("oas-swagger2")){
             ProjectImportRequest request = new ProjectImportRequest();
             request.setFile(file);
-            request.setIsNewTeam(isNewTeam);
-            request.setTeam(team);
+
+            if(isNewTeam){
+                Team team = new Team();
+                team.setName(teamName);
+                User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+                CreateTeamRequest createTeamRequest = new CreateTeamRequest();
+                createTeamRequest.setTeamName(teamName);
+                createTeamRequest.setCreator(user.getUsername());
+                createTeamRequest.setAccess(TeamAccess.PUBLIC);
+                createTeamRequest.setMembers(Collections.singletonList(user.getUsername()));
+                request.setTeam(this.teamService.createTeam(createTeamRequest));
+            }
+            else{
+                request.setTeam(
+                    this.teamService.getTeamByName(teamName)
+                );
+            }
+
             return (commandExecutor.executeCommand(Swagger2ImportCommand.class, request) == null)?
                     RequestResponse.failed() : RequestResponse.success();
         }

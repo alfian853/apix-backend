@@ -5,6 +5,7 @@ import com.future.apix.config.filter.CorsFilter;
 import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
+import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.entity.teamdetail.Member;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.TeamService;
@@ -53,7 +54,7 @@ public class TeamControllerTest {
     private static final String TEAM_ID = "test-id";
     private static final String TEAM_NAME = "TeamTest";
     private static final String TEAM_DIVISION = "division";
-    private static final String TEAM_ACCESS = "public";
+    private static final TeamAccess TEAM_ACCESS = TeamAccess.PUBLIC;
     private static final String TEAM_CREATOR = "test";
 
     private static final String USER_USERNAME = "test";
@@ -65,7 +66,6 @@ public class TeamControllerTest {
     private static final Team TEAM = Team.builder()
             .id(TEAM_ID)
             .name(TEAM_NAME)
-            .division(TEAM_DIVISION)
             .access(TEAM_ACCESS)
             .creator(TEAM_CREATOR)
             .members(TEAM_MEMBER)
@@ -115,7 +115,7 @@ public class TeamControllerTest {
 
     @Test
     public void createTeam_success() throws Exception {
-        when(teamService.createTeam(TEAM)).thenReturn(RequestResponse.success("Team is created!"));
+        when(teamService.createTeam(any())).thenReturn(new Team());
 
         mvc.perform(post("/teams")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -123,7 +123,7 @@ public class TeamControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.message", is("Team is created!")));
-        verify(teamService, times(1)).createTeam(TEAM);
+        verify(teamService, times(1)).createTeam(any());
     }
 
     @Test

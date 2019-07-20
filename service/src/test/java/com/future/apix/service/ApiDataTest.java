@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
+import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.repository.TeamRepository;
@@ -61,8 +62,7 @@ public class ApiDataTest {
     private static final Team TEAM = Team.builder()
         .id("test-id")
         .name("teamTest")
-        .division("division")
-        .access("public")
+        .access(TeamAccess.PUBLIC)
         .creator("test")
         .build();
 

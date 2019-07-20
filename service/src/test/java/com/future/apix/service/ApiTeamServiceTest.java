@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
+import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.exception.InvalidRequestException;
@@ -61,16 +62,14 @@ public class ApiTeamServiceTest {
     private static final Team TEAM = Team.builder()
         .id("test-id")
         .name("TeamTest")
-        .division("division")
-        .access("public")
+        .access(TeamAccess.PUBLIC)
         .creator("test")
         .build();
 
     private static final Team TEAM_DIFFCREATOR = Team.builder()
         .id("test-id")
         .name("TeamTest")
-        .division("division")
-        .access("public")
+        .access(TeamAccess.PUBLIC)
         .creator("not-test")
         .build();
 
@@ -207,8 +206,7 @@ public class ApiTeamServiceTest {
         Team teamDiff = Team.builder()
             .id("test-id")
             .name("TeamTest")
-            .division("division")
-            .access("public")
+            .access(TeamAccess.PUBLIC)
             .creator("not-test")
             .build();
         project.setProjectOwner(teamDiff);

@@ -1,10 +1,7 @@
 package com.future.apix.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.apix.command.Command;
 import com.future.apix.command.QueryExecutorCommand;
-import com.future.apix.command.impl.QueryExecutorCommandImpl;
-import com.future.apix.command.model.QueryExecutorRequest;
 import com.future.apix.config.filter.CorsFilter;
 import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.ApiProject;

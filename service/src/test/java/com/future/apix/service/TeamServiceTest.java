@@ -3,12 +3,14 @@ package com.future.apix.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
+import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.entity.teamdetail.Member;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
+import com.future.apix.request.CreateTeamRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.impl.TeamServiceImpl;
@@ -44,7 +46,7 @@ public class TeamServiceTest {
     private static final String TEAM_ID = "test-id";
     private static final String TEAM_NAME = "TeamTest";
     private static final String TEAM_DIVISION = "division";
-    private static final String TEAM_ACCESS = "public";
+    private static final TeamAccess TEAM_ACCESS = TeamAccess.PUBLIC;
     private static final String TEAM_CREATOR = "test";
 
     private static final String USER_USERNAME = "test";
@@ -56,7 +58,6 @@ public class TeamServiceTest {
     private static final Team TEAM = Team.builder()
             .id(TEAM_ID)
             .name(TEAM_NAME)
-            .division(TEAM_DIVISION)
             .access(TEAM_ACCESS)
             .creator(TEAM_CREATOR)
             .members(TEAM_MEMBER)
@@ -136,8 +137,7 @@ public class TeamServiceTest {
         Team team = serviceMock.getTeamByName(TEAM_NAME);
         Assert.assertEquals("test-id", team.getId());
         Assert.assertEquals("TeamTest", team.getName());
-        Assert.assertEquals("division", team.getDivision());
-        Assert.assertEquals("public", team.getAccess());
+        Assert.assertEquals(TeamAccess.PUBLIC, team.getAccess());
         Assert.assertEquals("test", team.getCreator());
     }
 
@@ -148,7 +148,7 @@ public class TeamServiceTest {
     public void createTeam_teamAlreadyExists(){
         when(teamRepository.findByName(TEAM_NAME)).thenReturn(TEAM);
         try {
-            serviceMock.createTeam(TEAM);
+            serviceMock.createTeam(new CreateTeamRequest());
         } catch (DuplicateEntryException e) {
             Assert.assertEquals("Team name is already exists!", e.getMessage());
         }
@@ -159,9 +159,12 @@ public class TeamServiceTest {
         when(teamRepository.findByName(TEAM_NAME)).thenReturn(null);
         when(teamRepository.save(any(Team.class))).thenReturn(TEAM);
         when(userRepository.findByUsername(USER_USERNAME)).thenReturn(USER);
-        RequestResponse response = serviceMock.createTeam(TEAM);
-        Assert.assertTrue(response.getSuccess());
-        Assert.assertEquals("Team is created!", response.getMessage());
+        CreateTeamRequest request = new CreateTeamRequest();
+        request.setTeamName(TEAM_NAME);
+        request.setCreator(USER_USERNAME);
+        Team response = serviceMock.createTeam(request);
+
+        verify(teamRepository).save(any());
     }
 
     /*
@@ -191,7 +194,6 @@ public class TeamServiceTest {
         Team teamNewMember = Team.builder()
             .id(TEAM_ID)
             .name(TEAM_NAME)
-            .division(TEAM_DIVISION)
             .access(TEAM_ACCESS)
             .creator(TEAM_CREATOR)
             .members(Arrays.asList(new Member("JohnDoe", false)))

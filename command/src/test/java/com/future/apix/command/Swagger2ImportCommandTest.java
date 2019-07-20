@@ -1,14 +1,12 @@
 package com.future.apix.command;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.apix.entity.ApiProject;
-import com.future.apix.repository.ApiRepository;
-import com.future.apix.repository.TeamRepository;
-import com.future.apix.request.ProjectImportRequest;
 import com.future.apix.command.impl.Swagger2ImportCommandImpl;
-import com.future.apix.util.ApixUtil;
-import org.junit.Assert;
-import org.junit.Before;
+import com.future.apix.entity.ApiProject;
+import com.future.apix.entity.Team;
+import com.future.apix.repository.ApiRepository;
+import com.future.apix.request.ProjectImportRequest;
+import com.future.apix.util.converter.SwaggerToApixOasConverter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,22 +14,11 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class Swagger2ImportCommandTest {
-    private ObjectMapper mapper = new ObjectMapper();
 
     @InjectMocks
     private Swagger2ImportCommandImpl command;
@@ -40,42 +27,26 @@ public class Swagger2ImportCommandTest {
     private ApiRepository apiRepository;
 
     @Mock
-    private TeamRepository teamRepository;
+    private SwaggerToApixOasConverter converter;
 
-    @Before
-    public void init(){
-        command.setMapper(mapper);
-    }
+    @Mock
+    private ObjectMapper mapper;
 
     @Test
-    public void importTest() throws URISyntaxException {
-        URI uri = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
-        File testFile = new File(uri.getPath());
-        MockMultipartFile multipartFile = null;
-        try {
-            multipartFile = new MockMultipartFile("filename.json", "filename.json",
-                    "application/json", Files.readAllBytes(Paths.get(uri))
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        ProjectImportRequest request = new ProjectImportRequest("", false, multipartFile);
+    public void importTest() {
+        MockMultipartFile multipartFile = new MockMultipartFile("filename.json", "filename.json",
+                "application/json", "".getBytes()
+        );
+
+        ProjectImportRequest request = new ProjectImportRequest(new Team(), multipartFile);
+
+        when(converter.convert(any())).thenReturn(new ApiProject());
+        when(apiRepository.save(any())).thenReturn(new ApiProject());
+
         ApiProject result = command.execute(request);
 
-        uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
-        ApiProject expectedResult = null;
-        try {
-            expectedResult = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
-            expectedResult.setId(result.getId());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         verify(apiRepository, times(1)).save(any());
-        HashMap<String, Object> obj1 = mapper.convertValue(result, HashMap.class);
-        HashMap<String, Object> obj2 = mapper.convertValue(expectedResult, HashMap.class);
-        Assert.assertTrue(ApixUtil.isEqualObject(obj1, obj2,
-                new HashSet<>(Arrays.asList("definitions","_signature","$ref","required","createdAt","updatedAt"))));
 
 
     }

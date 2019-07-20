@@ -6,6 +6,7 @@ import com.future.apix.util.LazyObjectWrapper;
 import com.future.apix.util.ObjectInitiator;
 import com.future.apix.util.converter.ApiProjectConverter;
 import com.future.apix.util.converter.SwaggerToApixOasConverter;
+import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import org.kohsuke.github.GitHub;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,20 +21,23 @@ public class BeanConfig {
     private String token;
 
     @Bean
-    ObjectMapper getObjectMapper(){
+    ObjectMapper objectMapper(){
         return new ObjectMapper().configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     }
 
     @Bean
-    ApiProjectConverter getApiProjectConverter(){
+    ApiProjectConverter apiProjectConverter(){
         return new ApiProjectConverter();
     }
 
     @Bean
-    SwaggerToApixOasConverter getSwaggerToApixOasConverter() {return new SwaggerToApixOasConverter(); }
+    SwaggerToApixOasConverter swaggerToApixOasConverter() {return new SwaggerToApixOasConverter(); }
 
     @Bean
-    public LazyObjectWrapper<GitHub> authToken() throws IOException {
+    JsonQueryExecutor jsonQueryExecutor(){return new JsonQueryExecutor();}
+
+    @Bean
+    public LazyObjectWrapper<GitHub> LazyGitHubObjectWrapper() throws IOException {
 
         return new LazyObjectWrapper<>(new ObjectInitiator<GitHub>() {
             @Override
@@ -49,7 +53,7 @@ public class BeanConfig {
 
             @Override
             public void onInitFailed() {
-                throw new RuntimeException("apix github service unavaliable");
+                throw new RuntimeException("Apix github service unavaliable");
             }
         });
     }

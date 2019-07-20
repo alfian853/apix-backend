@@ -11,7 +11,7 @@ public class JsonQueryExecutor {
     private ObjectMapper mapper = new ObjectMapper();
     private static QueryActionExecutor actionExecutor = QueryActionExecutor.getInstance();
 
-    private boolean checkAndExecuteActions(HashMap<String,Object> target,HashMap<String,Object> query){
+    private boolean checkAndExecuteActions(Map<String,Object> target, Map<String,Object> query){
         if(query.containsKey("_hasActions")){
             List<HashMap<String,Object> > actions = (List<HashMap<String, Object>>) query.get("_actions");
 
@@ -23,7 +23,7 @@ public class JsonQueryExecutor {
         return false;
     }
 
-    private boolean traverseChild(HashMap<String,Object> target,HashMap<String,Object> data){
+    private boolean traverseChild(Map<String,Object> target, Map<String,Object> data){
         boolean hasUpdate = false;
         for (Object o : data.entrySet()) {
             Map.Entry<String, Object> pair = (Map.Entry) o;
@@ -57,7 +57,7 @@ public class JsonQueryExecutor {
         return hasUpdate;
     }
 
-    protected boolean update(HashMap<String,Object> target,HashMap<String,Object> data){
+    protected boolean update(Map<String,Object> target,Map<String,Object> data){
 
         boolean hasUpdate = this.checkAndExecuteActions(target, data);
         hasUpdate |= this.traverseChild(target, data);
@@ -66,14 +66,14 @@ public class JsonQueryExecutor {
     }
 
     //return hasil update
-    public <T> T  executeQuery(T target, HashMap<String, Object> query){
+    public <T> T  executeQuery(T target, Map<String, Object> query){
         HashMap<String,Object> json = mapper.convertValue(target, HashMap.class);
         update(json, query);
         return (T) mapper.convertValue(json,target.getClass());
     }
 
     //return : apakah terjadi update?
-    public boolean executeQuery(HashMap<String,Object> target, HashMap<String, Object> query){
+    public boolean executeQuery(Map<String,Object> target, Map<String, Object> query){
         return update(target, query);
     }
 

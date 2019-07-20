@@ -27,7 +27,8 @@ public class QueryExecutorCommandImpl implements QueryExecutorCommand {
         HashMap<String, Object> queryField;
     }
 
-    private JsonQueryExecutor queryExecutor = new JsonQueryExecutor();
+    @Autowired
+    private JsonQueryExecutor queryExecutor;
 
     @Autowired
     ApiRepository apiRepository;

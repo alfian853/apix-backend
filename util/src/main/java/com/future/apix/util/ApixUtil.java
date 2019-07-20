@@ -2,7 +2,6 @@ package com.future.apix.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.Mappable;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -13,8 +12,8 @@ public class ApixUtil {
      */
     private static ObjectMapper mapper = new ObjectMapper();
 
-    public static HashMap<String,Object> toStrObjMap(Object object){
-        return (HashMap<String,Object>) object;
+    public static Map<String,Object> toStrObjMap(Object object){
+        return (Map<String,Object>) object;
     }
     public static List<Object> toList(Object object){
         return (List<Object>) object;
@@ -44,117 +43,72 @@ public class ApixUtil {
         };
         arr1.sort(comparator);
         arr2.sort(comparator);
-        if(arr1.size() != arr2.size())return false;
+        if(arr1.size() != arr2.size()){
+            return false;
+        }
         int len = arr1.size();
         for(int i = 0; i < len; ++i){
-            Object val1 = arr1.get(i);
-            Object val2 = arr2.get(i);
 
-            if(val1.getClass() != val2.getClass()){
-                System.out.println("T");
-                return false;
-            }
-            else if(val1 instanceof List){
-                if(!isEqualArray(toList(val1), toList(val2), ignoredField)){
-                    return false;
-                }
-            }
-            else if(val1 instanceof Map){
-                if(!isEqualObject(toStrObjMap(val1), toStrObjMap(val2), ignoredField)){
-                    System.out.println("rrr");
-                    System.out.println(arr1);
-                    System.out.println(arr2);
-
-                    return false;
-                }
-            }
-            else if(val1 instanceof Mappable){
-                HashMap<String, Object> tmp1 = mapper.convertValue(val1, HashMap.class);
-                HashMap<String, Object> tmp2 = mapper.convertValue(val2, HashMap.class);
-                if(!isEqualObject(tmp1, tmp2, ignoredField)){
-                    System.out.println("xx");
-                    return false;
-                }
-            }
-            else if(!val1.equals(val2)){
-                System.out.println("Y");
-                System.out.println(val1);
-                System.out.println(val2);
+            if(!isEqualObject(arr1.get(i), arr2.get(i),ignoredField) ){
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean isEqualObject(HashMap<String, Object> obj1, HashMap<String, Object> obj2, Set<String> ignoredField){
-        Set<String> key1 = obj1.keySet();
-        key1.removeAll(ignoredField);
-        Set<String> key2 = obj2.keySet();
-        key2.removeAll(ignoredField);
-        if(key1.size() != key2.size()){
-            System.out.println("O");
-            System.out.println(key1);
-            System.out.println(key2);
-            System.out.println(obj1);
-            System.out.println(obj2);
+    public static boolean isEqualObject(Object obj1, Object obj2, Set<String> ignoredField){
+
+        if(obj1 == null && obj2 == null){
+            return true;
+        }
+        else if(obj1 == null ^ obj2 == null){
             return false;
         }
-
-        for(String key : key1){
-            Object val1 = obj1.get(key);
-            Object val2 = obj2.get(key);
-
-            if(val1 == null && val2 == null){
-                continue;
-            }
-            else if(val1 == null ^ val2 == null){
-                System.out.println(val1);
-                System.out.println(val2);
-                System.out.println(key);
-                System.out.println("A");
+        if(obj1 instanceof Number && obj2 instanceof Number){
+            Number d1 = (Number) obj1;
+            Number d2 = (Number) obj2;
+            if(Math.abs(d1.doubleValue()-d2.doubleValue()) > 0.0000001){
                 return false;
             }
-            if(val1 instanceof Number && val2 instanceof Number){
-                Number d1 = (Number) val1;
-                Number d2 = (Number) val2;
-                if(Math.abs(d1.doubleValue()-d2.doubleValue()) > 0.0000001){
-                    return false;
-                }
-            }
-            else if(val1.getClass() != val2.getClass()){
-                System.out.println(val1.getClass());
-                System.out.println(val2.getClass());
-                System.out.println(key);
-                System.out.println(val1);
-                System.out.println(val2);
-                System.out.println("B");
-                return false;
-            }
-            else if(val1 instanceof List){
-                if(!isEqualArray(toList(val1), toList(val2), ignoredField)){
-                    return false;
-                }
-            }
-            else if(val1 instanceof Map){
-                if(!isEqualObject(toStrObjMap(val1), toStrObjMap(val2), ignoredField)){
-                    return false;
-                }
-            }
-            else if(val1 instanceof Mappable){
-                HashMap<String, Object> tmp1 = mapper.convertValue(val1, HashMap.class);
-                HashMap<String, Object> tmp2 = mapper.convertValue(val2, HashMap.class);
-                if(!isEqualObject(tmp1, tmp2, ignoredField)){
-                    return false;
-                }
+        }
+        else if(obj1 instanceof Map || obj1 instanceof Mappable){
+            Map<String, Object> map1;
+            Map<String, Object> map2;
+            if(obj1 instanceof Mappable){
+                map1 = (Map<String, Object>) obj1;
+                map2 = (Map<String, Object>) obj2;
             }
             else{
-                if(!val1.equals(val2)){
-                    System.out.println("not equal!, key: "+key);
-                    System.out.println(val1);
-                    System.out.println(val2);
+                map1 = mapper.convertValue(obj1, HashMap.class);
+                map2 = mapper.convertValue(obj2, HashMap.class);
+
+            }
+            Set<String> key1 = map1.keySet();
+            key1.removeAll(ignoredField);
+            Set<String> key2 = map2.keySet();
+            key2.removeAll(ignoredField);
+            if(key1.size() != key2.size()){
+                return false;
+            }
+
+            for(String key : key1){
+                Object val1 = map1.get(key);
+                Object val2 = map2.get(key);
+                if(!isEqualObject(val1, val2, ignoredField)){
                     return false;
                 }
             }
+        }
+        else if(obj1.getClass() != obj2.getClass()){
+            return false;
+        }
+        else if(obj1 instanceof List){
+            if(!isEqualArray(toList(obj1), toList(obj2), ignoredField)){
+                return false;
+            }
+        }
+        else{
+            return obj1.equals(obj2);
         }
 
         return true;

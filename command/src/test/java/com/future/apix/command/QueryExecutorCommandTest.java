@@ -8,6 +8,7 @@ import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
 import com.future.apix.response.ProjectUpdateResponse;
+import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +41,8 @@ public class QueryExecutorCommandTest {
     @Mock
     ApiRepository apiRepository;
 
+    @Mock
+    JsonQueryExecutor queryExecutor;
 
     @Before
     public void init() throws IOException, URISyntaxException {
@@ -53,6 +57,8 @@ public class QueryExecutorCommandTest {
     public void updateSuccess() throws URISyntaxException, IOException {
         URI uri = getClass().getClassLoader().getResource("update-testcase/success-query.json").toURI();
         HashMap<String,Object> query = mapper.readValue(Files.readAllBytes(Paths.get(uri)), HashMap.class);
+
+        when(queryExecutor.executeQuery(any(),any())).thenReturn(true);
 
         ProjectUpdateResponse response = dataUpdate.execute(new QueryExecutorRequest("123", query));
         Assert.assertTrue(response.isSuccess());

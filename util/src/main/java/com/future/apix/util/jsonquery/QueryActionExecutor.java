@@ -1,6 +1,6 @@
 package com.future.apix.util.jsonquery;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class QueryActionExecutor {
 
@@ -13,7 +13,7 @@ public class QueryActionExecutor {
         return executor;
     }
 
-    public void execute(HashMap<String,Object> target, HashMap<String,Object> query) {
+    public void execute(Map<String,Object> target, Map<String,Object> query) {
 
         String actionString = (String) query.get("action");
 
@@ -31,7 +31,7 @@ public class QueryActionExecutor {
 
     }
 
-    protected void doRename(HashMap<String, Object> target, HashMap<String, Object> query) {
+    protected void doRename(Map<String, Object> target, Map<String, Object> query) {
         String key = (String) query.get("key");
         Object temp = target.get(key);
         target.remove(key);
@@ -39,12 +39,12 @@ public class QueryActionExecutor {
         System.out.println("rename success : "+query.toString());
     }
 
-    protected void doInsert(HashMap<String, Object> target, HashMap<String, Object> query) {
+    protected void doInsert(Map<String, Object> target, Map<String, Object> query) {
         target.put((String) query.get("key"), query.get("value"));
         System.out.println("insert success : "+query.toString());
     }
 
-    protected void doDelete(HashMap<String, Object> target, HashMap<String, Object> query) {
+    protected void doDelete(Map<String, Object> target, Map<String, Object> query) {
         target.remove(query.get("key"));
         System.out.println("delete success : "+query.toString());
     }

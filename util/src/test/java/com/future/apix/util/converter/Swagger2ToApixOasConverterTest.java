@@ -1,9 +1,8 @@
-package com.future.apix.util;
+package com.future.apix.util.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
-import com.future.apix.util.ApixUtil;
-import com.future.apix.util.converter.SwaggerToApixOasConverter;
+import com.future.apix.util.JsonUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +24,13 @@ public class Swagger2ToApixOasConverterTest {
 
     @InjectMocks
     private SwaggerToApixOasConverter converter;
-
+    private JsonUtil jsonUtil = new JsonUtil((map1, map2) -> {
+        String key = "name";
+        if(!map1.containsKey(key)){
+            key = "ref";
+        }
+        return map1.get(key).toString().compareTo(map2.get(key).toString());
+    });
     @Test
     public void importTest() throws URISyntaxException, IOException {
         URI uri = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
@@ -44,7 +49,7 @@ public class Swagger2ToApixOasConverterTest {
         }
         HashMap<String, Object> obj1 = mapper.convertValue(result, HashMap.class);
         HashMap<String, Object> obj2 = mapper.convertValue(expectedResult, HashMap.class);
-        Assert.assertTrue(ApixUtil.isEqualObject(obj1, obj2,
+        Assert.assertTrue(jsonUtil.isEqualObject(obj1, obj2,
                 new HashSet<>(Arrays.asList("githubProject","definitions","_signature","$ref","required","createdAt","updatedAt"))));
 
 

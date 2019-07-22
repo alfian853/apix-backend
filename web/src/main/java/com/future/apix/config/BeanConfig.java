@@ -2,6 +2,8 @@ package com.future.apix.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.future.apix.util.JsonUtil;
 import com.future.apix.util.LazyObjectWrapper;
 import com.future.apix.util.ObjectInitiator;
 import com.future.apix.util.converter.ApiProjectConverter;
@@ -37,7 +39,7 @@ public class BeanConfig {
     JsonQueryExecutor jsonQueryExecutor(){return new JsonQueryExecutor();}
 
     @Bean
-    public LazyObjectWrapper<GitHub> LazyGitHubObjectWrapper() throws IOException {
+    public LazyObjectWrapper<GitHub> LazyGitHubObjectWrapper() {
 
         return new LazyObjectWrapper<>(new ObjectInitiator<GitHub>() {
             @Override
@@ -46,7 +48,6 @@ public class BeanConfig {
                 try {
                     git = GitHub.connectUsingOAuth(token);
                 } finally {
-                    System.out.println(git);
                     return git;
                 }
             }
@@ -56,5 +57,15 @@ public class BeanConfig {
                 throw new RuntimeException("Apix github service unavaliable");
             }
         });
+    }
+
+    @Bean
+    JsonUtil jsonUtil(){
+        return new JsonUtil();
+    }
+
+    @Bean
+    YAMLMapper yamlMapper(){
+        return new YAMLMapper();
     }
 }

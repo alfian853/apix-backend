@@ -38,7 +38,11 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
     @Autowired
     private ObjectMapper mapper;
 
-    private YAMLMapper yamlMapper = new YAMLMapper();
+    @Autowired
+    private JsonUtil jsonUtil;
+
+    @Autowired
+    private YAMLMapper yamlMapper;
 
     private Map<String,String> map$refTorRef = new HashMap<String, String>(){{
         this.put("$ref","ref");
@@ -140,7 +144,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                 swagger2.setOasFileProjectUpdateDate(project.getUpdatedAt());
 
                 //replace '$ref' with 'ref'
-                JsonUtil.remappingKeys(oasHashMap, this.map$refTorRef);
+                jsonUtil.remappingKeys(oasHashMap, this.map$refTorRef);
 
                 swagger2Repository.save(swagger2);
             }
@@ -148,7 +152,7 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
             else if(!fileExist){
                 System.out.println("FILE NOT EXISTS! jadi buat baru");
                 Map<String, Object> swaggerOas = swagger2.getOasSwagger2();
-                JsonUtil.remappingKeys(swagger2.getOasSwagger2(),maprefTor$ref);
+                jsonUtil.remappingKeys(swagger2.getOasSwagger2(),maprefTor$ref);
                 writeFile(swagger2.getOasFileName(), request.getFormat(), swaggerOas);
             }
             response.setFileUrl(EXPORT_URL + targetFilePath);

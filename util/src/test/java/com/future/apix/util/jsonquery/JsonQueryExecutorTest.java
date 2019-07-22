@@ -1,7 +1,7 @@
-package com.future.apix.util;
+package com.future.apix.util.jsonquery;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.apix.util.jsonquery.JsonQueryExecutor;
+import com.future.apix.util.JsonUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +30,14 @@ public class JsonQueryExecutorTest {
             Arrays.asList("definitions","_signature","$ref","required","security","externalDocs")
     );
 
+    private JsonUtil jsonUtil = new JsonUtil((map1, map2) -> {
+        String key = "name";
+        if(!map1.containsKey(key)){
+            key = "ref";
+        }
+        return map1.get(key).toString().compareTo(map2.get(key).toString());
+    });
+
     @Test
     public void updateSuccess() throws URISyntaxException, IOException {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
@@ -43,6 +51,6 @@ public class JsonQueryExecutorTest {
 
         queryExecutor.executeQuery(project, query);
 
-        Assert.assertTrue(ApixUtil.isEqualObject(project, expected, this.ignoredField));
+        Assert.assertTrue(jsonUtil.isEqualObject(project, expected, this.ignoredField));
     }
 }

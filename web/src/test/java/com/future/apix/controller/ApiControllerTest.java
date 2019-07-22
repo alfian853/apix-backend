@@ -5,6 +5,10 @@ import com.future.apix.command.QueryExecutorCommand;
 import com.future.apix.config.filter.CorsFilter;
 import com.future.apix.controller.controlleradvice.DefaultControllerAdvice;
 import com.future.apix.entity.ApiProject;
+import com.future.apix.entity.Team;
+import com.future.apix.entity.User;
+import com.future.apix.entity.enumeration.TeamAccess;
+import com.future.apix.entity.teamdetail.Member;
 import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.request.ProjectAssignTeamRequest;
@@ -16,28 +20,35 @@ import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiTeamService;
 import com.future.apix.service.CommandExecutorService;
+import com.future.apix.service.TeamService;
+import com.sun.org.apache.xpath.internal.Arg;
+import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -45,6 +56,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -60,6 +72,9 @@ public class ApiControllerTest {
     private ApiTeamService apiTeamService;
 
     @Mock
+    private TeamService teamService;
+
+    @Mock
     private CommandExecutorService commandExecutor;
 
     @Spy
@@ -70,6 +85,21 @@ public class ApiControllerTest {
 
     private ApiProject project;
     private Optional<ApiProject> optionalApiProject;
+
+    private static final String TEAM_ID = "test-id";
+    private static final String TEAM_NAME = "TeamTest";
+    private static final TeamAccess TEAM_ACCESS = TeamAccess.PUBLIC;
+    private static final String TEAM_CREATOR = "test";
+    private static final List<Member>
+        TEAM_MEMBER = Collections.singletonList(new Member("test", true));
+    private static final Team TEAM = Team.builder()
+        .id(TEAM_ID)
+        .name(TEAM_NAME)
+        .access(TEAM_ACCESS)
+        .creator(TEAM_CREATOR)
+        .members(TEAM_MEMBER)
+        .build();
+    private static final User USER = new User("", "test", "", Arrays.asList("ROLE_USER", "ROLE_ADMIN"), Arrays.asList("TeamTest"));
 
     @Before
     public void init() throws IOException, URISyntaxException {
@@ -85,14 +115,36 @@ public class ApiControllerTest {
     }
 
     @Test
-    public void importFromFile_success() throws Exception {
+    public void importFromFile_teamNotExists_success() throws Exception {
+        when(teamService.createTeam(any())).thenReturn(TEAM);
+        when(commandExecutor.executeCommand(any(), any())).thenReturn(project);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(USER);
+
+        MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
+        mvc.perform(multipart("/projects/import")
+            .file("file", jsonFile.getBytes())
+            .param("type", "oas-swagger2")
+            .param("team", "team")
+            .param("isNewTeam", "true"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success", is(true)))
+            .andExpect(jsonPath("$.message", is("")));
+    }
+
+    @Test
+    public void importFromFile_teamExists_success() throws Exception {
+        when(teamService.getTeamByName(anyString())).thenReturn(TEAM);
         when(commandExecutor.executeCommand(any(), any())).thenReturn(project);
         MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
         mvc.perform(multipart("/projects/import")
             .file("file", jsonFile.getBytes())
             .param("type", "oas-swagger2")
             .param("team", "team")
-        .param("isNewTeam", "false"))
+            .param("isNewTeam", "false"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success", is(true)))
             .andExpect(jsonPath("$.message", is("")));
@@ -100,6 +152,7 @@ public class ApiControllerTest {
 
     @Test
     public void importFromFile_isNull() throws Exception {
+        when(teamService.getTeamByName(anyString())).thenReturn(TEAM);
         when(commandExecutor.executeCommand(any(), any())).thenReturn(null);
         MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
         mvc.perform(multipart("/projects/import")
@@ -126,10 +179,11 @@ public class ApiControllerTest {
         verify(commandExecutor, times(0)).executeCommand(any(),any());
     }
 
-    /*
+
     @Test
+    @Ignore
     public void importFromFile_uploadFileSizeExceeded() throws Exception {
-//        byte[] bytes = new byte[1024 * 1024 * 10];
+        //        byte[] bytes = new byte[1024 * 1024 * 10];
         URI uri = getClass().getClassLoader().getResource("stoplight.json").toURI();
         System.out.println(uri);
         byte[] project = FileUtils.readFileToByteArray(new File(uri));
@@ -144,12 +198,9 @@ public class ApiControllerTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.success", is(false)))
             .andDo(print());
-//            .andExpect(jsonPath("$.message", is("oas format is not supported")));
+        //            .andExpect(jsonPath("$.message", is("oas format is not supported")));
         verify(commandExecutor, times(0)).executeCommand(any(),any());
-
     }
-
-     */
 
     @Test
     public void exportToOas_success() throws Exception {
@@ -158,27 +209,13 @@ public class ApiControllerTest {
         response.setMessage("File has been exported!");
         response.setFileUrl("url");
         when(commandExecutor.executeCommand(any(), any())).thenReturn(response);
-        mvc.perform(post("/projects/{id}/export", 1)
-            .param("type", "oas-swagger2")
+        mvc.perform(get("/projects/{id}/export", 1)
             .param("format", "JSON"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success", is(true)))
             .andExpect(jsonPath("$.message", is("File has been exported!")))
             .andExpect(jsonPath("$.file_url", is("url")));
         verify(commandExecutor, times(1)).executeCommand(any(),any());
-    }
-
-    @Test
-    public void exportToOas_typeNotEqual() throws Exception {
-        //        when(commandExecutor.executeCommand(any(), any())).thenReturn(new DownloadResponse());
-        mvc.perform(post("/projects/{id}/export", 1)
-            .param("type", "not-oas")
-            .param("format", "JSON"))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.success", is(false)))
-            .andExpect(jsonPath("$.message", is("oas format is not supported")));
-        verify(commandExecutor, times(0)).executeCommand(any(),any());
-
     }
 
     @Test
@@ -283,7 +320,7 @@ public class ApiControllerTest {
         when(apiTeamService.grantTeamAccess(anyString(), any())).thenReturn(RequestResponse.success("Team has been assigned to project!"));
         mvc.perform(post("/projects/{id}/assign", 1)
             .contentType(MediaType.APPLICATION_JSON)
-        .content(mapper.writeValueAsString(request)))
+            .content(mapper.writeValueAsString(request)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success", is(true)))
             .andExpect(jsonPath("$.message", is("Team has been assigned to project!")));
@@ -301,6 +338,58 @@ public class ApiControllerTest {
             .andExpect(jsonPath("$.success", is(true)))
             .andExpect(jsonPath("$.message", is("Team has been removed from project!")));
         verify(apiTeamService, times(1)).grantTeamAccess(anyString(), any());
+    }
+
+    @Test
+    public void searchProjects() throws Exception {
+        mvc.perform(get("/projects/search")
+        .param("page", "1")
+        .param("size", "2")
+        .param("search", "test"))
+            .andExpect(status().isOk());
+        verify(apiDataService).findSearch(anyString(), any(Pageable.class));
+    }
+
+    @Test
+    public void findAllPageable_SortAsc() throws Exception {
+        mvc.perform(get("/projects")
+            .param("page", "1")
+            .param("size", "2")
+            .param("direction", "asc")
+            .param("sort", "test"))
+            .andExpect(status().isOk());
+        verify(apiDataService).findAll(PageRequest.of(1,2, Sort.Direction.ASC, "test"));
+    }
+
+    @Test
+    public void findAllPageable_SortDesc() throws Exception {
+        mvc.perform(get("/projects")
+            .param("page", "1")
+            .param("size", "2")
+            .param("direction", "desc")
+            .param("sort", "test"))
+            .andExpect(status().isOk());
+        verify(apiDataService).findAll(PageRequest.of(1,2, Sort.Direction.DESC, "test"));
+    }
+
+    @Test
+    public void findAllPageable_sortRandom() throws Exception {
+        mvc.perform(get("/projects")
+            .param("page", "1")
+            .param("size", "2")
+            .param("direction", "random")
+            .param("sort", "test"))
+            .andExpect(status().isOk());
+        verify(apiDataService).findAll(PageRequest.of(1,2, Sort.Direction.ASC, "test"));
+    }
+
+    @Test
+    public void findAllPageable_SortNull() throws Exception {
+        mvc.perform(get("/projects")
+            .param("page", "1")
+            .param("size", "2"))
+            .andExpect(status().isOk());
+        verify(apiDataService).findAll(PageRequest.of(1,2));
     }
 
 }

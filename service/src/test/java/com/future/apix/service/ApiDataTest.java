@@ -23,6 +23,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,10 +55,7 @@ public class ApiDataTest {
     ApiRepository apiRepository;
 
     @Mock
-    TeamRepository teamRepository;
-
-    @Mock
-    UserRepository userRepository;
+    TeamService teamService;
 
     private Optional<ApiProject> optionalApiProject;
     private ApiProject project;
@@ -147,7 +148,7 @@ public class ApiDataTest {
             .isNewTeam(false)
             .team("TeamTest")
             .build();
-        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
+        when(teamService.getTeamByName(anyString())).thenReturn(TEAM);
         when(apiRepository.save(any(ApiProject.class))).thenReturn(project);
         ProjectCreateResponse response = serviceMock.createProject(request);
         Assert.assertTrue(response.getSuccess());
@@ -179,10 +180,9 @@ public class ApiDataTest {
         expected.setStatusToSuccess(); expected.setMessage("User is authenticated");
         expected.setUsername(USER_USERNAME); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
 //        when(mapper.convertValue(any(), eq(UserProfileResponse.class))).thenReturn(expected);
-        doReturn(expected).when(mapper).convertValue(any(), eq(UserProfileResponse.class));
+//        doReturn(expected).when(mapper).convertValue(any(), eq(UserProfileResponse.class));
 
-        when(userRepository.findByUsername(anyString())).thenReturn(USER);
-        when(teamRepository.save(any(Team.class))).thenReturn(TEAM);
+        when(teamService.createTeam(any())).thenReturn(TEAM);
         when(apiRepository.save(any(ApiProject.class))).thenReturn(project);
         ProjectCreateResponse response = serviceMock.createProject(request);
         Assert.assertTrue(response.getSuccess());
@@ -198,5 +198,22 @@ public class ApiDataTest {
         when(apiRepository.findByTeamsIn(anyString())).thenReturn(Arrays.asList(project));
         List<ApiProject> projects = serviceMock.findByUser("teamTest");
         Assert.assertEquals(1, projects.size());
+    }
+
+    @Test
+    public void searchProjects(){
+        Page apiPage = new PageImpl<ApiProject>(Arrays.asList(project));
+        when(apiRepository.findBySearch(anyString(), any(Pageable.class))).thenReturn(apiPage);
+        Page<ApiProject> apiProjectPage = serviceMock.findSearch("test", PageRequest.of(0, 2));
+        verify(apiRepository).findBySearch(anyString(), any());
+    }
+
+    @Test
+    public void pageableProjects(){
+        Page apiPage = new PageImpl<ApiProject>(Arrays.asList(project));
+        when(apiRepository.findAll(any(Pageable.class))).thenReturn(apiPage);
+        Page<ApiProject> apiProjectPage = serviceMock.findAll(PageRequest.of(0, 2));
+        verify(apiRepository).findAll(any(Pageable.class));
+        Assert.assertEquals(apiProjectPage.getContent(), Arrays.asList(project));
     }
 }

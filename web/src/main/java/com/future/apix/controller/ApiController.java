@@ -117,13 +117,15 @@ public class ApiController {
                                     @RequestParam(value = "size", defaultValue = "10") int size,
                                     @RequestParam(value = "sort", required = false) String sort,
                                     @RequestParam(value = "direction", required = false) String direction) {
-        if (!direction.isEmpty() && direction.equals("asc")){
-            return apiDataService.findAll(PageRequest.of(page, size, Sort.Direction.ASC, sort));
-        }
-        else if (!direction.isEmpty() && direction.equals("desc")) {
-            return apiDataService.findAll(PageRequest.of(page, size, Sort.Direction.DESC, sort));
-        }
-        else throw new DataNotFoundException("Projects is not available at the moment!");
+        if (direction != null) {
+            if (direction.equals("asc"))
+                return apiDataService.findAll(PageRequest.of(page, size, Sort.Direction.ASC, sort));
+            else if (direction.equals("desc"))
+                return apiDataService.findAll(PageRequest.of(page, size, Sort.Direction.DESC, sort));
+            else
+                return apiDataService.findAll(PageRequest.of(page, size, Sort.Direction.ASC, sort));
+        } else
+            return apiDataService.findAll(PageRequest.of(page, size));
     }
 
     @GetMapping("/search")

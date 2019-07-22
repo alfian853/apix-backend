@@ -9,8 +9,6 @@ import com.future.apix.entity.apidetail.ProjectInfo;
 import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.repository.ApiRepository;
-import com.future.apix.repository.TeamRepository;
-import com.future.apix.repository.UserRepository;
 import com.future.apix.request.CreateTeamRequest;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.response.ProjectCreateResponse;

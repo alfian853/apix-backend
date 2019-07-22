@@ -7,6 +7,7 @@ import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.entity.teamdetail.Member;
+import com.future.apix.request.CreateTeamRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.TeamService;
 import org.junit.Before;
@@ -53,7 +54,6 @@ public class TeamControllerTest {
 
     private static final String TEAM_ID = "test-id";
     private static final String TEAM_NAME = "TeamTest";
-    private static final String TEAM_DIVISION = "division";
     private static final TeamAccess TEAM_ACCESS = TeamAccess.PUBLIC;
     private static final String TEAM_CREATOR = "test";
 
@@ -89,8 +89,7 @@ public class TeamControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is("test-id")))
                 .andExpect(jsonPath("$[0].name", is("TeamTest")))
-                .andExpect(jsonPath("$[0].division", is("division")))
-                .andExpect(jsonPath("$[0].access", is("public")))
+                .andExpect(jsonPath("$[0].access", is("PUBLIC")))
                 .andExpect(jsonPath("$[0].creator", is("test")))
                 .andExpect(jsonPath("$[0].members", hasSize(1)));
         verify(teamService, times(1)).getTeams();
@@ -106,8 +105,7 @@ public class TeamControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is("test-id")))
                 .andExpect(jsonPath("$[0].name", is("TeamTest")))
-                .andExpect(jsonPath("$[0].division", is("division")))
-                .andExpect(jsonPath("$[0].access", is("public")))
+                .andExpect(jsonPath("$[0].access", is("PUBLIC")))
                 .andExpect(jsonPath("$[0].creator", is("test")))
                 .andExpect(jsonPath("$[0].members", hasSize(1)));
         verify(teamService, times(1)).getMyTeam(any());
@@ -116,10 +114,16 @@ public class TeamControllerTest {
     @Test
     public void createTeam_success() throws Exception {
         when(teamService.createTeam(any())).thenReturn(new Team());
+        CreateTeamRequest request = CreateTeamRequest.builder()
+            .creator(TEAM_CREATOR)
+            .access(TEAM_ACCESS)
+            .teamName(TEAM_NAME)
+            .members(Collections.singletonList(USER_USERNAME))
+            .build();
 
         mvc.perform(post("/teams")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(TEAM)))
+                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.message", is("Team is created!")));
@@ -146,27 +150,9 @@ public class TeamControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is("test-id")))
                 .andExpect(jsonPath("$.name", is("TeamTest")))
-                .andExpect(jsonPath("$.division", is("division")))
-                .andExpect(jsonPath("$.access", is("public")))
+                .andExpect(jsonPath("$.access", is("PUBLIC")))
                 .andExpect(jsonPath("$.creator", is("test")))
                 .andExpect(jsonPath("$.members", hasSize(1)));
         verify(teamService, times(1)).getTeamByName(TEAM_NAME);
     }
-
-    /*
-    @Test
-    public void grantTeam_test() throws Exception {
-        when(teamService.grantTeamAccess(TEAM_NAME, TEAM_MEMBER))
-                .thenReturn(RequestResponse.success("Team members grant have been updated!"));
-
-        mvc.perform(put("/teams/{name}", "TeamTest")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(TEAM_MEMBER)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.message", is("Team members grant have been updated!")));
-        verify(teamService, times(1)).grantTeamAccess(TEAM_NAME, TEAM_MEMBER);
-    }
-
-     */
 }

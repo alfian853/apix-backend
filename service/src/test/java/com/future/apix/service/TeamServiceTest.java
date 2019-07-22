@@ -17,6 +17,7 @@ import com.future.apix.service.impl.TeamServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kohsuke.github.GHEventPayload;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -68,7 +69,7 @@ public class TeamServiceTest {
      */
     @Test
     public void getTeams_test(){
-        when(teamRepository.findAll()). thenReturn(Arrays.asList(TEAM));
+        when(teamRepository.findAll()).thenReturn(Arrays.asList(TEAM));
         List<Team> teams = serviceMock.getTeams();
         Assert.assertEquals(Arrays.asList(TEAM), teams);
         Assert.assertEquals(1, teams.size());
@@ -97,7 +98,7 @@ public class TeamServiceTest {
 
         when(authentication.getPrincipal()).thenReturn(USER);
         when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
-        when(teamRepository.findByMembersUsername(USER_USERNAME)).thenReturn(Arrays.asList(TEAM));
+        when(teamRepository.findByMembersUsername(anyString())).thenReturn(Arrays.asList(TEAM));
 
         List<Team> teams = serviceMock.getMyTeam(authentication);
         Assert.assertEquals(Arrays.asList(TEAM), teams);
@@ -133,7 +134,7 @@ public class TeamServiceTest {
 
     @Test
     public void getTeamByName_success(){
-        when(teamRepository.findByName(TEAM_NAME)).thenReturn(TEAM);
+        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         Team team = serviceMock.getTeamByName(TEAM_NAME);
         Assert.assertEquals("test-id", team.getId());
         Assert.assertEquals("TeamTest", team.getName());
@@ -146,9 +147,15 @@ public class TeamServiceTest {
      */
     @Test
     public void createTeam_teamAlreadyExists(){
-        when(teamRepository.findByName(TEAM_NAME)).thenReturn(TEAM);
+        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
+        CreateTeamRequest request = CreateTeamRequest.builder()
+            .creator(TEAM_CREATOR)
+            .teamName(TEAM_NAME)
+            .members(Collections.emptyList())
+            .access(TEAM_ACCESS)
+            .build();
         try {
-            serviceMock.createTeam(new CreateTeamRequest());
+            serviceMock.createTeam(request);
         } catch (DuplicateEntryException e) {
             Assert.assertEquals("Team name is already exists!", e.getMessage());
         }
@@ -156,12 +163,15 @@ public class TeamServiceTest {
 
     @Test
     public void createTeam_success(){
-        when(teamRepository.findByName(TEAM_NAME)).thenReturn(null);
+        when(teamRepository.findByName(anyString())).thenReturn(null);
         when(teamRepository.save(any(Team.class))).thenReturn(TEAM);
-        when(userRepository.findByUsername(USER_USERNAME)).thenReturn(USER);
-        CreateTeamRequest request = new CreateTeamRequest();
-        request.setTeamName(TEAM_NAME);
-        request.setCreator(USER_USERNAME);
+        when(userRepository.findByUsername(anyString())).thenReturn(USER);
+        CreateTeamRequest request = CreateTeamRequest.builder()
+            .creator(TEAM_CREATOR)
+            .teamName(TEAM_NAME)
+            .access(TEAM_ACCESS)
+            .members(Collections.singletonList(USER_USERNAME))
+            .build();
         Team response = serviceMock.createTeam(request);
 
         verify(teamRepository).save(any());
@@ -172,7 +182,7 @@ public class TeamServiceTest {
      */
     @Test
     public void editTeam_teamAlreadyExists(){
-        when(teamRepository.findByName(TEAM_NAME)).thenReturn(null);
+        when(teamRepository.findByName(anyString())).thenReturn(null);
         try {
             serviceMock.editTeam("TeamTest", TEAM);
         } catch (DataNotFoundException e) {
@@ -182,7 +192,7 @@ public class TeamServiceTest {
 
     @Test
     public void editTeam_successMemberAlreadyExist(){
-        when(teamRepository.findByName(TEAM_NAME)).thenReturn(TEAM);
+        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         RequestResponse response = serviceMock.editTeam("TeamTest", TEAM);
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Members have been invited!", response.getMessage());
@@ -190,7 +200,7 @@ public class TeamServiceTest {
 
     @Test
     public void editTeam_successAddMember(){
-        when(teamRepository.findByName(TEAM_NAME)).thenReturn(TEAM);
+        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         Team teamNewMember = Team.builder()
             .id(TEAM_ID)
             .name(TEAM_NAME)

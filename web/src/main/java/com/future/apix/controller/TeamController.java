@@ -39,7 +39,7 @@ public class TeamController {
     @ResponseStatus(HttpStatus.CREATED)
     public RequestResponse createTeam(@RequestBody @Valid CreateTeamRequest teamRequest) {
         Team newTeam = teamService.createTeam(teamRequest);
-        return RequestResponse.success();
+        return RequestResponse.success("Team is created!");
     }
 
     @PutMapping("/{name}")

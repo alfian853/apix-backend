@@ -1,9 +1,14 @@
 package com.future.apix.service;
 
+import com.future.apix.exception.DataNotFoundException;
+import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ApiRepository;
+import com.future.apix.request.GithubContentsRequest;
+import com.future.apix.response.github.GithubContentResponse;
 import com.future.apix.service.impl.GithubApiServiceImpl;
-import org.junit.Before;
-import org.junit.Test;
+import com.future.apix.util.LazyObjectWrapper;
+import org.apache.commons.io.IOUtils;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.*;
 import org.mockito.InjectMocks;
@@ -13,8 +18,17 @@ import org.mockito.Spy;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.springframework.data.domain.PageImpl;
+import sun.nio.ch.IOUtil;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -28,7 +42,7 @@ public class GithubApiServiceTest {
     GithubApiServiceImpl service;
 
     @Mock
-    GitHub gitHub;
+    LazyObjectWrapper<GitHub> gitHub;
 
     @Mock
     ApiRepository apiRepository;
@@ -56,14 +70,15 @@ public class GithubApiServiceTest {
     @Test
     public void getMyselfTest() throws IOException {
         GHMyself ghMyself = new GHMyself();
-        when(gitHub.getMyself()).thenReturn(ghMyself);
+        when(gitHub.get()).thenReturn(mock(GitHub.class));
+        when(gitHub.get().getMyself()).thenReturn(ghMyself);
         service.getMyself();
-        verify(gitHub).getMyself();
-        verifyNoMoreInteractions(gitHub);
+        verify(gitHub.get()).getMyself();
     }
 
     @Test
     public void getMyselfRepositoriesTest()throws IOException{
+        /*
         GHRepository ghRepository = mock(GHRepository.class);
 //        when(ghRepository.getName()).thenReturn("myName");
         doReturn(new Long(2)).when(ghRepository).getId();
@@ -86,6 +101,87 @@ public class GithubApiServiceTest {
             }
         });
         service.getMyselfRepositories();
+
+         */
+        GHRepository repository = new GHRepository();
+//        GHMyself myself = new GHMyself();
+        when(gitHub.get()).thenReturn(mock(GitHub.class));
+        when(gitHub.get().getMyself()).thenReturn(mock(GHMyself.class));
+        PagedIterable<GHRepository> repositories = mock(PagedIterable.class);
+        doReturn(repositories).when(gitHub.get()).getMyself().listRepositories();
+
+        service.getMyselfRepositories();
+        verify(gitHub.get()).getMyself();
+        verify(gitHub.get()).getMyself().listRepositories();
+    }
+
+    @Test
+    public void getBranchesTest() throws IOException {
+        when(gitHub.get()).thenReturn(mock(GitHub.class));
+//        GHRepository repository = new GHRepository();
+        when(gitHub.get().getRepository(anyString())).thenReturn(mock(GHRepository.class));
+        Map<String, GHBranch> branches = new HashMap<>();
+        branches.put("dev", new GHBranch());
+//        when(gitHub.get().getRepository(anyString()).getBranches()).thenReturn(mock(Map.class));
+        when(gitHub.get().getRepository(anyString()).getBranches()).thenReturn(branches);
+//
+        List<String> result = service.getBranches("owner/repo");
+//        verify(gitHub).get().getRepository(anyString());
+        verify(gitHub.get().getRepository(anyString())).getBranches();
+        Assert.assertEquals(result.get(0), "dev");
+    }
+
+    @Test
+    public void getFileContent_Success() throws IOException {
+        when(gitHub.get()).thenReturn(mock(GitHub.class));
+        when(gitHub.get().getRepository(anyString())).thenReturn(mock(GHRepository.class));
+        GHContent ghContent = mock(GHContent.class);
+//        when(ghContent.isFile()).thenReturn(true);
+        when(gitHub.get().getRepository(anyString()).getFileContent(anyString(), anyString()))
+            .thenReturn(ghContent);
+        when(ghContent.isFile()).thenReturn(true);
+        when(ghContent.getOwner()).thenReturn(mock(GHRepository.class));
+        when(ghContent.getOwner().getName()).thenReturn("owner");
+        String contentString = "{\"swagger\" : \"2.0\",\"host\" : \"petstore.swagger.io\"}";
+        InputStream is = new ByteArrayInputStream(contentString.getBytes(StandardCharsets.UTF_8));
+        when(ghContent.read()).thenReturn(is);
+//        when(ioUtils.toString(any(InputStream.class), anyString())).thenReturn(contentString);
+//        when(gitHub.get().getRepository(anyString()).getFileContent(anyString(), anyString()).isFile()).thenReturn(true);
+        GithubContentResponse response = service.getFileContent("owner/repo", "test.md", "master");
+        verify(gitHub.get().getRepository(anyString())).getFileContent(anyString(), anyString());
+        Assert.assertEquals(response.getContent(), contentString);
+    }
+
+    @Test
+    public void getFileContent_NotFound() throws IOException {
+        when(gitHub.get()).thenReturn(mock(GitHub.class));
+        when(gitHub.get().getRepository(anyString())).thenReturn(mock(GHRepository.class));
+        GHContent ghContent = mock(GHContent.class);
+        when(gitHub.get().getRepository(anyString()).getFileContent(anyString(), anyString()))
+            .thenReturn(ghContent);
+        try {
+            service.getFileContent("owner/repo", "test.md", "master");
+        } catch (DataNotFoundException e) {
+            Assert.assertEquals(e.getMessage(), "File is not available!");
+        }
+    }
+
+    @Test
+    public void updateFile_NotFound() throws IOException {
+        when(gitHub.get()).thenReturn(mock(GitHub.class));
+        when(gitHub.get().getRepository(anyString())).thenReturn(mock(GHRepository.class));
+        GHContent ghContent = mock(GHContent.class);
+        when(gitHub.get().getRepository(anyString()).getFileContent(anyString(), anyString()))
+            .thenReturn(ghContent);
+        GithubContentsRequest request = new GithubContentsRequest();
+        request.setMessage("commit message");
+        request.setProjectId("123");
+        request.setSha("sha-123");
+        try {
+            service.updateFile("owner/repo", "test.md", request);
+        } catch (InvalidRequestException e) {
+            Assert.assertEquals(e.getMessage(), "Content is not a file!");
+        }
     }
 
 

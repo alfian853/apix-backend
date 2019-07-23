@@ -12,6 +12,7 @@ import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import org.kohsuke.github.GitHub;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class BeanConfig {
     private String token;
 
     @Bean
+    @Primary
     ObjectMapper objectMapper(){
         return new ObjectMapper().configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     }
@@ -54,7 +56,7 @@ public class BeanConfig {
 
             @Override
             public void onInitFailed() {
-                throw new RuntimeException("Apix github service unavaliable");
+                throw new RuntimeException("Apix github service unavailable");
             }
         });
     }

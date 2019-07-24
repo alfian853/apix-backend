@@ -216,13 +216,4 @@ public class GithubApiServiceImpl implements GithubApiService {
         }
         return contentBuilder.toString();
     }
-
-    private HashMap<String, Object> convertContentToHashMap(InputStream i) throws IOException {
-        String readContent = IOUtils.toString(i, StandardCharsets.UTF_8.name());
-        Gson gson = new Gson();
-        HashMap<String, Object> obj = gson.fromJson(readContent, HashMap.class);
-//        HashMap<String, Object> obj = oMapper.convertValue(readContent, HashMap.class);
-        return obj;
-    }
-
 }

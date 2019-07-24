@@ -10,6 +10,7 @@ import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.request.GithubCommitterRequest;
 import com.future.apix.request.GithubContentsRequest;
 import com.future.apix.response.ProjectCreateResponse;
+import com.future.apix.response.github.GithubCommitResponse;
 import com.future.apix.response.github.GithubContentResponse;
 import com.future.apix.service.impl.GithubApiServiceImpl;
 import com.future.apix.util.LazyObjectWrapper;
@@ -46,8 +47,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class GithubApiServiceTest {
     //    https://github.com/kohsuke/github-api/blob/master/src/test/java/org/kohsuke/github/AbstractGitHubApiTestBase.java
-//    https://github.com/kohsuke/github-api/blob/master/src/test/java/org/kohsuke/github/AppTest.java
-//    https://github.com/kohsuke/github-api/blob/master/src/test/java/org/kohsuke/github/GitHubTest.java
+    //    https://github.com/kohsuke/github-api/blob/master/src/test/java/org/kohsuke/github/AppTest.java
+    //    https://github.com/kohsuke/github-api/blob/master/src/test/java/org/kohsuke/github/GitHubTest.java
     @Spy
     @InjectMocks
     GithubApiServiceImpl service;
@@ -64,35 +65,38 @@ public class GithubApiServiceTest {
     @Mock
     SwaggerToApixOasConverter converter;
 
+    @Mock
+    CommandExecutorService commandExecutor;
+
     @Spy
     ObjectMapper mapper;
 
     private ApiProject project;
-//    private ApiProject swagger;
+    //    private ApiProject swagger;
 
     @Before
     public void setUp() throws Exception {
-//        File f = new File(System.getProperty("user.home"), ".github.kohsuke2");
-//        if (f.exists()) {
-//            Properties props = new Properties();
-//            FileInputStream in = null;
-//            try {
-//                in = new FileInputStream(f);
-//                props.load(in);
-//            } finally {
-//                IOUtils.closeQuietly(in);
-//            }
-//            // use the non-standard credential preferentially, so that developers of this library do not have
-//            // to clutter their event stream.
-//            gitHub = GitHubBuilder.fromProperties(props).withRateLimitHandler(RateLimitHandler.FAIL).build();
-//        } else {
-//            gitHub = GitHubBuilder.fromCredentials().withRateLimitHandler(RateLimitHandler.FAIL).build();
-//        }
+        //        File f = new File(System.getProperty("user.home"), ".github.kohsuke2");
+        //        if (f.exists()) {
+        //            Properties props = new Properties();
+        //            FileInputStream in = null;
+        //            try {
+        //                in = new FileInputStream(f);
+        //                props.load(in);
+        //            } finally {
+        //                IOUtils.closeQuietly(in);
+        //            }
+        //            // use the non-standard credential preferentially, so that developers of this library do not have
+        //            // to clutter their event stream.
+        //            gitHub = GitHubBuilder.fromProperties(props).withRateLimitHandler(RateLimitHandler.FAIL).build();
+        //        } else {
+        //            gitHub = GitHubBuilder.fromCredentials().withRateLimitHandler(RateLimitHandler.FAIL).build();
+        //        }
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
 
-//        URI uri2 = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
-//        swagger = mapper.readValue(Files.readAllBytes(Paths.get(uri2)), ApiProject.class);
+        //        URI uri2 = getClass().getClassLoader().getResource("swagger-oas.json").toURI();
+        //        swagger = mapper.readValue(Files.readAllBytes(Paths.get(uri2)), ApiProject.class);
     }
 
     @Test
@@ -133,7 +137,7 @@ public class GithubApiServiceTest {
 
          */
         GHRepository repository = new GHRepository();
-//        GHMyself myself = new GHMyself();
+        //        GHMyself myself = new GHMyself();
         when(gitHub.get()).thenReturn(mock(GitHub.class));
         when(gitHub.get().getMyself()).thenReturn(mock(GHMyself.class));
         PagedIterable<GHRepository> repositories = mock(PagedIterable.class);
@@ -147,15 +151,15 @@ public class GithubApiServiceTest {
     @Test
     public void getBranchesTest() throws IOException {
         when(gitHub.get()).thenReturn(mock(GitHub.class));
-//        GHRepository repository = new GHRepository();
+        //        GHRepository repository = new GHRepository();
         when(gitHub.get().getRepository(anyString())).thenReturn(mock(GHRepository.class));
         Map<String, GHBranch> branches = new HashMap<>();
         branches.put("dev", new GHBranch());
-//        when(gitHub.get().getRepository(anyString()).getBranches()).thenReturn(mock(Map.class));
+        //        when(gitHub.get().getRepository(anyString()).getBranches()).thenReturn(mock(Map.class));
         when(gitHub.get().getRepository(anyString()).getBranches()).thenReturn(branches);
-//
+        //
         List<String> result = service.getBranches("owner/repo");
-//        verify(gitHub).get().getRepository(anyString());
+        //        verify(gitHub).get().getRepository(anyString());
         verify(gitHub.get().getRepository(anyString())).getBranches();
         Assert.assertEquals(result.get(0), "dev");
     }
@@ -165,7 +169,7 @@ public class GithubApiServiceTest {
         when(gitHub.get()).thenReturn(mock(GitHub.class));
         when(gitHub.get().getRepository(anyString())).thenReturn(mock(GHRepository.class));
         GHContent ghContent = mock(GHContent.class);
-//        when(ghContent.isFile()).thenReturn(true);
+        //        when(ghContent.isFile()).thenReturn(true);
         when(gitHub.get().getRepository(anyString()).getFileContent(anyString(), anyString()))
             .thenReturn(ghContent);
         when(ghContent.isFile()).thenReturn(true);
@@ -174,8 +178,8 @@ public class GithubApiServiceTest {
         String contentString = "{\"swagger\" : \"2.0\",\"host\" : \"petstore.swagger.io\"}";
         InputStream is = new ByteArrayInputStream(contentString.getBytes(StandardCharsets.UTF_8));
         when(ghContent.read()).thenReturn(is);
-//        when(ioUtils.toString(any(InputStream.class), anyString())).thenReturn(contentString);
-//        when(gitHub.get().getRepository(anyString()).getFileContent(anyString(), anyString()).isFile()).thenReturn(true);
+        //        when(ioUtils.toString(any(InputStream.class), anyString())).thenReturn(contentString);
+        //        when(gitHub.get().getRepository(anyString()).getFileContent(anyString(), anyString()).isFile()).thenReturn(true);
         GithubContentResponse response = service.getFileContent("owner/repo", "test.md", "master");
         verify(gitHub.get().getRepository(anyString())).getFileContent(anyString(), anyString());
         Assert.assertEquals(response.getContent(), contentString);
@@ -214,23 +218,69 @@ public class GithubApiServiceTest {
     }
 
     @Test
-    @Ignore
-    public void updateFile() throws IOException {
+    //    @Ignore
+    public void updateFile_contentIsAlreadyEqual() throws IOException {
         when(gitHub.get()).thenReturn(mock(GitHub.class));
         when(gitHub.get().getRepository(anyString())).thenReturn(mock(GHRepository.class));
         GHContent ghContent = mock(GHContent.class);
         when(gitHub.get().getRepository(anyString()).getFileContent(anyString(), anyString()))
             .thenReturn(ghContent);
         when(ghContent.isFile()).thenReturn(true);
-        DigestUtils utils = mock(DigestUtils.class);
-        when(utils.sha256Hex(anyString())).thenReturn("sha");
+        //        DigestUtils utils = mock(DigestUtils.class);
+        String contentString = "{\"swagger\" : \"2.0\",\"host\" : \"petstore.swagger.io\"}";
+        InputStream is = new ByteArrayInputStream(contentString.getBytes(StandardCharsets.UTF_8));
+        when(ghContent.read()).thenReturn(is);
+        //        when(utils.sha256Hex(any(InputStream.class))).thenReturn("sha");
+        //        doReturn("sha").when(utils)
+        //        when(utils.sha256Hex(anyByte())).thenReturn("sha");
         ProjectOasSwagger2 swagger2 = new ProjectOasSwagger2();
         swagger2.setOasFileName("oas-file-name");
+        //        doReturn(any()).when(commandExecutor.executeCommand(any(), anyString()));
         when(oasRepository.findProjectOasSwagger2ByProjectId(anyString())).thenReturn(Optional.of(swagger2));
+        //        Files files = mock(Files.class);
+        //        doReturn(notNull()).when(files.lines(any(),any()));
+        //        when(service.readFromFile(any())).thenReturn(contentString);
+        doReturn(contentString).when(service).readFromFile(any());
 
         GithubContentsRequest request = new GithubContentsRequest();
         request.setMessage("message"); request.setSha("sha"); request.setProjectId("123");
-        service.updateFile("owner/repo", "test.txt", request);
+        try {
+            service.updateFile("owner/repo", "test.txt", request);
+        } catch (InvalidRequestException e) {
+            Assert.assertEquals(e.getMessage(), "Content of OAS in Github is already equal");
+        }
+
+    }
+
+    @Test
+    public void updateFile_contentIsReplaced() throws IOException {
+        when(gitHub.get()).thenReturn(mock(GitHub.class));
+        when(gitHub.get().getRepository(anyString())).thenReturn(mock(GHRepository.class));
+        GHContent ghContent = mock(GHContent.class);
+        when(gitHub.get().getRepository(anyString()).getFileContent(anyString(), anyString()))
+            .thenReturn(ghContent);
+        when(ghContent.isFile()).thenReturn(true);
+        String contentString = "{\"swagger\" : \"2.0\",\"host\" : \"petstore.swagger.io\"}";
+        String differString = "{\"swagger\" : \"3.0\",\"host\" : \"test.test.com\"}";
+        InputStream is = new ByteArrayInputStream(contentString.getBytes(StandardCharsets.UTF_8));
+        when(ghContent.read()).thenReturn(is);
+        ProjectOasSwagger2 swagger2 = new ProjectOasSwagger2();
+        swagger2.setOasFileName("oas-file-name");
+        when(oasRepository.findProjectOasSwagger2ByProjectId(anyString())).thenReturn(Optional.of(swagger2));
+        doReturn(differString).when(service).readFromFile(any());
+
+        GithubContentsRequest request = new GithubContentsRequest();
+        request.setMessage("message"); request.setSha("sha"); request.setProjectId("123");
+//        when(ghContent.update(anyString(), anyString(), anyString())).thenReturn(new GHContentUpdateResponse());
+        GHContentUpdateResponse updateResponse = mock(GHContentUpdateResponse.class);
+        when(ghContent.update(anyString(), anyString(), anyString())).thenReturn(updateResponse);
+        GHCommit commit = mock(GHCommit.class);
+        GHCommit.ShortInfo shortInfo = mock(GHCommit.ShortInfo.class);
+        when(updateResponse.getCommit()).thenReturn(commit);
+        when(commit.getCommitShortInfo()).thenReturn(shortInfo);
+        when(shortInfo.getMessage()).thenReturn("Commit Message");
+        GithubCommitResponse response = service.updateFile("owner/repo", "test.txt", request);
+        Assert.assertEquals(response.getMessage(), "Commit Message");
 
     }
 
@@ -259,13 +309,12 @@ public class GithubApiServiceTest {
         when(ghContent.getOwner()).thenReturn(mock(GHRepository.class));
         when(ghContent.getOwner().getName()).thenReturn("owner");
         String contentString = "{\"swagger\" : \"2.0\",\"host\" : \"petstore.swagger.io\"}";
-//        HashMap<String, >
         InputStream is = new ByteArrayInputStream(contentString.getBytes(StandardCharsets.UTF_8));
         when(ghContent.read()).thenReturn(is);
-//        HashMap<String, Object> hashMap = mapper.convertValue(contentString, HashMap.class);
+        //        HashMap<String, Object> hashMap = mapper.convertValue(contentString, HashMap.class);
         when(converter.convert(any())).thenReturn(project);
-//        Gson gson = mock(Gson.class);
-//        when(gson.fromJson(contentString, HashMap.class)).thenReturn(null);
+        //        Gson gson = mock(Gson.class);
+        //        when(gson.fromJson(contentString, HashMap.class)).thenReturn(null);
 
         try {
             service.pullFileContent("owner/repo", "test.txt", "master", "123");
@@ -288,7 +337,7 @@ public class GithubApiServiceTest {
         //        HashMap<String, >
         InputStream is = new ByteArrayInputStream(contentString.getBytes(StandardCharsets.UTF_8));
         when(ghContent.read()).thenReturn(is);
-//        ApiProject mockProject = mapper.convertValue(contentString, ApiProject.class);
+        //        ApiProject mockProject = mapper.convertValue(contentString, ApiProject.class);
         when(converter.convert(any())).thenReturn(new ApiProject());
         when(apiRepository.findById(anyString())).thenReturn(Optional.of(project));
         when(apiRepository.save(any())).thenReturn(project);

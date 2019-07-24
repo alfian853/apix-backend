@@ -120,7 +120,7 @@ public class GithubApiServiceImpl implements GithubApiService {
 //            System.out.println("Content\n" + readContent);
 
             String exportSha = DigestUtils.sha256Hex(readContent);
-            if (existSha.equals(exportSha)) throw new InvalidRequestException("Content of OAS in Github is already the same");
+            if (existSha.equals(exportSha)) throw new InvalidRequestException("Content of OAS in Github is already equal");
             GHContentUpdateResponse ghResponse = content.update(readContent, request.getMessage(), request.getBranch());
 //            return convertContentUpdate(ghResponse);
             return convertCommit(ghResponse.getCommit());
@@ -199,13 +199,13 @@ public class GithubApiServiceImpl implements GithubApiService {
         GithubCommitResponse response = new GithubCommitResponse();
         response.setSha(commit.getSHA1());
         response.setMessage(commit.getCommitShortInfo().getMessage());
-        response.setOwner(convertRepository(commit.getOwner()));
-        response.setCommitter(convertUser(commit.getCommitter()));
+//        response.setOwner(convertRepository(commit.getOwner()));
+//        response.setCommitter(convertUser(commit.getCommitter()));
         response.setCommitDate(commit.getCommitDate());
         return response;
     }
 
-    private String readFromFile(Path filePath) {
+    public String readFromFile(Path filePath) {
         StringBuilder contentBuilder = new StringBuilder();
         try (Stream<String> stream = Files.lines(filePath , StandardCharsets.UTF_8))
         {

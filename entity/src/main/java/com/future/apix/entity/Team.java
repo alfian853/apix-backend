@@ -25,14 +25,13 @@ public class Team {
     @Id
     String id;
 
-    @NotEmpty(message = "Team name must not be empty")
     private String name;
 
-    @NotNull(message = "Access must not be null")
+    private String division;
+
     private TeamAccess access = TeamAccess.PUBLIC;
     // 'private' require team creator for grant; 'public' for anyone to enter
 
-    @NotEmpty(message = "Team creator name must not be empty")
     private String creator; // person who create the team and give access to member
 
     private List<Member> members = new ArrayList<>();

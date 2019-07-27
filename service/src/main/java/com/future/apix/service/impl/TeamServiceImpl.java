@@ -8,6 +8,7 @@ import com.future.apix.entity.teamdetail.Member;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
+import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.CreateTeamRequest;
@@ -43,7 +44,7 @@ public class TeamServiceImpl implements TeamService {
             UserProfileResponse profile = oMapper.convertValue(authentication.getPrincipal(), UserProfileResponse.class);
             return teamRepository.findByMembersUsername(profile.getUsername());
         }
-        else throw new InvalidAuthenticationException("User is not authenticated!");
+        else throw new InvalidRequestException("User is not authenticated!");
     }
 
     @Override
@@ -70,6 +71,7 @@ public class TeamServiceImpl implements TeamService {
             Team newTeam = new Team();
             newTeam.setCreator(request.getCreator());
             newTeam.setAccess(request.getAccess());
+            newTeam.setDivision(request.getDivision());
             newTeam.setName(request.getTeamName());
 
             request.getMembers().forEach(name -> {

@@ -34,7 +34,9 @@ public class SwaggerToApixOasConverter {
     private void replaceRefWithId(Map<String, Object> data){
         for(Object obj : data.entrySet()){
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>) obj;
-            if(pair.getKey().equals("$ref") || pair.getKey().equals("ref")){
+            if((pair.getKey().equals("$ref") || pair.getKey().equals("ref"))
+                    && pair.getValue() instanceof String){
+
                 String ref = (String) pair.getValue();
                 ref = ref.split("/",3)[2];
                 pair.setValue(this.refDefinitions.get(ref));

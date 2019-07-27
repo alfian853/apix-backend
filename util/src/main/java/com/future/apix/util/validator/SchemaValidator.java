@@ -72,7 +72,7 @@ public class SchemaValidator {
             return res;
         }
         else if(type == DataType.OBJECT){
-            boolean res = !propertiesIsEmpty && formatIsNull && itemsIsEmpty && isValid(schema.getProperties()) && defaultIsNull;
+            boolean res = formatIsNull && itemsIsEmpty && isValid(schema.getProperties()) && defaultIsNull;
 //            System.out.println("itemIsEmpty:" + itemsIsEmpty);
 //            System.out.println("defaultIsNull: " + defaultIsNull);
 //            System.out.println("isValid: " + isValid(schema.getProperties()));

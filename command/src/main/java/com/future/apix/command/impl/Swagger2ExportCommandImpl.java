@@ -9,7 +9,7 @@ import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DefaultRuntimeException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.util.JsonUtil;
@@ -30,7 +30,7 @@ import java.util.Map;
 public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
     @Autowired
-    private ApiRepository apiRepository;
+    private ProjectRepository apiRepository;
 
     @Autowired
     private OasSwagger2Repository swagger2Repository;

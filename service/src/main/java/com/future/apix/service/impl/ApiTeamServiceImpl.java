@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
 import com.future.apix.exception.DataNotFoundException;
-import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.exception.InvalidRequestException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.request.ProjectAssignTeamRequest;
 import com.future.apix.response.RequestResponse;
@@ -28,7 +27,7 @@ public class ApiTeamServiceImpl implements ApiTeamService {
     private ObjectMapper oMapper;
 
     @Autowired
-    private ApiRepository apiRepository;
+    private ProjectRepository apiRepository;
 
     @Override
     public RequestResponse grantTeamAccess(String id, ProjectAssignTeamRequest request) {

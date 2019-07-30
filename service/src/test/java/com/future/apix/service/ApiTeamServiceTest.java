@@ -6,9 +6,8 @@ import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
-import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.exception.InvalidRequestException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.request.ProjectAssignTeamRequest;
 import com.future.apix.response.RequestResponse;
@@ -27,7 +26,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -52,7 +50,7 @@ public class ApiTeamServiceTest {
     ObjectMapper mapper;
 
     @Mock
-    ApiRepository apiRepository;
+    ProjectRepository apiRepository;
 
     @InjectMocks
     ApiTeamServiceImpl mock;

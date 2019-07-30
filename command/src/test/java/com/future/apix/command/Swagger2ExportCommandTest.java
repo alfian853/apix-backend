@@ -6,7 +6,7 @@ import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.entity.apidetail.ProjectInfo;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.command.impl.Swagger2ExportCommandImpl;
@@ -37,7 +37,7 @@ public class Swagger2ExportCommandTest {
     private Swagger2ExportCommandImpl command = new Swagger2ExportCommandImpl();
 
     @Mock
-    ApiRepository apiRepository;
+    ProjectRepository apiRepository;
 
     @Mock
     OasSwagger2Repository swagger2Repository;

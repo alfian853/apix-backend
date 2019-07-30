@@ -6,7 +6,7 @@ import com.future.apix.command.model.QueryExecutorRequest;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.InvalidRequestException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.response.ProjectUpdateResponse;
 import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import org.junit.Assert;
@@ -39,7 +39,7 @@ public class QueryExecutorCommandTest {
     ObjectMapper mapper;
 
     @Mock
-    ApiRepository apiRepository;
+    ProjectRepository apiRepository;
 
     @Mock
     JsonQueryExecutor queryExecutor;

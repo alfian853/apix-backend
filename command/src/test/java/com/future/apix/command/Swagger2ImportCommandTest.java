@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.command.impl.Swagger2ImportCommandImpl;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.request.ProjectImportRequest;
 import com.future.apix.util.converter.SwaggerToApixOasConverter;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class Swagger2ImportCommandTest {
     private Swagger2ImportCommandImpl command;
 
     @Mock
-    private ApiRepository apiRepository;
+    private ProjectRepository apiRepository;
 
     @Mock
     private SwaggerToApixOasConverter converter;

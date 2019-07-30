@@ -7,7 +7,7 @@ import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.exception.DataNotFoundException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.util.QueueCommand;
@@ -28,7 +28,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
 
 
     @Autowired
-    ApiRepository apiRepository;
+    ProjectRepository apiRepository;
 
     @Autowired
     OasSwagger2Repository swagger2Repository;

@@ -8,9 +8,12 @@ import com.future.apix.entity.apidetail.Github;
 import com.future.apix.entity.apidetail.ProjectInfo;
 import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
+import com.future.apix.repository.request.ProjectAdvancedQuery;
 import com.future.apix.request.CreateTeamRequest;
 import com.future.apix.request.ProjectCreateRequest;
+import com.future.apix.response.ProjectDto;
+import com.future.apix.response.PagedResponse;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
@@ -24,12 +27,13 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ApiDataServiceImpl implements ApiDataService {
 
     @Autowired
-    private ApiRepository apiRepository;
+    private ProjectRepository apiRepository;
 
     @Autowired
     private ObjectMapper oMapper;
@@ -107,5 +111,34 @@ public class ApiDataServiceImpl implements ApiDataService {
         response.setMessage("Project has been created!");
         response.setProjectId(project.getId());
         return response;
+    }
+
+    @Override
+    public PagedResponse<ProjectDto> getByQuery(ProjectAdvancedQuery query) {
+        Page<ApiProject> page = apiRepository.findByQuery(query);
+        return PagedResponse.<ProjectDto>builder()
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .first(page.isFirst())
+                .last(page.isLast())
+                .offset(page.getPageable().getOffset())
+                .pageNumber(page.getPageable().getPageNumber())
+                .pageSize(page.getPageable().getPageSize())
+                .numberOfElements(page.getNumberOfElements())
+                .contents(
+                        page.get()
+                                .map(apiProject -> ProjectDto.builder()
+                                        .id(apiProject.getId())
+                                        .githubUsername(apiProject.getGithubProject().getOwner())
+                                        .host(apiProject.getHost())
+                                        .title(apiProject.getInfo().getTitle())
+                                        .repository(apiProject.getGithubProject().getRepo())
+                                        .owner(apiProject.getProjectOwner().getCreator())
+                                        .updatedAt(apiProject.getUpdatedAt())
+                                        .build())
+                                .collect(Collectors.toList())
+                )
+                .build();
+
     }
 }

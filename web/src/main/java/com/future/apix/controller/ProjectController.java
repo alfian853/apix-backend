@@ -8,15 +8,14 @@ import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.entity.enumeration.TeamAccess;
-import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.repository.enums.ProjectField;
+import com.future.apix.repository.request.ProjectAdvancedQuery;
 import com.future.apix.request.CreateTeamRequest;
 import com.future.apix.request.ProjectAssignTeamRequest;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.request.ProjectImportRequest;
-import com.future.apix.response.DownloadResponse;
-import com.future.apix.response.ProjectCreateResponse;
-import com.future.apix.response.RequestResponse;
+import com.future.apix.response.*;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiTeamService;
 import com.future.apix.service.CommandExecutorService;
@@ -40,7 +39,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
-public class ApiController {
+public class ProjectController {
 
     @Autowired
     private ApiDataService apiDataService;
@@ -113,19 +112,19 @@ public class ApiController {
     public List<ApiProject> findAllProjects() {return apiDataService.findAllProjects(); }
 
     @GetMapping
-    public Page<ApiProject> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
-                                    @RequestParam(value = "size", defaultValue = "10") int size,
-                                    @RequestParam(value = "sort", required = false) String sort,
-                                    @RequestParam(value = "direction", required = false) String direction) {
-        if (direction != null) {
-            if (direction.equals("asc"))
-                return apiDataService.findAll(PageRequest.of(page, size, Sort.Direction.ASC, sort));
-            else if (direction.equals("desc"))
-                return apiDataService.findAll(PageRequest.of(page, size, Sort.Direction.DESC, sort));
-            else
-                return apiDataService.findAll(PageRequest.of(page, size, Sort.Direction.ASC, sort));
-        } else
-            return apiDataService.findAll(PageRequest.of(page, size));
+    public PagedResponse<ProjectDto> findByQuery(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                 @RequestParam(value = "size", defaultValue = "10") int size,
+                                                 @RequestParam(value = "sort", required = false) String sort,
+                                                 @RequestParam(value = "direction", required = false) String direction,
+                                                 @RequestParam(value = "search") String search){
+        ProjectAdvancedQuery query = ProjectAdvancedQuery.builder()
+                .direction(Sort.Direction.fromString(direction))
+                .page(page)
+                .size(size)
+                .sortBy(ProjectField.getProjectField(sort))
+                .search(search)
+                .build();
+        return apiDataService.getByQuery(query);
     }
 
     @GetMapping("/search")

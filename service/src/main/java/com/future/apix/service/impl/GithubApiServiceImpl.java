@@ -6,7 +6,7 @@ import com.future.apix.command.model.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.request.GithubContentsRequest;
 import com.future.apix.response.ProjectCreateResponse;
@@ -52,7 +52,7 @@ public class GithubApiServiceImpl implements GithubApiService {
     private OasSwagger2Repository oasRepository;
 
     @Autowired
-    private ApiRepository apiRepository;
+    private ProjectRepository apiRepository;
 
     @Autowired
     private SwaggerToApixOasConverter converter;

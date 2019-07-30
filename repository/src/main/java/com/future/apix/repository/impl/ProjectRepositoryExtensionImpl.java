@@ -1,15 +1,17 @@
 package com.future.apix.repository.impl;
 
 import com.future.apix.entity.ApiProject;
-import com.future.apix.repository.RepositoryExtension;
+import com.future.apix.repository.ProjectRepositoryExtension;
 import com.future.apix.repository.enums.MongoEntityField;
 import com.future.apix.repository.enums.ProjectField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public class ProjectRepositoryExtensionImpl implements RepositoryExtension<ApiProject> {
+@Repository
+public class ProjectRepositoryExtensionImpl implements ProjectRepositoryExtension {
 
     @Autowired
     MongoTemplate mongoTemplate;
@@ -26,7 +28,7 @@ public class ProjectRepositoryExtensionImpl implements RepositoryExtension<ApiPr
 
     @Override
     public List<MongoEntityField> getFieldList() {
-        return ProjectField.HOST.getMongoFieldList();
+        return ProjectField.TITLE.getMongoFieldList();
     }
 
 }

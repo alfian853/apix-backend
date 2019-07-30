@@ -29,7 +29,8 @@ public class ApiProjectConverter {
         for(Object obj : data.entrySet()){
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>) obj;
             if(pair.getKey() == null)continue;
-            if(pair.getKey().equals("$ref") || pair.getKey().equals("ref")){
+            if((pair.getKey().equals("$ref") || pair.getKey().equals("ref")) &&
+                    pair.getValue() instanceof String){
                 String ref = (String) pair.getValue();
                 ref = ref.split("/",3)[2];
                 pair.setValue("#/definitions/"+idToName.get(ref));

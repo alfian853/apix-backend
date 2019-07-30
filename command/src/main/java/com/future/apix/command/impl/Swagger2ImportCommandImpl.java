@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.command.Swagger2ImportCommand;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.request.ProjectImportRequest;
 import com.future.apix.util.converter.SwaggerToApixOasConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
 
     @Autowired
-    private ApiRepository apiRepository;
+    private ProjectRepository apiRepository;
 
     @Autowired
     private ObjectMapper oMapper;

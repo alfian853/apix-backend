@@ -6,9 +6,7 @@ import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
-import com.future.apix.repository.ApiRepository;
-import com.future.apix.repository.TeamRepository;
-import com.future.apix.repository.UserRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
@@ -20,7 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
@@ -52,7 +49,7 @@ public class ApiDataTest {
     ObjectMapper mapper;
 
     @Mock
-    ApiRepository apiRepository;
+    ProjectRepository apiRepository;
 
     @Mock
     TeamService teamService;

@@ -5,9 +5,8 @@ import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.OasSwagger2Repository;
-import com.future.apix.request.GithubCommitterRequest;
 import com.future.apix.request.GithubContentsRequest;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.github.GithubCommitResponse;
@@ -15,22 +14,13 @@ import com.future.apix.response.github.GithubContentResponse;
 import com.future.apix.service.impl.GithubApiServiceImpl;
 import com.future.apix.util.LazyObjectWrapper;
 import com.future.apix.util.converter.SwaggerToApixOasConverter;
-import com.google.gson.Gson;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
-import org.eclipse.egit.github.core.client.PageIterator;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.kohsuke.github.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-import org.springframework.data.domain.PageImpl;
-import sun.nio.ch.IOUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,7 +28,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -57,7 +46,7 @@ public class GithubApiServiceTest {
     LazyObjectWrapper<GitHub> gitHub;
 
     @Mock
-    ApiRepository apiRepository;
+    ProjectRepository apiRepository;
 
     @Mock
     OasSwagger2Repository oasRepository;

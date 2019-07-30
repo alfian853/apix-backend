@@ -21,9 +21,7 @@ import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiTeamService;
 import com.future.apix.service.CommandExecutorService;
 import com.future.apix.service.TeamService;
-import com.sun.org.apache.xpath.internal.Arg;
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -61,7 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApiControllerTest {
+public class ProjectControllerTest {
     @Autowired
     private MockMvc mvc;
 
@@ -81,7 +79,7 @@ public class ApiControllerTest {
     private ObjectMapper mapper;
 
     @InjectMocks
-    private ApiController apiController;
+    private ProjectController apiController;
 
     private ApiProject project;
     private Optional<ApiProject> optionalApiProject;

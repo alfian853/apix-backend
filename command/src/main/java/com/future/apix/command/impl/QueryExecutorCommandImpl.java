@@ -7,7 +7,7 @@ import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
-import com.future.apix.repository.ApiRepository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.response.ProjectUpdateResponse;
 import com.future.apix.util.jsonquery.JsonQueryExecutor;
 import lombok.Data;
@@ -31,7 +31,7 @@ public class QueryExecutorCommandImpl implements QueryExecutorCommand {
     private JsonQueryExecutor queryExecutor;
 
     @Autowired
-    ApiRepository apiRepository;
+    ProjectRepository apiRepository;
 
     @Autowired
     private ObjectMapper mapper;

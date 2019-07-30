@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.support.PageableExecutionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface RepositoryExtension<ENTITY> {
@@ -22,9 +23,14 @@ public interface RepositoryExtension<ENTITY> {
     default Page<ENTITY> findByQuery(ProjectAdvancedQuery requestQuery) {
         Pageable pageable = PageRequest.of(requestQuery.getPage(), requestQuery.getSize());
         Query query = new Query();
+
+        List<Criteria> andCriteria = new ArrayList<>();
+
         getFieldList().forEach(field -> {
-            query.addCriteria(Criteria.where(field.getMongoFieldValue()).regex(requestQuery.getSearch()));
+            andCriteria.add(Criteria.where(field.getMongoFieldValue())
+                    .regex(requestQuery.getSearch(),"i"));
         });
+        query.addCriteria(new Criteria().orOperator(andCriteria.toArray(new Criteria[0])));
 
         Sort sort = new Sort(requestQuery.getDirection(), requestQuery.getSortBy().getMongoFieldValue());
 
@@ -32,6 +38,7 @@ public interface RepositoryExtension<ENTITY> {
         query.with(sort);
 
         List<ENTITY> list = this.getMongoTemplate().find(query, this.getEntityClass());
+        System.out.println(list);
         return PageableExecutionUtils.getPage(list, pageable,
             ()-> getMongoTemplate().count(query, this.getEntityClass()));
     }

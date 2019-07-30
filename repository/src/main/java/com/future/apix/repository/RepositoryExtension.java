@@ -20,7 +20,7 @@ public interface RepositoryExtension<ENTITY> {
     Class<ENTITY> getEntityClass();
     List<? extends MongoEntityField> getFieldList();
 
-    default Page<ENTITY> findByQuery(ProjectAdvancedQuery requestQuery) {
+    default Page<ENTITY> findByQuery(ProjectAdvancedQuery requestQuery, Criteria...additionalCriteria) {
         Pageable pageable = PageRequest.of(requestQuery.getPage(), requestQuery.getSize());
         Query query = new Query();
 
@@ -30,7 +30,17 @@ public interface RepositoryExtension<ENTITY> {
             andCriteria.add(Criteria.where(field.getMongoFieldValue())
                     .regex(requestQuery.getSearch(),"i"));
         });
-        query.addCriteria(new Criteria().orOperator(andCriteria.toArray(new Criteria[0])));
+
+        Criteria orCriteria = new Criteria().orOperator(andCriteria.toArray(new Criteria[0]));
+
+        if(additionalCriteria.length > 0){
+            int len = additionalCriteria.length;
+            for(int i=0; i < len ; ++i){
+                orCriteria.andOperator(additionalCriteria[i]);
+            }
+        }
+
+        query.addCriteria(orCriteria);
 
         Sort sort = new Sort(requestQuery.getDirection(), requestQuery.getSortBy().getMongoFieldValue());
 

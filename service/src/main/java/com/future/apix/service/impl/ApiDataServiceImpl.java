@@ -21,6 +21,7 @@ import com.future.apix.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -139,6 +140,36 @@ public class ApiDataServiceImpl implements ApiDataService {
                                 .collect(Collectors.toList())
                 )
                 .build();
+
+    }
+
+    @Override
+    public PagedResponse<ProjectDto> getByTeamAndQuery(ProjectAdvancedQuery query, String team) {
+        Criteria teamCriteria = Criteria.where("teams").is(team);
+        Page<ApiProject> page = apiRepository.findByQuery(query, teamCriteria);
+        return PagedResponse.<ProjectDto>builder()
+            .totalElements(page.getTotalElements())
+            .totalPages(page.getTotalPages())
+            .first(page.isFirst())
+            .last(page.isLast())
+            .offset(page.getPageable().getOffset())
+            .pageNumber(page.getPageable().getPageNumber())
+            .pageSize(page.getPageable().getPageSize())
+            .numberOfElements(page.getNumberOfElements())
+            .contents(
+                page.get()
+                    .map(apiProject -> ProjectDto.builder()
+                        .id(apiProject.getId())
+                        .githubUsername(apiProject.getGithubProject().getOwner())
+                        .host(apiProject.getHost())
+                        .title(apiProject.getInfo().getTitle())
+                        .repository(apiProject.getGithubProject().getRepo())
+                        .owner(apiProject.getProjectOwner().getCreator())
+                        .updatedAt(apiProject.getUpdatedAt())
+                        .build())
+                    .collect(Collectors.toList())
+            )
+            .build();
 
     }
 }

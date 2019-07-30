@@ -107,16 +107,12 @@ public class ProjectController {
                 new QueryExecutorRequest(id, query));
     }
 
-    // digunakan untuk mendapatkan apiProject (filter by host, basePath, dan info)
-    @GetMapping("/all/info")
-    public List<ApiProject> findAllProjects() {return apiDataService.findAllProjects(); }
-
     @GetMapping
     public PagedResponse<ProjectDto> findByQuery(@RequestParam(value = "page", defaultValue = "0") int page,
                                                  @RequestParam(value = "size", defaultValue = "10") int size,
-                                                 @RequestParam(value = "sort", required = false) String sort,
-                                                 @RequestParam(value = "direction", required = false) String direction,
-                                                 @RequestParam(value = "search") String search){
+                                                 @RequestParam(value = "sort", required = false, defaultValue = "updated_at") String sort,
+                                                 @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction,
+                                                 @RequestParam(value = "search", defaultValue = "") String search){
         ProjectAdvancedQuery query = ProjectAdvancedQuery.builder()
                 .direction(Sort.Direction.fromString(direction))
                 .page(page)
@@ -127,11 +123,21 @@ public class ProjectController {
         return apiDataService.getByQuery(query);
     }
 
-    @GetMapping("/search")
-    public Page<ApiProject> findSearch(@RequestParam(value = "page", defaultValue = "0") int page,
-                                       @RequestParam(value = "size", defaultValue = "10") int size,
-                                       @RequestParam(value = "search") String search) {
-        return apiDataService.findSearch(search, PageRequest.of(page, size));
+    @GetMapping("/team/{team}")
+    public PagedResponse<ProjectDto> findByTeamAndQuery(@PathVariable(value = "team") String team,
+                                                        @RequestParam(value = "page", defaultValue = "0") int page,
+                                                        @RequestParam(value = "size", defaultValue = "10") int size,
+                                                        @RequestParam(value = "sort", required = false, defaultValue = "updated_at") String sort,
+                                                        @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction,
+                                                        @RequestParam(value = "search", defaultValue = "") String search) {
+        ProjectAdvancedQuery query = ProjectAdvancedQuery.builder()
+            .direction(Sort.Direction.fromString(direction))
+            .page(page)
+            .size(size)
+            .sortBy(ProjectField.getProjectField(sort))
+            .search(search)
+            .build();
+        return apiDataService.getByTeamAndQuery(query, team);
     }
 
     // digunakan untuk delete by Id (sementara)

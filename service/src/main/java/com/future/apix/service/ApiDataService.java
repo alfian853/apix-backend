@@ -32,4 +32,6 @@ public interface  ApiDataService {
     ProjectCreateResponse createProject(ProjectCreateRequest request);
 
     PagedResponse<ProjectDto> getByQuery(ProjectAdvancedQuery query);
+
+    PagedResponse<ProjectDto> getByTeamAndQuery(ProjectAdvancedQuery query, String team);
 }

@@ -261,15 +261,6 @@ public class ProjectControllerTest {
     }
 
     @Test
-    public void findAllProjects_test() throws Exception {
-        when(apiDataService.findAllProjects()).thenReturn(Arrays.asList(project));
-        mvc.perform(get("/projects/all/info"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(1)));
-        verify(apiDataService, times(1)).findAllProjects();
-    }
-
-    @Test
     public void deleteById_success() throws Exception {
         when(apiDataService.deleteById(anyString())).thenReturn(RequestResponse.success("Project has been deleted!"));
         mvc.perform(delete("/projects/{id}", 1))
@@ -336,16 +327,6 @@ public class ProjectControllerTest {
             .andExpect(jsonPath("$.success", is(true)))
             .andExpect(jsonPath("$.message", is("Team has been removed from project!")));
         verify(apiTeamService, times(1)).grantTeamAccess(anyString(), any());
-    }
-
-    @Test
-    public void searchProjects() throws Exception {
-        mvc.perform(get("/projects/search")
-        .param("page", "1")
-        .param("size", "2")
-        .param("search", "test"))
-            .andExpect(status().isOk());
-        verify(apiDataService).findSearch(anyString(), any(Pageable.class));
     }
 
     @Test

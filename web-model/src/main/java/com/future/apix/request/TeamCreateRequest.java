@@ -15,12 +15,10 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateTeamRequest {
+public class TeamCreateRequest {
 
     @NotEmpty(message = "Team name must not be empty")
     private String teamName;
-
-    private String division;
 
     @NotNull(message = "Access must not be null")
     private TeamAccess access;

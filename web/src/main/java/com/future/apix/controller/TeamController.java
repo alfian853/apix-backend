@@ -1,21 +1,16 @@
 package com.future.apix.controller;
 
 import com.future.apix.entity.Team;
-import com.future.apix.entity.enumeration.TeamAccess;
-import com.future.apix.entity.teamdetail.Member;
-import com.future.apix.request.CreateTeamRequest;
+import com.future.apix.request.TeamCreateRequest;
+import com.future.apix.request.TeamEditMemberRequest;
 import com.future.apix.response.RequestResponse;
-import com.future.apix.response.TeamResponse;
-import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.TeamService;
-import com.future.apix.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -37,19 +32,25 @@ public class TeamController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public RequestResponse createTeam(@RequestBody @Valid CreateTeamRequest teamRequest) {
-        Team newTeam = teamService.createTeam(teamRequest);
+    public RequestResponse createTeam(@RequestBody @Valid TeamCreateRequest teamCreateRequest) {
+        Team newTeam = teamService.createTeam(teamCreateRequest);
         return RequestResponse.success("Team is created!");
     }
 
     @PutMapping("/{name}")
-    public RequestResponse editTeam(@PathVariable("name") String name, @RequestBody @Valid Team team){
-        return teamService.editTeam(name, team);
+    public RequestResponse inviteTeam(@PathVariable("name") String name,
+                                      @RequestBody TeamEditMemberRequest request){
+        return teamService.inviteMembers(name, request);
     }
 
     @GetMapping("/{name}")
     public Team getTeamByName(@PathVariable("name") String name) {
         return teamService.getTeamByName(name);
+    }
+
+    @DeleteMapping("/{name}")
+    public RequestResponse deleteTeam(@PathVariable("name") String name) {
+        return teamService.deleteTeam(name);
     }
 
     /*

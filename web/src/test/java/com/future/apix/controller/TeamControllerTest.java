@@ -7,7 +7,7 @@ import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.entity.teamdetail.Member;
-import com.future.apix.request.CreateTeamRequest;
+import com.future.apix.request.TeamCreateRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.TeamService;
 import org.junit.Before;
@@ -19,9 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.PrintingResultHandler;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,7 +112,7 @@ public class TeamControllerTest {
     @Test
     public void createTeam_success() throws Exception {
         when(teamService.createTeam(any())).thenReturn(new Team());
-        CreateTeamRequest request = CreateTeamRequest.builder()
+        TeamCreateRequest request = TeamCreateRequest.builder()
             .creator(TEAM_CREATOR)
             .access(TEAM_ACCESS)
             .teamName(TEAM_NAME)

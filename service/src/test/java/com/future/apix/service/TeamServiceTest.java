@@ -10,22 +10,19 @@ import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
-import com.future.apix.request.CreateTeamRequest;
+import com.future.apix.request.TeamCreateRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.impl.TeamServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kohsuke.github.GHEventPayload;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
@@ -148,7 +145,7 @@ public class TeamServiceTest {
     @Test
     public void createTeam_teamAlreadyExists(){
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
-        CreateTeamRequest request = CreateTeamRequest.builder()
+        TeamCreateRequest request = TeamCreateRequest.builder()
             .creator(TEAM_CREATOR)
             .teamName(TEAM_NAME)
             .members(Collections.emptyList())
@@ -166,7 +163,7 @@ public class TeamServiceTest {
         when(teamRepository.findByName(anyString())).thenReturn(null);
         when(teamRepository.save(any(Team.class))).thenReturn(TEAM);
         when(userRepository.findByUsername(anyString())).thenReturn(USER);
-        CreateTeamRequest request = CreateTeamRequest.builder()
+        TeamCreateRequest request = TeamCreateRequest.builder()
             .creator(TEAM_CREATOR)
             .teamName(TEAM_NAME)
             .access(TEAM_ACCESS)

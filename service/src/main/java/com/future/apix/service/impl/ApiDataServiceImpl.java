@@ -10,7 +10,7 @@ import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.request.ProjectAdvancedQuery;
-import com.future.apix.request.CreateTeamRequest;
+import com.future.apix.request.TeamCreateRequest;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.response.ProjectDto;
 import com.future.apix.response.PagedResponse;
@@ -86,14 +86,14 @@ public class ApiDataServiceImpl implements ApiDataService {
         Team team;
 
         if(request.getIsNewTeam()){
-            CreateTeamRequest createTeamRequest = new CreateTeamRequest();
+            TeamCreateRequest teamCreateRequest = new TeamCreateRequest();
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            createTeamRequest.setCreator(user.getUsername());
+            teamCreateRequest.setCreator(user.getUsername());
 
-            createTeamRequest.setMembers(Collections.singletonList(user.getUsername()));
-            createTeamRequest.setTeamName(request.getTeam());
-            createTeamRequest.setAccess(TeamAccess.PUBLIC);
-            team = teamService.createTeam(createTeamRequest);
+            teamCreateRequest.setMembers(Collections.singletonList(user.getUsername()));
+            teamCreateRequest.setTeamName(request.getTeam());
+            teamCreateRequest.setAccess(TeamAccess.PUBLIC);
+            team = teamService.createTeam(teamCreateRequest);
         }
         else{
             team = teamService.getTeamByName(request.getTeam());

@@ -11,7 +11,7 @@ import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.enums.ProjectField;
 import com.future.apix.repository.request.ProjectAdvancedQuery;
-import com.future.apix.request.CreateTeamRequest;
+import com.future.apix.request.TeamCreateRequest;
 import com.future.apix.request.ProjectAssignTeamRequest;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.request.ProjectImportRequest;
@@ -24,8 +24,6 @@ import com.future.apix.command.Swagger2ExportCommand;
 import com.future.apix.command.Swagger2ImportCommand;
 import com.future.apix.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
@@ -67,12 +64,12 @@ public class ProjectController {
                 team.setName(teamName);
                 User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-                CreateTeamRequest createTeamRequest = new CreateTeamRequest();
-                createTeamRequest.setTeamName(teamName);
-                createTeamRequest.setCreator(user.getUsername());
-                createTeamRequest.setAccess(TeamAccess.PUBLIC);
-                createTeamRequest.setMembers(Collections.singletonList(user.getUsername()));
-                request.setTeam(this.teamService.createTeam(createTeamRequest));
+                TeamCreateRequest teamCreateRequest = new TeamCreateRequest();
+                teamCreateRequest.setTeamName(teamName);
+                teamCreateRequest.setCreator(user.getUsername());
+                teamCreateRequest.setAccess(TeamAccess.PUBLIC);
+                teamCreateRequest.setMembers(Collections.singletonList(user.getUsername()));
+                request.setTeam(this.teamService.createTeam(teamCreateRequest));
             }
             else{
                 request.setTeam(

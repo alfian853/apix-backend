@@ -27,8 +27,6 @@ public class Team {
 
     private String name;
 
-    private String division;
-
     private TeamAccess access = TeamAccess.PUBLIC;
     // 'private' require team creator for grant; 'public' for anyone to enter
 

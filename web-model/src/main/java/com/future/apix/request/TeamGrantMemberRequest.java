@@ -1,5 +1,6 @@
 package com.future.apix.request;
 
+import com.future.apix.entity.teamdetail.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,9 +12,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeamEditMemberRequest {
+public class TeamGrantMemberRequest {
     private String teamName;
 
-    private List<String> members;
+    private List<Member> members;
+
+    private Boolean grant;
 
 }

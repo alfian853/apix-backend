@@ -130,14 +130,14 @@ public class TeamControllerTest {
 
     @Test
     public void editTeam_test() throws Exception {
-        when(teamService.editTeam(anyString(), any())).thenReturn(RequestResponse.success("Members have been invited!"));
+        when(teamService.inviteMembers(anyString(), any())).thenReturn(RequestResponse.success("Members have been invited!"));
         mvc.perform(put("/teams/{name}","TeamTest")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(TEAM)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success", is(true)))
                 .andExpect(jsonPath("$.message", is("Members have been invited!")));
-        verify(teamService, times(1)).editTeam("TeamTest", TEAM);
+        verify(teamService, times(1)).inviteMembers("TeamTest", TEAM);
     }
 
     @Test

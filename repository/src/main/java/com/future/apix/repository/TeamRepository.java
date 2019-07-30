@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface TeamRepository extends MongoRepository<Team, String> {
+public interface TeamRepository extends MongoRepository<Team, String>, TeamRepositoryExtension {
     List<Team> findByAccessEquals(String access);
 
     Team findByName(String name);

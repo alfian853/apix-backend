@@ -11,7 +11,7 @@ import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.TeamCreateRequest;
-import com.future.apix.request.TeamEditMemberRequest;
+import com.future.apix.request.TeamGrantMemberRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.TeamService;
@@ -51,7 +51,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public Team getTeamByName(String name) {
         return Optional.ofNullable(teamRepository.findByName(name))
-            .orElseThrow(() -> new DataNotFoundException("Team is not found!"));
+                .orElseThrow(() -> new DataNotFoundException("Team is not found!"));
     }
 
     @Override
@@ -60,9 +60,9 @@ public class TeamServiceImpl implements TeamService {
 
         if(existTeam == null){
             User teamCreator = Optional.ofNullable(
-                userRepository.findByUsername(request.getCreator())
+                    userRepository.findByUsername(request.getCreator())
             ).orElseThrow(
-                () -> new DataNotFoundException("user not found!")
+                    () -> new DataNotFoundException("user not found!")
             );
             if(!teamCreator.getTeams().contains(request.getTeamName())){
                 teamCreator.getTeams().add(request.getTeamName());
@@ -73,6 +73,7 @@ public class TeamServiceImpl implements TeamService {
             newTeam.setCreator(request.getCreator());
             newTeam.setAccess(request.getAccess());
             newTeam.setName(request.getTeamName());
+            newTeam.getMembers().add(new Member(teamCreator.getUsername(), true));
 
             request.getMembers().forEach(name -> {
                 User user = userRepository.findByUsername(name);
@@ -89,33 +90,35 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public RequestResponse inviteMembers(String name, TeamEditMemberRequest request) {
+    public RequestResponse inviteMembers(String name, Team team) {
         Team existTeam = Optional.ofNullable(teamRepository.findByName(name))
-            .orElseThrow(() -> new DataNotFoundException("Team does not exist!"));
+                .orElseThrow(() -> new DataNotFoundException("Team does not exist!"));
         RequestResponse response = new RequestResponse();
-        request.getMembers().forEach(member -> {
-            User user = userRepository.findByUsername(member);
-            if (user != null){
-                Boolean memberAvailable = false;
-                for(Member existMember: existTeam.getMembers()){
-                    if (existMember.equals(member) || existMember.getUsername().equals(member))
-                        memberAvailable = true;
-                }
-                if(!memberAvailable) {
-                    existTeam.getMembers().add(new Member(member, false));
+//        team.getMembers().forEach(member -> {
+//            User user = userRepository.findByUsername(member);
+//            if (user != null){
+//                Boolean memberAvailable = false;
+//                for(Member existMember: existTeam.getMembers()){
+//                    if (existMember.equals(member) || existMember.getUsername().equals(member))
+//                        memberAvailable = true;
+//                }
+//                if(!memberAvailable) {
+//                    existTeam.getMembers().add(new Member(member, false));
+//                }
+//            }
+//        });
+        for(Member member : team.getMembers()){
+            boolean memberAvailable = false;
+            for(Member existMember: existTeam.getMembers()){
+                if (existMember.equals(member) || existMember.getUsername().equals(member.getUsername())) {
+                    memberAvailable = true;
+                    break;
                 }
             }
-        });
-        //        for(Member member : team.getMembers()){
-        //            Boolean memberAvailable = false;
-        //            for(Member existMember: existTeam.getMembers()){
-        //                if (existMember.equals(member) || existMember.getUsername().equals(member.getUsername()))
-        //                    memberAvailable = true;
-        //            }
-        //            if(!memberAvailable) {
-        //                existTeam.getMembers().add(member);
-        //            }
-        //        }
+            if(!memberAvailable) {
+                existTeam.getMembers().add(member);
+            }
+        }
         teamRepository.save(existTeam);
         response.setStatusToSuccess();
         response.setMessage("Members have been invited!");
@@ -125,7 +128,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public RequestResponse deleteTeam(String name) {
         Team existTeam = Optional.ofNullable(teamRepository.findByName(name))
-            .orElseThrow(() -> new DataNotFoundException("Team does not exist!"));
+                .orElseThrow(() -> new DataNotFoundException("Team does not exist!"));
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserProfileResponse profile = oMapper.convertValue(auth.getPrincipal(), UserProfileResponse.class);
         if (existTeam.getCreator().equals(profile.getUsername())){
@@ -137,4 +140,48 @@ public class TeamServiceImpl implements TeamService {
         }
         else throw new InvalidRequestException("You are not allowed to delete this team!");
     }
+
+
+    @Override
+    public RequestResponse grantTeamAccess(String name, TeamGrantMemberRequest request) {
+        List<Member> members = request.getMembers();
+        boolean isGrant = request.getGrant();
+        if (members.size() == 0) throw new DataNotFoundException("There is no member to be granted!");
+        String failedName = "";
+        Team team = teamRepository.findByName(name);
+        if (team != null) {
+            for (Member member : members) {
+                String memberName = member.getUsername();
+                User user = userRepository.findByUsername(memberName);
+                if (user == null) {
+                    failedName += memberName + ", ";
+                    continue;
+                }
+                else if (isGrant) { // update in User if not yet belong to team
+                    if (!user.getTeams().contains(name)) user.getTeams().add(name);
+                    userRepository.save(user);
+                }
+                else if (!isGrant) {
+                    if (user.getTeams().contains(name)) user.getTeams().remove(name);
+                    userRepository.save(user);
+                }
+                int idx = team.getMembers().indexOf(member);
+                if (isGrant) team.getMembers().get(idx).setGrant(true); // grant access to members
+                else team.getMembers().remove(idx); // remove member from team
+            }
+            teamRepository.save(team);
+            RequestResponse response = new RequestResponse();
+            if (!failedName.equals("")) {
+                response.setStatusToFailed();
+                response.setMessage("Members: " + failedName + "is failed to updated!");
+            } else {
+                response.setStatusToSuccess();
+                if (isGrant) response.setMessage("Members have joined team!");
+                else response.setMessage("Members have been removed from team!");
+            }
+            return response;
+        }
+        else throw new DataNotFoundException("Team is not found!");
+    }
+
 }

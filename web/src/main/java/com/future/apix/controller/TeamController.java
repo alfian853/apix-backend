@@ -1,8 +1,9 @@
 package com.future.apix.controller;
 
 import com.future.apix.entity.Team;
+import com.future.apix.repository.TeamRepository;
 import com.future.apix.request.TeamCreateRequest;
-import com.future.apix.request.TeamEditMemberRequest;
+import com.future.apix.request.TeamGrantMemberRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class TeamController {
 
     @Autowired
     TeamService teamService;
+
+    @Autowired
+    TeamRepository teamRepository;
 
     @GetMapping
     public List<Team> getTeams() {
@@ -38,9 +42,9 @@ public class TeamController {
     }
 
     @PutMapping("/{name}")
-    public RequestResponse inviteTeam(@PathVariable("name") String name,
-                                      @RequestBody TeamEditMemberRequest request){
-        return teamService.inviteMembers(name, request);
+    public RequestResponse inviteMembers(@PathVariable("name") String name,
+                                      @RequestBody @Valid Team team){
+        return teamService.inviteMembers(name, team);
     }
 
     @GetMapping("/{name}")
@@ -53,10 +57,17 @@ public class TeamController {
         return teamService.deleteTeam(name);
     }
 
-    /*
-    @PutMapping("/{name}")
-    public RequestResponse grantTeam(@PathVariable("name") String name, @RequestBody List<Member> members) {
-        return teamService.grantTeamAccess(name, members);
+    @PutMapping("/{name}/grant")
+    public RequestResponse grantTeam(@PathVariable("name") String name, @RequestBody TeamGrantMemberRequest request) {
+        return teamService.grantTeamAccess(name, request);
     }
-     */
+
+    @PutMapping("/{name}/repo")
+    public Team grantTeamRepo(@PathVariable("name") String name, @RequestParam String member) {
+//        boolean res = teamRepository.removeMemberFromTeam(name, member);
+//        if (res) return RequestResponse.success("success");
+//        else return RequestResponse.failed("failed");
+        return teamRepository.removeMemberFromTeam(name, member);
+    }
+
 }

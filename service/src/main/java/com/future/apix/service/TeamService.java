@@ -2,7 +2,7 @@ package com.future.apix.service;
 
 import com.future.apix.entity.Team;
 import com.future.apix.request.TeamCreateRequest;
-import com.future.apix.request.TeamEditMemberRequest;
+import com.future.apix.request.TeamGrantMemberRequest;
 import com.future.apix.response.RequestResponse;
 import org.springframework.security.core.Authentication;
 
@@ -15,11 +15,11 @@ public interface TeamService {
 
     Team createTeam(TeamCreateRequest request);
 
-    RequestResponse inviteMembers(String name, TeamEditMemberRequest request);
+    RequestResponse inviteMembers(String name, Team team);
 
     List<Team> getMyTeam(Authentication authentication);
 
     RequestResponse deleteTeam(String name);
 
-//    RequestResponse grantTeamAccess(String name, List<Member> members);
+    RequestResponse grantTeamAccess(String name, TeamGrantMemberRequest request);
 }

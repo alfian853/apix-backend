@@ -181,7 +181,7 @@ public class TeamServiceTest {
     public void editTeam_teamAlreadyExists(){
         when(teamRepository.findByName(anyString())).thenReturn(null);
         try {
-            serviceMock.editTeam("TeamTest", TEAM);
+            serviceMock.inviteMembers("TeamTest", TEAM);
         } catch (DataNotFoundException e) {
             Assert.assertEquals("Team does not exist!", e.getMessage());
         }
@@ -190,7 +190,7 @@ public class TeamServiceTest {
     @Test
     public void editTeam_successMemberAlreadyExist(){
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
-        RequestResponse response = serviceMock.editTeam("TeamTest", TEAM);
+        RequestResponse response = serviceMock.inviteMembers("TeamTest", TEAM);
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Members have been invited!", response.getMessage());
     }
@@ -208,7 +208,7 @@ public class TeamServiceTest {
 
 //        https://stackoverflow.com/questions/5755477/java-list-add-unsupportedoperationexception
 
-        RequestResponse response = serviceMock.editTeam("TeamTest",teamNewMember);
+        RequestResponse response = serviceMock.inviteMembers("TeamTest",teamNewMember);
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Members have been invited!", response.getMessage());
     }

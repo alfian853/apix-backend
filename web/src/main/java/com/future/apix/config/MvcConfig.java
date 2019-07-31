@@ -1,16 +1,14 @@
 package com.future.apix.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.apix.util.converter.ApiProjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.http.MediaType;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebMvc
@@ -48,14 +46,4 @@ public class MvcConfig implements WebMvcConfigurer {
                 .mediaType("json", MediaType.APPLICATION_JSON);
     }
 
-    /*
-//    https://www.baeldung.com/spring-maxuploadsizeexceeded
-    @Bean
-    public MultipartResolver multipartResolver(){
-        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
-        multipartResolver.setMaxUploadSize(512000); // 500kB
-        return multipartResolver;
-    }
-
-     */
 }

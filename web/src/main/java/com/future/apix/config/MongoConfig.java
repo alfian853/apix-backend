@@ -12,11 +12,6 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 @Configuration
 public class MongoConfig {
 
-//    @Autowired
-//    void setMapKeyDotReplacement(MappingMongoConverter appingMongoConverter){
-//        mappingMongoConverter.setMapKeyDotReplacement("_");
-//    }
-
 //    https://stackoverflow.com/questions/35598595/how-to-customize-mappingmongoconverter-setmapkeydotreplacement-in-spring-boot
     @Autowired
     private MongoDbFactory mongoFactory;

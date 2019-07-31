@@ -1,12 +1,15 @@
 package com.future.apix.controller;
 
 import com.future.apix.entity.Team;
+import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.request.TeamCreateRequest;
 import com.future.apix.request.TeamGrantMemberRequest;
+import com.future.apix.request.TeamInviteRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.TeamService;
 import com.mongodb.client.result.UpdateResult;
+import org.omg.CORBA.DynAnyPackage.Invalid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -21,9 +24,6 @@ public class TeamController {
 
     @Autowired
     TeamService teamService;
-
-    @Autowired
-    TeamRepository teamRepository;
 
     @GetMapping
     public List<Team> getTeams() {
@@ -42,12 +42,6 @@ public class TeamController {
         return RequestResponse.success("Team is created!");
     }
 
-    @PutMapping("/{name}")
-    public RequestResponse inviteMembers(@PathVariable("name") String name,
-                                      @RequestBody @Valid Team team){
-        return teamService.inviteMembers(name, team);
-    }
-
     @GetMapping("/{name}")
     public Team getTeamByName(@PathVariable("name") String name) {
         return teamService.getTeamByName(name);
@@ -58,17 +52,23 @@ public class TeamController {
         return teamService.deleteTeam(name);
     }
 
-    @PutMapping("/{name}/grant")
-    public RequestResponse grantTeam(@PathVariable("name") String name, @RequestBody TeamGrantMemberRequest request) {
-        return teamService.grantTeamAccess(name, request);
+//  ===============================================================================================
+    @PutMapping("/{name}/invite")
+    public RequestResponse inviteMembersToTeam(@PathVariable("name") String name, @RequestBody
+        TeamInviteRequest request) {
+        return teamService.inviteMembersToTeam(name, request);
     }
 
-    @PutMapping("/{name}/repo")
-    public UpdateResult grantTeamRepo(@PathVariable("name") String name, @RequestParam String member) {
-//        boolean res = teamRepository.removeMemberFromTeam(name, member);
-//        if (res) return RequestResponse.success("success");
-//        else return RequestResponse.failed("failed");
-        return teamRepository.removeMemberFromTeam(name, member);
+    @PutMapping("/{name}/grant")
+    public RequestResponse grantTeam(@PathVariable("name") String name, @RequestBody TeamInviteRequest request) {
+        if(request.getInvite()) return teamService.grantTeamAccess(name, request);
+        else throw new InvalidRequestException("Invalid Request!");
+    }
+
+    @PutMapping("/{name}/remove")
+    public RequestResponse removeMembersFromTeam(@PathVariable("name") String name, @RequestBody TeamInviteRequest request) {
+        if (!request.getInvite()) return teamService.removeMembersFromTeam(name, request);
+        else throw new InvalidRequestException("Invalid Request!");
     }
 
 }

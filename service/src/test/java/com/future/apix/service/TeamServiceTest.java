@@ -176,7 +176,7 @@ public class TeamServiceTest {
 
     /*
         public RequestResponse editTeam(String name, Team team)
-     */
+
     @Test
     public void editTeam_teamAlreadyExists(){
         when(teamRepository.findByName(anyString())).thenReturn(null);
@@ -212,4 +212,5 @@ public class TeamServiceTest {
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Members have been invited!", response.getMessage());
     }
+     */
 }

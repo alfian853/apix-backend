@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface TeamRepositoryExtension {
     UpdateResult removeMemberFromTeam(String teamName, String member);
+    UpdateResult inviteMemberToTeam(String teamName, String member, boolean isInvite);
 }

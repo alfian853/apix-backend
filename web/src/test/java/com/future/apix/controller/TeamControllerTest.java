@@ -128,6 +128,7 @@ public class TeamControllerTest {
         verify(teamService, times(1)).createTeam(any());
     }
 
+    /*
     @Test
     public void editTeam_test() throws Exception {
         when(teamService.inviteMembers(anyString(), any())).thenReturn(RequestResponse.success("Members have been invited!"));
@@ -153,4 +154,6 @@ public class TeamControllerTest {
                 .andExpect(jsonPath("$.members", hasSize(1)));
         verify(teamService, times(1)).getTeamByName(TEAM_NAME);
     }
+
+     */
 }

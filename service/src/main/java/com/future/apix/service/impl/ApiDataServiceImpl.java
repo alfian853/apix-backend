@@ -69,8 +69,6 @@ public class ApiDataServiceImpl implements ApiDataService {
             TeamCreateRequest teamCreateRequest = new TeamCreateRequest();
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             teamCreateRequest.setCreator(user.getUsername());
-
-            teamCreateRequest.setMembers(Collections.singletonList(user.getUsername()));
             teamCreateRequest.setTeamName(request.getTeam());
             teamCreateRequest.setAccess(TeamAccess.PUBLIC);
             team = teamService.createTeam(teamCreateRequest);

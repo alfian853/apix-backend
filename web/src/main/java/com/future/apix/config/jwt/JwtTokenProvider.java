@@ -18,11 +18,11 @@ import java.util.List;
 
 @Component
 public class JwtTokenProvider {
-    @Value("${security.jwt.token.secret-key:seret}")
+    @Value("${apix.security.secret-key}")
     private String secretKey = "secret";
 
-    @Value("${security.jwt.token.expire-length:3600000}")
-    private long validityInMilliseconds = 3600000; // 1 hour
+    @Value("${apix.security.token.expire-length}")
+    private long validityInMilliseconds = 36000000; // 1 hour
 
     @Autowired
     private MongoUserDetailsService userDetailsService;
@@ -59,7 +59,7 @@ public class JwtTokenProvider {
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7, bearerToken.length());
+            return bearerToken.substring(7);
         }
         return null;
     }

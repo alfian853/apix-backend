@@ -5,15 +5,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.HashMap;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GithubCommitResponse {
     private String sha;
     private String message;
-    private GithubUserResponse committer;
     private Date commitDate;
-    private GithubRepoResponse owner;
-
 }

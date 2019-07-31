@@ -8,6 +8,7 @@ import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 @Data
 public class ApiSection implements Mappable {
@@ -15,6 +16,6 @@ public class ApiSection implements Mappable {
 
     @Field("_signature")
     @JsonProperty("_signature")
-    String signature;
-    Tag info;
+    String signature = UUID.randomUUID().toString();
+    Tag info = new Tag();
 }

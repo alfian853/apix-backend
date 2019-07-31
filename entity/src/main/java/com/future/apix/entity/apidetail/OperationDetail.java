@@ -13,7 +13,7 @@ import java.util.HashMap;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OperationDetail implements Mappable {
 
-    String name,in = "",description,type;
+    String name,in,description,type;
     boolean required;
 
     // Isi dari Header Object hampir sama dengan Parameter Object

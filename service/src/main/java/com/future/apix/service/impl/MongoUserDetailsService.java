@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 //https://www.codementor.io/gtommee97/rest-authentication-with-spring-security-and-mongodb-j8wgh8kg7
 
@@ -21,10 +22,8 @@ public class MongoUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user != null)
-            return user;
-
-        throw new UsernameNotFoundException("Username: " + username + " not found!");
+//        https://confluence.gdn-app.com/display/GDNIT/%5BBackend%5D+Use+java.util.Optional
+        return Optional.ofNullable(userRepository.findByUsername(username))
+            .orElseThrow(() -> new UsernameNotFoundException("Username: " + username + " not found!"));
     }
 }

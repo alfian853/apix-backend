@@ -1,12 +1,26 @@
 package com.future.apix.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.command.model.ExportRequest;
+import com.future.apix.command.model.enumerate.FileFormat;
+import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.repository.ProjectRepository;
+import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.request.GithubContentsRequest;
-import com.future.apix.response.github.*;
+import com.future.apix.response.ProjectCreateResponse;
+import com.future.apix.response.github.GithubCommitResponse;
+import com.future.apix.response.github.GithubContentResponse;
+import com.future.apix.response.github.GithubRepoResponse;
+import com.future.apix.response.github.GithubUserResponse;
+import com.future.apix.service.CommandExecutorService;
 import com.future.apix.service.GithubApiService;
+import com.future.apix.command.Swagger2ExportCommand;
+import com.future.apix.util.LazyObjectWrapper;
+import com.future.apix.util.converter.SwaggerToApixOasConverter;
+import com.google.gson.Gson;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.kohsuke.github.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,52 +30,45 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 public class GithubApiServiceImpl implements GithubApiService {
 
-    @Value("${apix.github.token}")
-    private String token;
+    @Value("${apix.export_oas.directory}")
+    private String EXPORT_DIR;
 
     @Autowired
     private ObjectMapper oMapper;
 
-//    private static GitHub gitHub;
+    @Autowired
+    private CommandExecutorService commandExecutor;
 
-    @Override
-    public String authenticateUser() throws IOException {
-        GitHub gitHub = authToken();
-        return "Github is authenticated!";
-    }
+    @Autowired
+    private OasSwagger2Repository oasRepository;
 
-    @Override
-    public Boolean isAuthenticated() throws IOException {
-        GitHub gitHub = authToken();
-        return gitHub.isCredentialValid();
-    }
+    @Autowired
+    private ProjectRepository apiRepository;
+
+    @Autowired
+    private SwaggerToApixOasConverter converter;
+
+    @Autowired
+    private LazyObjectWrapper<GitHub> gitHub;
 
     @Override
     public GithubUserResponse getMyself() throws IOException {
-        GitHub gitHub = authToken();
-        GHMyself self = gitHub.getMyself();
+        GHMyself self = gitHub.get().getMyself();
         return convertUser(self);
     }
 
     @Override
-    public GithubUserResponse getUser(String login) throws IOException {
-        GitHub gitHub = authToken();
-        GHUser user = gitHub.getUser(login);
-        return convertUser(user);
-    }
-
-    @Override
     public List<GithubRepoResponse> getMyselfRepositories() throws IOException {
-        GitHub gitHub = authToken();
-        PagedIterable<GHRepository> repositories = gitHub.getMyself().listRepositories();
+        PagedIterable<GHRepository> repositories = gitHub.get().getMyself().listRepositories();
         List<GithubRepoResponse> repoList = new ArrayList<>();
 
         Iterator itr = repositories.iterator();
@@ -75,43 +82,20 @@ public class GithubApiServiceImpl implements GithubApiService {
     }
 
     @Override
-    public GithubRepoResponse getRepository(String repoName) throws IOException {
-        GitHub gitHub = authToken();
-        GHRepository repository = gitHub.getRepository(repoName);
-        return convertRepository(repository);
-    }
-
-    @Override
-    public Map<String, GHBranch> getBranches(String repoName) throws IOException {
-        GitHub gitHub = authToken();
-        return gitHub.getRepository(repoName).getBranches();
-    }
-
-    @Override
-    public GithubBranchResponse getBranch(String repoName, String branchName) throws IOException {
-        GitHub gitHub = authToken();
-        GHBranch branch = gitHub.getRepository(repoName).getBranch(branchName);
-        return convertBranch(branch);
-    }
-
-    @Override
-    public GithubContentResponse getReadme(String repoName) throws IOException {
-        GitHub gitHub = authToken();
-        GHContent content = gitHub.getRepository(repoName).getReadme();
-        return convertContent(content);
+    public List<String> getBranches(String repoName) throws IOException {
+        List<String> branchName = new ArrayList<>();
+        Map<String, GHBranch> branches = gitHub.get().getRepository(repoName).getBranches();
+        for (Map.Entry<String, GHBranch> entry : branches.entrySet()){
+            if (!Objects.equals(entry.getKey(), "master")) branchName.add(entry.getKey());
+            // exclude master, since it is default branch
+        }
+        return branchName;
     }
 
     @Override
     public GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException {
-        GitHub gitHub = authToken();
         if (ref == null || ref.length() <= 0) ref = "master";
-        GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, ref);
-//        System.out.println("ContentPath: " + contentPath + "; Is File: " + content.isFile());
-//        System.out.println("Url: " + content.getUrl());
-//        InputStream i = content.read();
-//        String readContent = IOUtils.toString(i, StandardCharsets.UTF_8.name());
-//        System.out.println("Content: " + readContent);
-
+        GHContent content = gitHub.get().getRepository(repoName).getFileContent(contentPath, ref);
         if (content.isFile()) {
             return convertContent(content);
 
@@ -122,41 +106,59 @@ public class GithubApiServiceImpl implements GithubApiService {
 
     @Override
     public GithubCommitResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException {
-        GitHub gitHub = authToken();
         if (request.getBranch() == null || request.getBranch().length() <= 0) request.setBranch("master");
-        GHContent content = gitHub.getRepository(repoName).getFileContent(contentPath, request.getBranch());
+        GHContent content = gitHub.get().getRepository(repoName).getFileContent(contentPath, request.getBranch());
         if (content.isFile()) {
-            GHContentUpdateResponse ghResponse = content.update(request.getContent(), request.getMessage(), request.getBranch());
-//            GHContent contentResponse = ghResponse.getContent();
-//            GHCommit commit = ghResponse.getCommit();
-//            return convertContentUpdate(ghResponse);
-//            return convertContent(contentResponse);
+            String existSha = DigestUtils.sha256Hex(content.read());
+
+            String projectId = request.getProjectId();
+            ExportRequest exportFormat = new ExportRequest(projectId, FileFormat.JSON);
+            commandExecutor.executeCommand(Swagger2ExportCommand.class, exportFormat);
+            String oasPath = oasRepository.findProjectOasSwagger2ByProjectId(projectId).orElseThrow(DataNotFoundException::new).getOasFileName();
+            Path path = Paths.get(EXPORT_DIR + oasPath + "." + FileFormat.JSON.toString().toLowerCase());
+            String readContent = readFromFile(path);
+
+            String exportSha = DigestUtils.sha256Hex(readContent);
+            if (existSha.equals(exportSha)) throw new InvalidRequestException("Content of OAS in Github is already equal");
+            GHContentUpdateResponse ghResponse = content.update(readContent, request.getMessage(), request.getBranch());
             return convertCommit(ghResponse.getCommit());
         }
         else
             throw new InvalidRequestException("Content is not a file!");
     }
 
-//    ============ private Function ===============
+    @Override
+    public ProjectCreateResponse pullFileContent(String repoName, String contentPath, String ref, String projectId) throws IOException {
+        if (ref == null || ref.length() <= 0) ref = "master";
+        GHContent content = gitHub.get().getRepository(repoName).getFileContent(contentPath, ref);
+        if (content.isFile()) {
+            GithubContentResponse GithubResponse = convertContent(content);
+            ApiProject project = converter.convert(GithubResponse.getJson());
+            ApiProject existingProject = apiRepository.findById(projectId)
+                    .orElseThrow(() -> new DataNotFoundException("Project is not found!"));
+            project.setId(projectId);
+            project.setProjectOwner(existingProject.getProjectOwner());
+            project.setTeams(existingProject.getTeams());
+            apiRepository.save(project);
 
-    private GitHub authToken() throws IOException {
-        GitHub gitHub = GitHub.connectUsingOAuth(token);
-        return gitHub;
+            ProjectCreateResponse response = new ProjectCreateResponse();
+            response.setStatusToSuccess();
+            response.setMessage("Project from github successfully pulled!");
+            response.setProjectId(project.getId());
+            return response;
+        }
+        else {
+            throw new InvalidRequestException("Content is not a file!");
+        }
     }
+
+//    ============ private Function ===============
 
     private GithubUserResponse convertUser(GHUser user) throws IOException {
         GithubUserResponse response = new GithubUserResponse();
         response.setId(user.getId());
         response.setLogin(user.getLogin());
         response.setName(user.getName());
-        return response;
-    }
-
-    private GithubUserResponse convertCommitter(GitUser user) {
-        GithubUserResponse response = new GithubUserResponse();
-        response.setDate(user.getDate());
-        response.setName(user.getName());
-        response.setEmail(user.getEmail());
         return response;
     }
 
@@ -167,14 +169,6 @@ public class GithubApiServiceImpl implements GithubApiService {
         response.setFullName(repository.getFullName());
         response.setDescription(repository.getDescription());
         response.setOwnerName(repository.getOwnerName());
-        return response;
-    }
-
-    private GithubBranchResponse convertBranch(GHBranch branch) {
-        GithubBranchResponse response = new GithubBranchResponse();
-        response.setName(branch.getName());
-        response.setSha(branch.getSHA1());
-        response.setRepoName(branch.getOwner().getName());
         return response;
     }
 
@@ -192,12 +186,8 @@ public class GithubApiServiceImpl implements GithubApiService {
         InputStream i = content.read();
         String readContent = IOUtils.toString(i, StandardCharsets.UTF_8.name());
         response.setContent(readContent);
-        return response;
-    }
-
-    private GithubContentUpdateResponse convertContentUpdate(GHContentUpdateResponse updateResponse) {
-        GithubContentUpdateResponse response = new GithubContentUpdateResponse();
-        response = oMapper.convertValue(updateResponse, GithubContentUpdateResponse.class);
+        Gson gson = new Gson();
+        response.setJson(gson.fromJson(readContent, HashMap.class));
         return response;
     }
 
@@ -205,9 +195,19 @@ public class GithubApiServiceImpl implements GithubApiService {
         GithubCommitResponse response = new GithubCommitResponse();
         response.setSha(commit.getSHA1());
         response.setMessage(commit.getCommitShortInfo().getMessage());
-        response.setOwner(convertRepository(commit.getOwner()));
-        response.setCommitter(convertUser(commit.getCommitter()));
         response.setCommitDate(commit.getCommitDate());
         return response;
+    }
+
+    public String readFromFile(Path filePath) {
+        StringBuilder contentBuilder = new StringBuilder();
+        try (Stream<String> stream = Files.lines(filePath , StandardCharsets.UTF_8))
+        {
+            stream.forEach(s -> contentBuilder.append(s).append("\n"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return contentBuilder.toString();
     }
 }

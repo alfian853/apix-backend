@@ -12,5 +12,5 @@ public class SecurityScheme implements Mappable {
     // In Swagger 2.0 called Security Scheme Object
 
     String type, description, name, in, flow, authorizationUrl, tokenUrl;
-    HashMap<String, String> scopes = new HashMap<>();
+    HashMap<String, String> scopes;
 }

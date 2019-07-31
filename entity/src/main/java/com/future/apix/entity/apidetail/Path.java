@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 @Data
 public class Path implements Mappable {
@@ -16,7 +17,7 @@ public class Path implements Mappable {
 
     @Field("_signature")
     @JsonProperty("_signature")
-    String signature;
+    String signature = UUID.randomUUID().toString();
 
     public HashMap<String, Schema> getPathVariables(){
         return (pathVariables == null)?pathVariables = new HashMap<>():this.pathVariables;

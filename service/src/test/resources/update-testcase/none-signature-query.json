@@ -1,0 +1,41 @@
+{
+  "sections" : {
+    "pet": {
+      "paths": {
+        "/pet": {
+          "methods": {
+            "post": {
+              "request": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "_actions" : [
+                      {
+                        "action" : "rename",
+                        "key": "qnumber",
+                        "newKey": "qnumber2"
+                      },
+                      {
+                        "action": "delete",
+                        "key" : "qstring"
+                      }
+                    ],
+                    "_hasActions" : true,
+                    "qnumber2": {
+                      "_actions" : [{
+                        "action" : "put",
+                        "key": "maximum",
+                        "value": 10
+                      }],
+                      "_hasActions" : true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

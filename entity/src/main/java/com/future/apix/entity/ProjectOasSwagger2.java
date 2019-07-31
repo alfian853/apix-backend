@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Document("ApiProjectOasSwagger2")
@@ -19,11 +20,11 @@ public class ProjectOasSwagger2 {
     //will be manually updated
     Date oasFileProjectUpdateDate;
 
-    String oasFileName;
+    String oasFileName; // without file extension
 
     Date generatedCodesProjectUpdatedDate;
 
     String generatedCodesFileName;
 
-    HashMap<String, Object> oasSwagger2;
+    Map<String, Object> oasSwagger2;
 }

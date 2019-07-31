@@ -42,13 +42,26 @@ public class Schema implements Mappable {
     }
 
 
-    Object additionalProperties;
+//    Object additionalProperties;
 
     /** if datatype = Array
      *      array of string = {type:String,pattern:"[A-Z]+"}
      *      array of int = {type:Integer,format : Int32}
+     *
+     *      if items = {} still Valid
      * **/
     Schema items;
+
+    public Schema getItems() {
+        if(this.items != null){
+            if(this.items.getType() != null || this.items.ref != null) return this.items;
+            else{
+                items.setType("object");
+                return items;
+            }
+        }
+        return null;
+    }
 
     /** if datatype = {String,Integer,Number,...}
      * we can define the example
@@ -60,6 +73,9 @@ public class Schema implements Mappable {
 
     /**if datatype = {Integer,Number}**/
     String format;
+
+    /**if datatype = {File}**/
+    String extension;
 
     /** if enum in List **/
     @Field("enum")

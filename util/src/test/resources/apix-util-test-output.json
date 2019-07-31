@@ -1,0 +1,19 @@
+{
+  "newKey1" : "val1",
+  "key2" : [
+    {
+      "index" : 0,
+      "newKey1" : "val1",
+      "key2.1" : "val2.1"
+    },
+    {
+      "index" : 1,
+      "key2.2" : [
+        {
+          "index" : 0,
+          "newKey2.2.1" : "val2.2.1"
+        }
+      ]
+    }
+  ]
+}

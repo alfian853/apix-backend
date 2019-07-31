@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class ProjectCreateResponse extends RequestResponse {
 
-    @JsonProperty("newProject")
-    ApiProject apiProject;
+//    @JsonProperty("newProject")
+//    ApiProject apiProject;
+
+    @JsonProperty("new_project")
+    String projectId;
 }

@@ -19,13 +19,15 @@ public class GithubContentsRequest {
 
     @NotEmpty(message = "Message cannot be empty")
     @NotNull(message = "Message cannot be null")
-    private String message;
+    private String message; // commit message
 
-    @NotEmpty(message = "Content cannot be empty")
-    @NotNull(message = "Content cannot be null")
-    private String content;
+//    @NotEmpty(message = "Content cannot be empty")
+//    @NotNull(message = "Content cannot be null")
+//    private String content;
 
+    @NotNull(message = "Sha is required based on file sha")
     private String sha;
+    private String projectId;
     private String branch;
 
     private GithubCommitterRequest committer;

@@ -1,7 +1,6 @@
 package com.future.apix.controller.controlleradvice;
 
 import com.future.apix.exception.*;
-import com.future.apix.response.MethodArgumentInvalidResponse;
 import com.future.apix.response.RequestResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -9,15 +8,15 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 @ControllerAdvice
@@ -27,15 +26,8 @@ public class DefaultControllerAdvice {
     @ExceptionHandler(value={Exception.class, DefaultRuntimeException.class})
     @RequestMapping(produces = "application/vnd.error+json")
     public ResponseEntity<RequestResponse> DefaultExceptionHandler(Exception exception){
-
         RequestResponse response = new RequestResponse();
-        if(exception instanceof DataIntegrityViolationException){
-            DataIntegrityViolationException e = (DataIntegrityViolationException) exception;
-                response.setMessage(Objects.requireNonNull(e.getRootCause()).getMessage());
-        }
-        else{
-            response.setMessage(exception.getMessage());
-        }
+        response.setMessage(exception.getMessage());
         exception.printStackTrace();
         response.setStatusToFailed();
         if(response.getMessage() == null){
@@ -48,9 +40,7 @@ public class DefaultControllerAdvice {
     @ExceptionHandler(DataNotFoundException.class)
     @RequestMapping(produces = "application/vnd.error+json")
     public ResponseEntity<RequestResponse> DataNotFoundExceptionHandler(DataNotFoundException exception){
-
         exception.printStackTrace();
-
         RequestResponse response = new RequestResponse();
         response.setStatusToFailed();
         response.setMessage(exception.getMessage());
@@ -77,7 +67,6 @@ public class DefaultControllerAdvice {
     @RequestMapping(produces = "application/vnd.error+json")
     public ResponseEntity<RequestResponse> conflictExceptionHandler(ConflictException exception){
         exception.printStackTrace();
-
         return new ResponseEntity<>(
                 RequestResponse.failed(exception.getMessage()),
                 new HttpHeaders(),
@@ -89,11 +78,8 @@ public class DefaultControllerAdvice {
     @RequestMapping(produces = "application/vnd.error+json")
     public ResponseEntity<RequestResponse> invalidJwtToken(Exception exception) {
         exception.printStackTrace();
-
         return new ResponseEntity<>(RequestResponse.failed(exception.getMessage()),
                 new HttpHeaders(),
                 HttpStatus.UNAUTHORIZED);
-
     }
-
 }

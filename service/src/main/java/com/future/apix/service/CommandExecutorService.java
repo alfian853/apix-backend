@@ -1,8 +1,7 @@
 package com.future.apix.service;
 
-import com.future.apix.response.RequestResponse;
-import com.future.apix.service.command.Command;
+import com.future.apix.command.Command;
 
 public interface CommandExecutorService {
-    <T extends RequestResponse,R> T execute(Class<? extends Command<T,R>> commandClass, R request);
+    <RESPONSE,REQUEST> RESPONSE executeCommand(Class<? extends Command<RESPONSE,REQUEST>> commandClass, REQUEST request);
 }

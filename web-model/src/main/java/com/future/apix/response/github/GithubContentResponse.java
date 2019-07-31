@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.InputStream;
+import java.util.HashMap;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,10 +16,12 @@ public class GithubContentResponse {
     private long size;
     private String name;
     private String repoName;
+    private String sha;
     private String path;
     private String content;
-    private String sha;
     private String url;
     private String htmlUrl;
+
+    private HashMap<String, Object> json;
 
 }

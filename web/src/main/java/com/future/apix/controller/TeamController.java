@@ -6,6 +6,7 @@ import com.future.apix.request.TeamCreateRequest;
 import com.future.apix.request.TeamGrantMemberRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.TeamService;
+import com.mongodb.client.result.UpdateResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -63,7 +64,7 @@ public class TeamController {
     }
 
     @PutMapping("/{name}/repo")
-    public Team grantTeamRepo(@PathVariable("name") String name, @RequestParam String member) {
+    public UpdateResult grantTeamRepo(@PathVariable("name") String name, @RequestParam String member) {
 //        boolean res = teamRepository.removeMemberFromTeam(name, member);
 //        if (res) return RequestResponse.success("success");
 //        else return RequestResponse.failed("failed");

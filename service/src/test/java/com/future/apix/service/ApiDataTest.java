@@ -100,16 +100,6 @@ public class ApiDataTest {
     }
 
     /*
-        public List<ApiProject> findAllProject()
-     */
-    @Test
-    public void findAllProjects_test(){
-        when(apiRepository.findAllProjects()).thenReturn(Arrays.asList(project));
-        List<ApiProject> projects = serviceMock.findAllProjects();
-        Assert.assertEquals(Arrays.asList(project), projects);
-    }
-
-    /*
         public RequestResponse deleteById(String id)
      */
     @Test
@@ -186,31 +176,4 @@ public class ApiDataTest {
         Assert.assertEquals("Project has been created!", response.getMessage());
     }
 
-
-    /*
-        public List<ApiProject> findByUser(String teamName)
-     */
-    @Test
-    public void findByUser(){
-        when(apiRepository.findByTeamsIn(anyString())).thenReturn(Arrays.asList(project));
-        List<ApiProject> projects = serviceMock.findByUser("teamTest");
-        Assert.assertEquals(1, projects.size());
-    }
-
-    @Test
-    public void searchProjects(){
-        Page apiPage = new PageImpl<ApiProject>(Arrays.asList(project));
-        when(apiRepository.findBySearch(anyString(), any(Pageable.class))).thenReturn(apiPage);
-        Page<ApiProject> apiProjectPage = serviceMock.findSearch("test", PageRequest.of(0, 2));
-        verify(apiRepository).findBySearch(anyString(), any());
-    }
-
-    @Test
-    public void pageableProjects(){
-        Page apiPage = new PageImpl<ApiProject>(Arrays.asList(project));
-        when(apiRepository.findAll(any(Pageable.class))).thenReturn(apiPage);
-        Page<ApiProject> apiProjectPage = serviceMock.findAll(PageRequest.of(0, 2));
-        verify(apiRepository).findAll(any(Pageable.class));
-        Assert.assertEquals(apiProjectPage.getContent(), Arrays.asList(project));
-    }
 }

@@ -21,8 +21,4 @@ public interface UserService {
 
     /* For Auth */
     User getUser(String username);
-
-    /* For User -> Team Management */
-//    List<UserProfileResponse> getUsersByTeam(String team);
-
 }

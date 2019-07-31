@@ -12,7 +12,5 @@ import java.util.HashMap;
 public class GithubCommitResponse {
     private String sha;
     private String message;
-    private GithubUserResponse committer;
     private Date commitDate;
-    private GithubRepoResponse owner;
 }

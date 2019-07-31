@@ -21,5 +21,6 @@ public interface TeamService {
 
     RequestResponse deleteTeam(String name);
 
+    // User can confirm invitation from team
     RequestResponse grantTeamAccess(String name, TeamGrantMemberRequest request);
 }

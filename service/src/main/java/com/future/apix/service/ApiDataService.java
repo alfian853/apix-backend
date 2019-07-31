@@ -15,18 +15,9 @@ import java.util.List;
 public interface  ApiDataService {
 
     ApiProject findById(String id);
-    Page<ApiProject> findAll(Pageable pageable);
-
-    Page<ApiProject> findSearch(String search, Pageable pageable);
-
-    // digunakan untuk mendapatkan field tertentu yang diletakkan pada front page
-    List<ApiProject> findAllProjects();
-
 
     // delete by id (sementara)
     RequestResponse deleteById(String id);
-
-    List<ApiProject> findByUser(String username);
 
     // create new Project
     ProjectCreateResponse createProject(ProjectCreateRequest request);

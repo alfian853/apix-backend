@@ -117,12 +117,10 @@ public class GithubApiServiceImpl implements GithubApiService {
             String oasPath = oasRepository.findProjectOasSwagger2ByProjectId(projectId).orElseThrow(DataNotFoundException::new).getOasFileName();
             Path path = Paths.get(EXPORT_DIR + oasPath + "." + FileFormat.JSON.toString().toLowerCase());
             String readContent = readFromFile(path);
-//            System.out.println("Content\n" + readContent);
 
             String exportSha = DigestUtils.sha256Hex(readContent);
             if (existSha.equals(exportSha)) throw new InvalidRequestException("Content of OAS in Github is already equal");
             GHContentUpdateResponse ghResponse = content.update(readContent, request.getMessage(), request.getBranch());
-//            return convertContentUpdate(ghResponse);
             return convertCommit(ghResponse.getCommit());
         }
         else
@@ -134,8 +132,6 @@ public class GithubApiServiceImpl implements GithubApiService {
         if (ref == null || ref.length() <= 0) ref = "master";
         GHContent content = gitHub.get().getRepository(repoName).getFileContent(contentPath, ref);
         if (content.isFile()) {
-//            HashMap<String, Object> json = convertContentToHashMap(content.read());
-//            ApiProject project = converter.convert(json);
             GithubContentResponse GithubResponse = convertContent(content);
             ApiProject project = converter.convert(GithubResponse.getJson());
             ApiProject existingProject = apiRepository.findById(projectId)
@@ -199,8 +195,6 @@ public class GithubApiServiceImpl implements GithubApiService {
         GithubCommitResponse response = new GithubCommitResponse();
         response.setSha(commit.getSHA1());
         response.setMessage(commit.getCommitShortInfo().getMessage());
-//        response.setOwner(convertRepository(commit.getOwner()));
-//        response.setCommitter(convertUser(commit.getCommitter()));
         response.setCommitDate(commit.getCommitDate());
         return response;
     }

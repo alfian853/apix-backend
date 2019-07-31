@@ -49,31 +49,11 @@ public class ApiDataServiceImpl implements ApiDataService {
     }
 
     @Override
-    public Page<ApiProject> findAll(Pageable pageable) {
-        return apiRepository.findAll(pageable);
-    }
-
-    @Override
-    public Page<ApiProject> findSearch(String search, Pageable pageable){
-        return apiRepository.findBySearch(search, pageable);
-    }
-
-    @Override
-    public List<ApiProject> findAllProjects() {
-        return apiRepository.findAllProjects();
-    }
-
-    @Override
     public RequestResponse deleteById(String id){
         ApiProject project = apiRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
         apiRepository.deleteById(id);
         return RequestResponse.success("Project has been deleted!");
-    }
-
-    @Override
-    public List<ApiProject> findByUser(String teamName) {
-        return apiRepository.findByTeamsIn(teamName);
     }
 
     @Override

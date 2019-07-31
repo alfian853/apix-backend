@@ -328,47 +328,4 @@ public class ProjectControllerTest {
             .andExpect(jsonPath("$.message", is("Team has been removed from project!")));
         verify(apiTeamService, times(1)).grantTeamAccess(anyString(), any());
     }
-
-    @Test
-    public void findAllPageable_SortAsc() throws Exception {
-        mvc.perform(get("/projects")
-            .param("page", "1")
-            .param("size", "2")
-            .param("direction", "asc")
-            .param("sort", "test"))
-            .andExpect(status().isOk());
-        verify(apiDataService).findAll(PageRequest.of(1,2, Sort.Direction.ASC, "test"));
-    }
-
-    @Test
-    public void findAllPageable_SortDesc() throws Exception {
-        mvc.perform(get("/projects")
-            .param("page", "1")
-            .param("size", "2")
-            .param("direction", "desc")
-            .param("sort", "test"))
-            .andExpect(status().isOk());
-        verify(apiDataService).findAll(PageRequest.of(1,2, Sort.Direction.DESC, "test"));
-    }
-
-    @Test
-    public void findAllPageable_sortRandom() throws Exception {
-        mvc.perform(get("/projects")
-            .param("page", "1")
-            .param("size", "2")
-            .param("direction", "random")
-            .param("sort", "test"))
-            .andExpect(status().isOk());
-        verify(apiDataService).findAll(PageRequest.of(1,2, Sort.Direction.ASC, "test"));
-    }
-
-    @Test
-    public void findAllPageable_SortNull() throws Exception {
-        mvc.perform(get("/projects")
-            .param("page", "1")
-            .param("size", "2"))
-            .andExpect(status().isOk());
-        verify(apiDataService).findAll(PageRequest.of(1,2));
-    }
-
 }

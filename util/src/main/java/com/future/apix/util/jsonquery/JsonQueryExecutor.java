@@ -12,8 +12,8 @@ public class JsonQueryExecutor {
     private static QueryActionExecutor actionExecutor = QueryActionExecutor.getInstance();
 
     private boolean checkAndExecuteActions(Map<String,Object> target, Map<String,Object> query){
-        if(query.containsKey("_hasActions")){
-            List<HashMap<String,Object> > actions = (List<HashMap<String, Object>>) query.get("_actions");
+        if(query.containsKey("_actions") && query.get("_actions") instanceof Iterable){
+            Iterable<HashMap<String,Object> > actions = (List<HashMap<String, Object>>) query.get("_actions");
 
             for (HashMap<String,Object> action : actions) {
                 actionExecutor.execute(target, action);
@@ -28,8 +28,7 @@ public class JsonQueryExecutor {
         for (Object o : data.entrySet()) {
             Map.Entry<String, Object> pair = (Map.Entry) o;
 
-            if(pair.getKey().equals("_hasActions") ||
-                    pair.getKey().equals("_actions")){
+            if(pair.getKey().equals("_actions")){
                 continue;
             }
 

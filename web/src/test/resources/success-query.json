@@ -21,14 +21,12 @@
                         "key" : "qstring"
                       }
                     ],
-                    "_hasActions" : true,
                     "qnumber2": {
                       "_actions" : [{
                         "action" : "put",
                         "key": "maximum",
                         "value": 10
-                      }],
-                      "_hasActions" : true
+                      }]
                     }
                   }
                 }

@@ -10,6 +10,7 @@ import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.OasSwagger2Repository;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.command.impl.Swagger2ExportCommandImpl;
+import com.future.apix.util.JsonUtil;
 import com.future.apix.util.converter.ApiProjectConverter;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +45,9 @@ public class Swagger2ExportCommandTest {
 
     @Mock
     ApiProjectConverter apiProjectConverter;
+
+    @Mock
+    JsonUtil jsonUtil;
 
     private HashSet<String> ignoredField = new HashSet<>(Arrays.asList("definitions","_signature","$ref","required","security","externalDocs"));;
 

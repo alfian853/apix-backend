@@ -1,6 +1,7 @@
 package com.future.apix.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.entity.enumeration.TeamAccess;
@@ -8,6 +9,7 @@ import com.future.apix.entity.teamdetail.Member;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.TeamCreateRequest;
@@ -28,10 +30,13 @@ import java.util.Optional;
 @Service
 public class TeamServiceImpl implements TeamService {
     @Autowired
-    TeamRepository teamRepository;
+    private TeamRepository teamRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Autowired
     private ObjectMapper oMapper;
@@ -97,11 +102,19 @@ public class TeamServiceImpl implements TeamService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserProfileResponse profile = oMapper.convertValue(auth.getPrincipal(), UserProfileResponse.class);
         if (existTeam.getCreator().equals(profile.getUsername())){
+            // delete team from each user
+            List<User> users = userRepository.findByTeams(name);
+            for (User user : users) {
+                teamRepository.removeTeamFromMember(name, user.getUsername());
+            }
+            // delete team from projects
+            List<ApiProject> projects = projectRepository.findByTeams(name);
+            for (ApiProject project : projects) {
+                teamRepository.removeTeamFromProject(name, project.getId());
+            }
+
             teamRepository.deleteById(existTeam.getId());
-            RequestResponse response = new RequestResponse();
-            response.setStatusToSuccess();
-            response.setMessage("Team has been deleted!");
-            return response;
+            return RequestResponse.success("Team has been deleted!");
         }
         else throw new InvalidRequestException("You are not allowed to delete this team!");
     }

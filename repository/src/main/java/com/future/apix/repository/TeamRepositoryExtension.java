@@ -7,6 +7,10 @@ import com.mongodb.client.result.UpdateResult;
 import java.util.List;
 
 public interface TeamRepositoryExtension {
-    UpdateResult removeMemberFromTeam(String teamName, String member);
-    UpdateResult inviteMemberToTeam(String teamName, String member, boolean isInvite);
+    UpdateResult removeMemberFromTeam(String teamName, String memberName);
+    UpdateResult inviteMemberToTeam(String teamName, String memberName, boolean isInvite);
+
+    // when delete team, should remove from projects and users too
+    UpdateResult removeTeamFromMember(String teamName, String memberName);
+    UpdateResult removeTeamFromProject(String teamName, String projectId);
 }

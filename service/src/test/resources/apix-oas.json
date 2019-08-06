@@ -1117,6 +1117,18 @@
       "in" : "header"
     }
   },
+  "githubProject" : {
+    "owner" : "",
+    "repo" : "",
+    "branch" : "",
+    "path" : ""
+  },
+  "projectOwner" : {
+    "name" : "owner",
+    "access" : "PRIVATE",
+    "creator" : "creator",
+    "members" : []
+  },
   "externalDocs" : {
     "description" : "Find out more about Swagger",
     "url" : "http://swagger.io"

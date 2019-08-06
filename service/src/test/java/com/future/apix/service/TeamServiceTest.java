@@ -168,7 +168,6 @@ public class TeamServiceTest {
     @Test
     public void createTeam_creatorNotFound(){
         when(teamRepository.findByName(anyString())).thenReturn(null);
-        when(teamRepository.save(any(Team.class))).thenReturn(TEAM);
         when(userRepository.findByUsername(anyString())).thenReturn(null);
         TeamCreateRequest request = TeamCreateRequest.builder()
             .creator(TEAM_CREATOR)
@@ -329,7 +328,6 @@ public class TeamServiceTest {
         when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
         Team diffTeam = Team.builder().name("TeamTest").creator("diffCreator").build();
         when(teamRepository.findByName(anyString())).thenReturn(diffTeam);
-        when(userRepository.findByUsername(anyString())).thenReturn(USER);
         try {
             teamService.inviteMembersToTeam(TEAM_NAME, new TeamInviteRequest());
         } catch (InvalidRequestException e){
@@ -419,7 +417,6 @@ public class TeamServiceTest {
         when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
         Team diffTeam = Team.builder().name("TeamTest").creator("diffCreator").build();
         when(teamRepository.findByName(anyString())).thenReturn(diffTeam);
-        when(userRepository.findByUsername(anyString())).thenReturn(USER);
         try {
             teamService.removeMembersFromTeam(TEAM_NAME, new TeamInviteRequest());
         } catch (InvalidRequestException e){

@@ -52,44 +52,38 @@ public class ProjectController {
 
     @PostMapping("/import")
     public RequestResponse importFromFile(@RequestParam("file")MultipartFile file,
-                                          @RequestParam("type") String type,
                                           @RequestParam("format") FileFormat format,
                                           @RequestParam("team") String teamName,
                                           @RequestParam("isNewTeam") Boolean isNewTeam) {
-        if(type.equals("oas-swagger2")){
-            ProjectImportRequest request = new ProjectImportRequest();
-            request.setFile(file);
-            request.setFormat(format);
+        ProjectImportRequest request = new ProjectImportRequest();
+        request.setFile(file);
+        request.setFormat(format);
 
-            if(isNewTeam){
-                Team team = new Team();
-                team.setName(teamName);
-                User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(isNewTeam){
+            Team team = new Team();
+            team.setName(teamName);
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-                TeamCreateRequest teamCreateRequest = new TeamCreateRequest();
-                teamCreateRequest.setTeamName(teamName);
-                teamCreateRequest.setCreator(user.getUsername());
-                teamCreateRequest.setAccess(TeamAccess.PUBLIC);
-                teamCreateRequest.setMembers(Collections.singletonList(user.getUsername()));
-                request.setTeam(this.teamService.createTeam(teamCreateRequest));
-            }
-            else{
-                request.setTeam(
-                    this.teamService.getTeamByName(teamName)
-                );
-            }
-
-            return (commandExecutor.executeCommand(Swagger2ImportCommand.class, request) == null)?
-                    RequestResponse.failed() : RequestResponse.success();
+            TeamCreateRequest teamCreateRequest = new TeamCreateRequest();
+            teamCreateRequest.setTeamName(teamName);
+            teamCreateRequest.setCreator(user.getUsername());
+            teamCreateRequest.setAccess(TeamAccess.PUBLIC);
+            teamCreateRequest.setMembers(Collections.singletonList(user.getUsername()));
+            request.setTeam(this.teamService.createTeam(teamCreateRequest));
         }
         else{
-            throw new InvalidRequestException("oas format is not supported");
+            request.setTeam(
+                this.teamService.getTeamByName(teamName)
+            );
         }
+
+        return (commandExecutor.executeCommand(Swagger2ImportCommand.class, request) == null)?
+            RequestResponse.failed() : RequestResponse.success();
     }
 
     @GetMapping("/{id}/export")
     public RequestResponse exportToOas(@PathVariable("id")String id,
-                                       @RequestParam("format") FileFormat format){
+        @RequestParam("format") FileFormat format){
         ExportRequest request = new ExportRequest(id, format);
         return commandExecutor.executeCommand(Swagger2ExportCommand.class,request);
     }
@@ -103,32 +97,32 @@ public class ProjectController {
     @PutMapping("/{id}")
     public RequestResponse doApiDataQuery(@PathVariable("id")String id,@RequestBody HashMap<String,Object> query){
         return commandExecutor.executeCommand(QueryExecutorCommand.class,
-                new QueryExecutorRequest(id, query));
+            new QueryExecutorRequest(id, query));
     }
 
     @GetMapping
     public PagedResponse<ProjectDto> findByQuery(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                 @RequestParam(value = "size", defaultValue = "10") int size,
-                                                 @RequestParam(value = "sort", required = false, defaultValue = "updated_at") String sort,
-                                                 @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction,
-                                                 @RequestParam(value = "search", defaultValue = "") String search){
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "sort", required = false, defaultValue = "updated_at") String sort,
+        @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction,
+        @RequestParam(value = "search", defaultValue = "") String search){
         AdvancedQuery query = AdvancedQuery.builder()
-                .direction(Sort.Direction.fromString(direction))
-                .page(page)
-                .size(size)
-                .sortBy(ProjectField.getProjectField(sort))
-                .search(search)
-                .build();
+            .direction(Sort.Direction.fromString(direction))
+            .page(page)
+            .size(size)
+            .sortBy(ProjectField.getProjectField(sort))
+            .search(search)
+            .build();
         return apiDataService.getByQuery(query);
     }
 
     @GetMapping("/team/{team}")
     public PagedResponse<ProjectDto> findByTeamAndQuery(@PathVariable(value = "team") String team,
-                                                        @RequestParam(value = "page", defaultValue = "0") int page,
-                                                        @RequestParam(value = "size", defaultValue = "10") int size,
-                                                        @RequestParam(value = "sort", required = false, defaultValue = "updated_at") String sort,
-                                                        @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction,
-                                                        @RequestParam(value = "search", defaultValue = "") String search) {
+        @RequestParam(value = "page", defaultValue = "0") int page,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "sort", required = false, defaultValue = "updated_at") String sort,
+        @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction,
+        @RequestParam(value = "search", defaultValue = "") String search) {
         AdvancedQuery query = AdvancedQuery.builder()
             .direction(Sort.Direction.fromString(direction))
             .page(page)
@@ -158,8 +152,8 @@ public class ProjectController {
 
     @PostMapping("/{id}/assign")
     public RequestResponse assignTeamToProject(
-            @PathVariable("id") String id,
-            @RequestBody ProjectAssignTeamRequest request
+        @PathVariable("id") String id,
+        @RequestBody ProjectAssignTeamRequest request
     ){
         return apiTeamService.grantTeamAccess(id, request);
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.command.impl.Swagger2ImportCommandImpl;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
+import com.future.apix.enumerate.FileFormat;
 import com.future.apix.repository.ProjectRepository;
 import com.future.apix.request.ProjectImportRequest;
 import com.future.apix.util.converter.SwaggerToApixOasConverter;
@@ -38,7 +39,7 @@ public class Swagger2ImportCommandTest {
                 "application/json", "".getBytes()
         );
 
-        ProjectImportRequest request = new ProjectImportRequest(new Team(), multipartFile);
+        ProjectImportRequest request = new ProjectImportRequest(new Team(), multipartFile, FileFormat.JSON);
 
         when(converter.convert(any())).thenReturn(new ApiProject());
         when(apiRepository.save(any())).thenReturn(new ApiProject());

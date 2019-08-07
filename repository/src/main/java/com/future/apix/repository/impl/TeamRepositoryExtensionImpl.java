@@ -72,8 +72,8 @@ public class TeamRepositoryExtensionImpl implements TeamRepositoryExtension {
 
     @Override
     public UpdateResult removeTeamFromProject(String teamName, String projectId) {
-//        db.getCollection('ApiProjects').update({_id: ObjectId("5d41c9a9d3ba6a0ca88a36a1")}, {$pull: {teams: 'coba'}})
-        Query query = new Query(Criteria.where("_id").is(new ObjectId(projectId)));
+//        db.getCollection('ApiProjects').update({_id: ObjectId("5d41c9a9d3ba6a0ca88a36a1"), projectOwner.name': {$ne: 'nono'} }, {$pull: {teams: 'coba'}   })
+        Query query = new Query(Criteria.where("_id").is(new ObjectId(projectId)).and("projectOwner.name").ne(teamName));
         Update update = new Update().pull("teams", teamName);
         return mongoTemplate.updateFirst(query, update, ApiProject.class);
     }

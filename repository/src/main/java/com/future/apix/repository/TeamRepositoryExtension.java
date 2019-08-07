@@ -12,5 +12,6 @@ public interface TeamRepositoryExtension {
 
     // when delete team, should remove from projects and users too
     UpdateResult removeTeamFromMember(String teamName, String memberName);
+    // only remove team from project where the team is not project owner
     UpdateResult removeTeamFromProject(String teamName, String projectId);
 }

@@ -112,6 +112,9 @@ public class TeamServiceImpl implements TeamService {
             for (ApiProject project : projects) {
                 teamRepository.removeTeamFromProject(name, project.getId());
             }
+            // only delete where team as member, cannot delete where team as project owner
+            if (!projectRepository.findByTeams(name).isEmpty())
+                throw new InvalidRequestException("There are projects under your team as owner!");
 
             teamRepository.deleteById(existTeam.getId());
             return RequestResponse.success("Team has been deleted!");

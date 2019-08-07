@@ -7,10 +7,10 @@ import com.future.apix.entity.User;
 import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.repository.ProjectRepository;
+import com.future.apix.repository.enums.ProjectField;
+import com.future.apix.repository.request.ProjectAdvancedQuery;
 import com.future.apix.request.ProjectCreateRequest;
-import com.future.apix.response.ProjectCreateResponse;
-import com.future.apix.response.RequestResponse;
-import com.future.apix.response.UserProfileResponse;
+import com.future.apix.response.*;
 import com.future.apix.service.impl.ApiDataServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,10 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,10 +37,10 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ApiDataTest {
+public class ApiDataServiceTest {
 
     @InjectMocks
-    ApiDataServiceImpl serviceMock;
+    ApiDataServiceImpl apiService;
 
     @Spy
     ObjectMapper mapper;
@@ -71,6 +68,26 @@ public class ApiDataTest {
     private static final List<String> USER_TEAMS = new ArrayList<>(Arrays.asList("TeamTest"));
     private static final User USER = new User(USER_ID, USER_USERNAME, USER_PASSWORD, USER_ROLES, USER_TEAMS);
 
+    private static final ProjectDto PROJECT_DTO = ProjectDto.builder()
+        .id(null)
+        .host("petstore.swagger.io")
+        .title("Swagger Petstore")
+        .owner("creator")
+        .githubUsername("")
+        .repository("")
+        .build();
+
+    private static final PagedResponse<ProjectDto> PAGED_DTO = PagedResponse.<ProjectDto>builder()
+        .totalPages(1)
+        .pageSize(1)
+        .pageNumber(1)
+        .numberOfElements(1)
+        .totalElements(1L)
+        .offset(0L)
+        .first(true)
+        .last(true)
+        .contents(Arrays.asList(PROJECT_DTO))
+        .build();
 
     @Before
     public void init() throws IOException, URISyntaxException {
@@ -86,7 +103,7 @@ public class ApiDataTest {
     @Test
     public void findById_NotFound(){
         try {
-            serviceMock.findById("test-id");
+            apiService.findById("test-id");
         } catch (DataNotFoundException e) {
             Assert.assertEquals("Project does not exists!", e.getMessage());
         }
@@ -95,7 +112,7 @@ public class ApiDataTest {
     @Test
     public void findById_Found(){
         when(apiRepository.findById(anyString())).thenReturn(optionalApiProject);
-        ApiProject expected = serviceMock.findById("test-id");
+        ApiProject expected = apiService.findById("test-id");
         Assert.assertEquals(expected, project);
     }
 
@@ -105,7 +122,7 @@ public class ApiDataTest {
     @Test
     public void deleteById_NotFound(){
         try {
-            serviceMock.deleteById("test-id");
+            apiService.deleteById("test-id");
         } catch (DataNotFoundException e){
             Assert.assertEquals("Project does not exists!", e.getMessage());
         }
@@ -114,7 +131,7 @@ public class ApiDataTest {
     @Test
     public void deleteById_Found(){
         when(apiRepository.findById(anyString())).thenReturn(optionalApiProject);
-        RequestResponse response = serviceMock.deleteById("test-id");
+        RequestResponse response = apiService.deleteById("test-id");
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Project has been deleted!", response.getMessage());
     }
@@ -137,7 +154,7 @@ public class ApiDataTest {
             .build();
         when(teamService.getTeamByName(anyString())).thenReturn(TEAM);
         when(apiRepository.save(any(ApiProject.class))).thenReturn(project);
-        ProjectCreateResponse response = serviceMock.createProject(request);
+        ProjectCreateResponse response = apiService.createProject(request);
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Project has been created!", response.getMessage());
     }
@@ -161,8 +178,8 @@ public class ApiDataTest {
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-
         when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(USER);
+
         UserProfileResponse expected = new UserProfileResponse();
         expected.setStatusToSuccess(); expected.setMessage("User is authenticated");
         expected.setUsername(USER_USERNAME); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
@@ -171,9 +188,57 @@ public class ApiDataTest {
 
         when(teamService.createTeam(any())).thenReturn(TEAM);
         when(apiRepository.save(any(ApiProject.class))).thenReturn(project);
-        ProjectCreateResponse response = serviceMock.createProject(request);
+        ProjectCreateResponse response = apiService.createProject(request);
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Project has been created!", response.getMessage());
+    }
+
+    @Test
+    public void getByQuery() {
+        Pageable pageable = mock(Pageable.class);
+        when(pageable.getOffset()).thenReturn(new Long(0));
+        when(apiRepository.findByQuery(any())).thenReturn(new PageImpl<ApiProject>(Arrays.asList(project)){
+            @Override
+            public Pageable getPageable() {
+                return pageable;
+            }
+        });
+        ProjectAdvancedQuery request = ProjectAdvancedQuery.builder()
+            .page(0)
+            .size(10)
+            .sortBy(ProjectField.UPDATED_AT)
+            .direction(Sort.Direction.DESC)
+            .search("")
+            .build();
+        PagedResponse<ProjectDto> response = apiService.getByQuery(request);
+        Assert.assertEquals(response.getTotalElements(), new Long(1));
+        Assert.assertEquals(response.getTotalPages(), new Integer(1));
+        Assert.assertEquals(response.getPageSize(), new Integer(0));
+        Assert.assertEquals(response.getContents(), Collections.singletonList(PROJECT_DTO));
+    }
+
+    @Test
+    public void getByTeamAndQuery() {
+        Pageable pageable = mock(Pageable.class);
+        when(pageable.getOffset()).thenReturn(new Long(0));
+        when(apiRepository.findByQuery(any(), any())).thenReturn(new PageImpl<ApiProject>(Arrays.asList(project)){
+            @Override
+            public Pageable getPageable() {
+                return pageable;
+            }
+        });
+        ProjectAdvancedQuery request = ProjectAdvancedQuery.builder()
+            .page(0)
+            .size(10)
+            .sortBy(ProjectField.UPDATED_AT)
+            .direction(Sort.Direction.DESC)
+            .search("")
+            .build();
+        PagedResponse<ProjectDto> response = apiService.getByTeamAndQuery(request, TEAM.getName());
+        Assert.assertEquals(response.getTotalElements(), new Long(1));
+        Assert.assertEquals(response.getTotalPages(), new Integer(1));
+        Assert.assertEquals(response.getPageSize(), new Integer(0));
+        Assert.assertEquals(response.getContents(), Collections.singletonList(PROJECT_DTO));
     }
 
 }

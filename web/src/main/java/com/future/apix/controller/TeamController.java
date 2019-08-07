@@ -2,14 +2,11 @@ package com.future.apix.controller;
 
 import com.future.apix.entity.Team;
 import com.future.apix.exception.InvalidRequestException;
-import com.future.apix.repository.TeamRepository;
 import com.future.apix.request.TeamCreateRequest;
-import com.future.apix.request.TeamGrantMemberRequest;
 import com.future.apix.request.TeamInviteRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.TeamService;
 import com.mongodb.client.result.UpdateResult;
-import org.omg.CORBA.DynAnyPackage.Invalid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -23,7 +20,7 @@ import java.util.List;
 public class TeamController {
 
     @Autowired
-    TeamService teamService;
+    private TeamService teamService;
 
     @GetMapping
     public List<Team> getTeams() {
@@ -70,5 +67,4 @@ public class TeamController {
         if (!request.getInvite()) return teamService.removeMembersFromTeam(name, request);
         else throw new InvalidRequestException("Invalid Request!");
     }
-
 }

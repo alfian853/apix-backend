@@ -13,10 +13,7 @@ import com.future.apix.exception.ConflictException;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.request.ProjectAssignTeamRequest;
 import com.future.apix.request.ProjectCreateRequest;
-import com.future.apix.response.DownloadResponse;
-import com.future.apix.response.ProjectCreateResponse;
-import com.future.apix.response.ProjectUpdateResponse;
-import com.future.apix.response.RequestResponse;
+import com.future.apix.response.*;
 import com.future.apix.service.ApiDataService;
 import com.future.apix.service.ApiTeamService;
 import com.future.apix.service.CommandExecutorService;
@@ -90,6 +87,7 @@ public class ProjectControllerTest {
     private static final String TEAM_CREATOR = "test";
     private static final List<Member>
         TEAM_MEMBER = Collections.singletonList(new Member("test", true));
+
     private static final Team TEAM = Team.builder()
         .id(TEAM_ID)
         .name(TEAM_NAME)
@@ -98,6 +96,24 @@ public class ProjectControllerTest {
         .members(TEAM_MEMBER)
         .build();
     private static final User USER = new User("", "test", "", Arrays.asList("ROLE_USER", "ROLE_ADMIN"), Arrays.asList("TeamTest"));
+
+    private static final ProjectDto PROJECT_DTO = ProjectDto.builder()
+        .id("123")
+        .host("petstore.swagger.io")
+        .title("Swagger Petstore")
+        .build();
+
+    private static final PagedResponse<ProjectDto> PAGED_DTO = PagedResponse.<ProjectDto>builder()
+        .totalPages(1)
+        .pageSize(1)
+        .pageNumber(1)
+        .numberOfElements(1)
+        .totalElements(1L)
+        .offset(0L)
+        .first(true)
+        .last(true)
+        .contents(Arrays.asList(PROJECT_DTO))
+        .build();
 
     @Before
     public void init() throws IOException, URISyntaxException {
@@ -327,5 +343,23 @@ public class ProjectControllerTest {
             .andExpect(jsonPath("$.success", is(true)))
             .andExpect(jsonPath("$.message", is("Team has been removed from project!")));
         verify(apiTeamService, times(1)).grantTeamAccess(anyString(), any());
+    }
+
+    @Test
+    public void findByQuery() throws Exception {
+        when(apiDataService.getByQuery(any())).thenReturn(PAGED_DTO);
+
+        mvc.perform(get("/projects"))
+            .andExpect(status().isOk());
+        verify(apiDataService, times(1)).getByQuery(any());
+    }
+
+    @Test
+    public void findByTeamAndQuery() throws Exception {
+        when(apiDataService.getByTeamAndQuery(any(), any())).thenReturn(PAGED_DTO);
+
+        mvc.perform(get("/projects/team/{team}", TEAM_NAME))
+            .andExpect(status().isOk());
+        verify(apiDataService, times(1)).getByTeamAndQuery(any(), any());
     }
 }

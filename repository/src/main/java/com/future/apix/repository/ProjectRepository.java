@@ -14,7 +14,7 @@ public interface ProjectRepository extends MongoRepository<ApiProject, String>, 
     List<ApiProject> findAllProjects();
 
     // List of Projects with users
-    List<ApiProject> findByTeamsIn(String teamName);
+    List<ApiProject> findByTeams(String teamName);
 
     @Query(value = "{}", fields = "{_id:1, basePath:1, host:1, info:1, teams:1, projectOwner:1, githubProject:1, updatedAt:1}")
     Page<ApiProject> findAll(Pageable pageable);

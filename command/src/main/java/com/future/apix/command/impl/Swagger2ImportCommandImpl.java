@@ -1,6 +1,7 @@
 package com.future.apix.command.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.future.apix.command.Swagger2ImportCommand;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.exception.InvalidRequestException;
@@ -24,6 +25,9 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
     private ObjectMapper oMapper;
 
     @Autowired
+    private YAMLMapper yamlMapper;
+
+    @Autowired
     private SwaggerToApixOasConverter converter;
 
     @Override
@@ -32,7 +36,8 @@ public class Swagger2ImportCommandImpl implements Swagger2ImportCommand {
         HashMap<String,Object> json = null;
         MultipartFile file = request.getFile();
         try {
-            json = oMapper.readValue(file.getInputStream(), HashMap.class);
+            if (request.getFormat().toString().equals("YAML")) json = yamlMapper.readValue(file.getInputStream(), HashMap.class);
+            else json = oMapper.readValue(file.getInputStream(), HashMap.class);
             ApiProject project = converter.convert(json);
             project.setProjectOwner(request.getTeam());
             project.getTeams().add(request.getTeam().getName());

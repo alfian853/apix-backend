@@ -4,7 +4,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.future.apix.command.Swagger2ExportCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.command.model.ExportRequest;
-import com.future.apix.command.model.enumerate.FileFormat;
+import com.future.apix.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.exception.DataNotFoundException;

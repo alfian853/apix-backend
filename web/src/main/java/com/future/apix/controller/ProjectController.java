@@ -3,7 +3,7 @@ package com.future.apix.controller;
 import com.future.apix.command.QueryExecutorCommand;
 import com.future.apix.command.model.ExportRequest;
 import com.future.apix.command.model.QueryExecutorRequest;
-import com.future.apix.command.model.enumerate.FileFormat;
+import com.future.apix.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
@@ -53,11 +53,13 @@ public class ProjectController {
     @PostMapping("/import")
     public RequestResponse importFromFile(@RequestParam("file")MultipartFile file,
                                           @RequestParam("type") String type,
+                                          @RequestParam("format") FileFormat format,
                                           @RequestParam("team") String teamName,
                                           @RequestParam("isNewTeam") Boolean isNewTeam) {
         if(type.equals("oas-swagger2")){
             ProjectImportRequest request = new ProjectImportRequest();
             request.setFile(file);
+            request.setFormat(format);
 
             if(isNewTeam){
                 Team team = new Team();

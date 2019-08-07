@@ -20,41 +20,15 @@ public class GithubApiController {
     @Autowired
     private GithubApiService githubService;
 
-    /*
-    @GetMapping("/isauth")
-    public boolean isAuthenticated() throws IOException {
-        return githubService.isAuthenticated();
-    }
-
-    @PostMapping("/auth")
-    public String authorizeUser() throws IOException {
-        return githubService.authenticateUser();
-    }
-    */
-
     @GetMapping("/user")
     public GithubUserResponse getMyself() throws IOException {
         return githubService.getMyself();
     }
 
-
-//    @GetMapping("/user/{username}")
-//    public GithubUserResponse getUser(@PathVariable("username") String username) throws IOException {
-//        return githubService.getUser(username);
-//    }
-
-
     @GetMapping("/user/repos")
     public List<GithubRepoResponse> getMyselfRepositories() throws IOException {
         return githubService.getMyselfRepositories();
     }
-
-//    @GetMapping("/repos/{owner}/{repo}")
-//    public GithubRepoResponse getRepository(
-//            @PathVariable("owner") String owner,
-//            @PathVariable("repo") String repo) throws IOException {
-//        return githubService.getRepository(owner + "/" + repo);
-//    }
 
     @GetMapping("/repos/{owner}/{repo}/branches")
     public List<String> getBranches(
@@ -62,22 +36,6 @@ public class GithubApiController {
             @PathVariable("repo") String repo) throws IOException {
         return githubService.getBranches(owner + "/" + repo);
     }
-
-//    @GetMapping("/repos/{owner}/{repo}/branches/{branch}")
-//    public GithubBranchResponse getBranch(
-//            @PathVariable("owner") String owner,
-//            @PathVariable("repo") String repo,
-//            @PathVariable("branch") String branchName
-//    ) throws IOException {
-//        return githubService.getBranch(owner + "/" + repo, branchName);
-//    }
-
-//    @GetMapping("/repos/{owner}/{repo}/readme")
-//    public GithubContentResponse getReadme(
-//            @PathVariable("owner") String owner,
-//            @PathVariable("repo") String repo) throws IOException {
-//        return githubService.getReadme(owner + "/" + repo);
-//    }
 
     @GetMapping("/repos/{owner}/{repo}/contents/{path:.+}")
     public GithubContentResponse getFileContent(
@@ -89,7 +47,6 @@ public class GithubApiController {
             @RequestParam(required = false) String ref
     ) throws IOException {
         return githubService.getFileContent(owner + "/" + repo, contentPath, ref);
-//        return githubService.pullFileContent(owner + "/" + repo, contentPath, ref, projectId);
     }
 
     @PostMapping("/repos/{owner}/{repo}/contents/{path:.+}")

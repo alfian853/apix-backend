@@ -8,7 +8,7 @@ import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.enums.ProjectField;
-import com.future.apix.repository.request.ProjectAdvancedQuery;
+import com.future.apix.repository.request.AdvancedQuery;
 import com.future.apix.request.ProjectCreateRequest;
 import com.future.apix.response.*;
 import com.future.apix.service.impl.ApiDataServiceImpl;
@@ -203,7 +203,7 @@ public class ApiDataServiceTest {
                 return pageable;
             }
         });
-        ProjectAdvancedQuery request = ProjectAdvancedQuery.builder()
+        AdvancedQuery request = AdvancedQuery.builder()
             .page(0)
             .size(10)
             .sortBy(ProjectField.UPDATED_AT)
@@ -227,7 +227,7 @@ public class ApiDataServiceTest {
                 return pageable;
             }
         });
-        ProjectAdvancedQuery request = ProjectAdvancedQuery.builder()
+        AdvancedQuery request = AdvancedQuery.builder()
             .page(0)
             .size(10)
             .sortBy(ProjectField.UPDATED_AT)

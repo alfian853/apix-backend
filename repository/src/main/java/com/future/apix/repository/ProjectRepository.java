@@ -10,17 +10,6 @@ import java.util.List;
 
 public interface ProjectRepository extends MongoRepository<ApiProject, String>, ProjectRepositoryExtension {
 
-    @Query(value = "{}", fields = "{_id:1, basePath:1, host:1, info:1, teams:1, projectOwner:1, githubProject:1, updatedAt:1}")
-    List<ApiProject> findAllProjects();
-
     // List of Projects with users
     List<ApiProject> findByTeams(String teamName);
-
-    @Query(value = "{}", fields = "{_id:1, basePath:1, host:1, info:1, teams:1, projectOwner:1, githubProject:1, updatedAt:1}")
-    Page<ApiProject> findAll(Pageable pageable);
-
-    @Query("{ $or: [ {'host': {$regex: ?0}}, {'info.title': {$regex: ?0}}, " +
-            "{'projectOwner.creator': {$regex: ?0}}, " +
-            "{'githubProject.owner': {$regex: ?0}}, {'githubProject.repo': {$regex: ?0}} ] }")
-    Page<ApiProject> findBySearch(String search, Pageable pageable);
 }

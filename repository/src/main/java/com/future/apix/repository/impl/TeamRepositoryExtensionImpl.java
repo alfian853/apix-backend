@@ -48,7 +48,7 @@ public class TeamRepositoryExtensionImpl implements TeamRepositoryExtension {
 //        db.getCollection('Teams').update({'name': 'nat', 'members.username': 'nut'}, {$set: {'members.$.grant': false} })
         UpdateResult result = mongoTemplate.updateFirst(query, update, Team.class);
         if(result.getMatchedCount() == 0) { // jika belum ada member
-            System.out.println("add Member");
+//            System.out.println("add Member");
             Query query1 = new Query(Criteria.where("name").is(teamName));
             Update update1 = new Update();
             Member member = new Member(memberName, isInvite);
@@ -57,7 +57,7 @@ public class TeamRepositoryExtensionImpl implements TeamRepositoryExtension {
             return mongoTemplate.updateFirst(query1, update1, Team.class);
         }
         else {
-            System.out.println("Change existing member");
+//            System.out.println("Change existing member");
             return result;
         }
     }

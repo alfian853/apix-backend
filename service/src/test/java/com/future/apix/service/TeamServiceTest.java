@@ -10,6 +10,7 @@ import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.TeamCreateRequest;
@@ -37,13 +38,16 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class TeamServiceTest {
     @InjectMocks
-    TeamServiceImpl teamService;
+    private TeamServiceImpl teamService;
 
     @Mock
-    TeamRepository teamRepository;
+    private TeamRepository teamRepository;
 
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    @Mock
+    private ProjectRepository projectRepository;
 
     @Mock
     ObjectMapper oMapper;
@@ -238,6 +242,7 @@ public class TeamServiceTest {
         expected.setUsername("test"); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
         when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
+
         RequestResponse response = teamService.deleteTeam("TeamTest");
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Team has been deleted!", response.getMessage());

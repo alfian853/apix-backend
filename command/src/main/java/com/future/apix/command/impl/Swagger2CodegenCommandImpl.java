@@ -141,13 +141,13 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                 */
 
 //                http://www.avajava.com/tutorials/lessons/how-do-i-zip-a-directory-and-all-its-contents.html
-                System.out.println("\nBaseName: " + baseName);
+//                System.out.println("\nBaseName: " + baseName);
                 File directoryToZip = new File(CODEGEN_RESULT_DIR + baseName);
-                System.out.println("--- GEtting references to all files in: " + directoryToZip.getCanonicalPath());
+//                System.out.println("--- GEtting references to all files in: " + directoryToZip.getCanonicalPath());
                 getAllFiles(directoryToZip, fileList);
-                System.out.println("-- Creating zip file");
+//                System.out.println("-- Creating zip file");
                 writeZipFile(directoryToZip, fileList);
-                System.out.println("-- Done");
+//                System.out.println("-- Done");
 
                 FileSystemUtils.deleteRecursively(new File(CODEGEN_RESULT_DIR +baseName));
 
@@ -208,7 +208,7 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
         FileInputStream fis = new FileInputStream(file);
         String zipFilePath = file.getCanonicalPath().substring(directoryToZip.getCanonicalPath().length() + 1,
                 file.getCanonicalPath().length());
-        System.out.println("Writing " + zipFilePath + " to zip file! AVAJAVA");
+//        System.out.println("Writing " + zipFilePath + " to zip file! AVAJAVA");
         ZipEntry zipEntry = new ZipEntry(zipFilePath);
         zos.putNextEntry(zipEntry);
 

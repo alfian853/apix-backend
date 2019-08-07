@@ -1,7 +1,7 @@
 package com.future.apix.repository;
 
 import com.future.apix.repository.enums.MongoEntityField;
-import com.future.apix.repository.request.ProjectAdvancedQuery;
+import com.future.apix.repository.request.AdvancedQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,35 +20,36 @@ public interface RepositoryExtension<ENTITY> {
     Class<ENTITY> getEntityClass();
     List<? extends MongoEntityField> getFieldList();
 
-    default Page<ENTITY> findByQuery(ProjectAdvancedQuery requestQuery, Criteria...additionalCriteria) {
+    default Page<ENTITY> findByQuery(AdvancedQuery requestQuery, Criteria...additionalCriteria) {
         Pageable pageable = PageRequest.of(requestQuery.getPage(), requestQuery.getSize());
         Query query = new Query();
 
         List<Criteria> andCriteria = new ArrayList<>();
 
-        getFieldList().forEach(field -> {
-            andCriteria.add(Criteria.where(field.getMongoFieldValue())
-                    .regex(requestQuery.getSearch(),"i"));
-        });
+        if(requestQuery.getSearch() != null){
+            getFieldList().forEach(field -> {
+                andCriteria.add(Criteria.where(field.getMongoFieldValue())
+                        .regex(requestQuery.getSearch(),"i"));
+            });
+        }
 
         Criteria orCriteria = new Criteria().orOperator(andCriteria.toArray(new Criteria[0]));
 
         if(additionalCriteria.length > 0){
-            int len = additionalCriteria.length;
-            for(int i=0; i < len ; ++i){
-                orCriteria.andOperator(additionalCriteria[i]);
+            for (Criteria additionalCriterion : additionalCriteria) {
+                orCriteria.andOperator(additionalCriterion);
             }
         }
 
         query.addCriteria(orCriteria);
-
-        Sort sort = new Sort(requestQuery.getDirection(), requestQuery.getSortBy().getMongoFieldValue());
-
         query.with(pageable);
-        query.with(sort);
+
+        if(requestQuery.getSortBy() != null){
+            Sort sort = new Sort(requestQuery.getDirection(), requestQuery.getSortBy().getMongoFieldValue());
+            query.with(sort);
+        }
 
         List<ENTITY> list = this.getMongoTemplate().find(query, this.getEntityClass());
-        System.out.println(list);
         return PageableExecutionUtils.getPage(list, pageable,
             ()-> getMongoTemplate().count(query, this.getEntityClass()));
     }

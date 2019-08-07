@@ -10,7 +10,7 @@ import com.future.apix.entity.User;
 import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.enums.ProjectField;
-import com.future.apix.repository.request.ProjectAdvancedQuery;
+import com.future.apix.repository.request.AdvancedQuery;
 import com.future.apix.request.TeamCreateRequest;
 import com.future.apix.request.ProjectAssignTeamRequest;
 import com.future.apix.request.ProjectCreateRequest;
@@ -110,7 +110,7 @@ public class ProjectController {
                                                  @RequestParam(value = "sort", required = false, defaultValue = "updated_at") String sort,
                                                  @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction,
                                                  @RequestParam(value = "search", defaultValue = "") String search){
-        ProjectAdvancedQuery query = ProjectAdvancedQuery.builder()
+        AdvancedQuery query = AdvancedQuery.builder()
                 .direction(Sort.Direction.fromString(direction))
                 .page(page)
                 .size(size)
@@ -127,7 +127,7 @@ public class ProjectController {
                                                         @RequestParam(value = "sort", required = false, defaultValue = "updated_at") String sort,
                                                         @RequestParam(value = "direction", required = false, defaultValue = "desc") String direction,
                                                         @RequestParam(value = "search", defaultValue = "") String search) {
-        ProjectAdvancedQuery query = ProjectAdvancedQuery.builder()
+        AdvancedQuery query = AdvancedQuery.builder()
             .direction(Sort.Direction.fromString(direction))
             .page(page)
             .size(size)

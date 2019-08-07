@@ -1,5 +1,6 @@
 package com.future.apix.repository.request;
 
+import com.future.apix.repository.enums.MongoEntityField;
 import com.future.apix.repository.enums.ProjectField;
 import lombok.Builder;
 import lombok.Data;
@@ -7,10 +8,10 @@ import org.springframework.data.domain.Sort;
 
 @Data
 @Builder
-public class ProjectAdvancedQuery {
+public class AdvancedQuery {
     int page;
     int size;
-    ProjectField sortBy;
-    Sort.Direction direction;
-    String search;
+    MongoEntityField sortBy;
+    Sort.Direction direction = Sort.Direction.ASC;
+    String search = "";
 }

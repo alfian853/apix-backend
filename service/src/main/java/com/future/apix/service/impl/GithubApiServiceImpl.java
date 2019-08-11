@@ -86,7 +86,8 @@ public class GithubApiServiceImpl implements GithubApiService {
         List<String> branchName = new ArrayList<>();
         Map<String, GHBranch> branches = gitHub.get().getRepository(repoName).getBranches();
         for (Map.Entry<String, GHBranch> entry : branches.entrySet()){
-            if (!Objects.equals(entry.getKey(), "master")) branchName.add(entry.getKey());
+//            if (!Objects.equals(entry.getKey(), "master"))
+            branchName.add(entry.getKey());
             // exclude master, since it is default branch
         }
         return branchName;

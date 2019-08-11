@@ -158,17 +158,9 @@ public class ApiProjectConverter {
                     if(parameters.size() > 0){
                         methodDataMap.put("parameters",parameters);
                     }
-                    LinkedHashMap<String,Object> responses = new LinkedHashMap<>();
-                    methodDataMap.put("responses",responses);
 
-                    //push responses
-                    methodData.getResponses().forEach((httpCode,response)->{
-                        LinkedHashMap<String,Object> responseMap = mapper.convertValue(response,LinkedHashMap.class);
-                        responses.put(
-                                httpCode,
-                                mapper.convertValue(responseMap, OperationDetail.class)
-                        );
-                    });
+                    // push responses
+                    methodDataMap.put("responses", methodData.getResponses());
 
                 });//close method
 
@@ -177,13 +169,13 @@ public class ApiProjectConverter {
                 }
                 this.replaceRefWithId(pathDataMap, definitionIdToName);
                 paths.put(pathName,pathDataMap);
-
             });//close path
         });//close section
+
         swaggerOas2 = mapper.convertValue(
                 swaggerOas2,
                 TypeFactory.defaultInstance().constructMapType(
-                        LinkedHashMap.class,String.class, Object.class
+                        LinkedHashMap.class, String.class, Object.class
                 )
         );
         return swaggerOas2;

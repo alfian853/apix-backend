@@ -31,35 +31,38 @@ public class ApiTeamServiceImpl implements ApiTeamService {
 
     @Override
     public RequestResponse grantTeamAccess(String id, ProjectAssignTeamRequest request) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        RequestResponse response = new RequestResponse();
-        String assignType = request.getAssignType();
-        String teamName = request.getTeamName();
-        Team team = Optional.ofNullable(teamRepository.findByName(teamName))
-            .orElseThrow(() -> new DataNotFoundException("Team does not exists!"));
-        UserProfileResponse profile = oMapper.convertValue(auth.getPrincipal(), UserProfileResponse.class);
-        ApiProject apiProject = apiRepository.findById(id)
-            .orElseThrow(() -> new DataNotFoundException("Api project does not exists!"));
-        if (profile.getUsername().equals(apiProject.getProjectOwner().getCreator())) {
+        if (this.checkProjectOwner(id)) {
+            String assignType = request.getAssignType();
+            String teamName = request.getTeamName();
+            ApiProject apiProject = apiRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Api project does not exists!"));
             if (assignType.equals("grant") && !apiProject.getTeams().contains(teamName)) {
                 apiProject.getTeams().add(teamName);
                 apiRepository.save(apiProject);
-                response.setStatusToSuccess();
-                response.setMessage("Team has been assigned to project!");
-                return response;
+                return RequestResponse.success("Team has been assigned to project!");
             }
             else if(assignType.equals("ungrant") && apiProject.getTeams().contains(teamName)){
                 apiProject.getTeams().remove(teamName);
                 apiRepository.save(apiProject);
-                response.setStatusToSuccess();
-                response.setMessage("Team has been removed from project!");
-                return response;
+                return RequestResponse.success("Team has been removed to project!");
             }
             else throw new InvalidRequestException("Team is already in the project!");
         }
         else {
             throw new InvalidRequestException("You are unauthorized to grant team!");
         }
+    }
+
+    @Override
+    public boolean checkProjectOwner(String id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserProfileResponse profile = oMapper.convertValue(auth.getPrincipal(), UserProfileResponse.class);
+        ApiProject apiProject = apiRepository.findById(id)
+            .orElseThrow(() -> new DataNotFoundException("Api project does not exists!"));
+        if (profile.getUsername().equals(apiProject.getProjectOwner().getCreator())) {
+            return true;
+        }
+        else return false;
     }
 
 }

@@ -1,11 +1,13 @@
 package com.future.apix.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.UserCreateRequest;
 import com.future.apix.response.RequestResponse;
@@ -27,6 +29,9 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TeamRepository teamRepository;
 
     @Autowired
     private ObjectMapper oMapper;
@@ -81,6 +86,10 @@ public class UserServiceImpl implements UserService {
     public RequestResponse deleteUser(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("User does not exists!"));
+        List<Team> teams = teamRepository.findByMembersUsername(user.getUsername());
+        for (Team team : teams) {
+            teamRepository.removeMemberFromTeam(team.getName(), user.getUsername());
+        }
         userRepository.deleteById(id);
         return RequestResponse.success("User has been deleted!");
     }

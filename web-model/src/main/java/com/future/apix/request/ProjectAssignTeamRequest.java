@@ -7,6 +7,6 @@ import lombok.*;
 @Getter
 @Setter
 public class ProjectAssignTeamRequest {
-    private String assignType;
+    private String assignType; // grant / ungrant
     private String teamName;
 }

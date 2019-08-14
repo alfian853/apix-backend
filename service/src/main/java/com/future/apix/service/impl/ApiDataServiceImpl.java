@@ -8,6 +8,7 @@ import com.future.apix.entity.apidetail.Github;
 import com.future.apix.entity.apidetail.ProjectInfo;
 import com.future.apix.entity.enumeration.TeamAccess;
 import com.future.apix.exception.DataNotFoundException;
+import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.request.AdvancedQuery;
 import com.future.apix.request.TeamCreateRequest;
@@ -17,6 +18,7 @@ import com.future.apix.response.PagedResponse;
 import com.future.apix.response.ProjectCreateResponse;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.service.ApiDataService;
+import com.future.apix.service.ApiTeamService;
 import com.future.apix.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,6 +41,9 @@ public class ApiDataServiceImpl implements ApiDataService {
     @Autowired
     private TeamService teamService;
 
+    @Autowired
+    private ApiTeamService apiTeamService;
+
     @Override
     public ApiProject findById(String id) {
         return apiRepository.findById(id)
@@ -49,8 +54,11 @@ public class ApiDataServiceImpl implements ApiDataService {
     public RequestResponse deleteById(String id){
         ApiProject project = apiRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
-        apiRepository.deleteById(id);
-        return RequestResponse.success("Project has been deleted!");
+        if (apiTeamService.checkProjectOwner(id)) {
+            apiRepository.deleteById(id);
+            return RequestResponse.success("Project has been deleted!");
+        }
+        else throw new InvalidRequestException("You are not authorized to delete this project!");
     }
 
     @Override

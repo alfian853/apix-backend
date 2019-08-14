@@ -23,8 +23,8 @@ public class QueryExecutorCommandImpl implements QueryExecutorCommand {
 
     @Data
     private class SignaturePointer {
-        HashMap<String, Object> targetField;
-        HashMap<String, Object> queryField;
+        HashMap<String, Object> targetPointer;
+        HashMap<String, Object> queryPointer;
     }
 
     @Autowired
@@ -55,8 +55,8 @@ public class QueryExecutorCommandImpl implements QueryExecutorCommand {
             }
             else if(pair.getKey().equals("_signature")){
                 SignaturePointer pointer = new SignaturePointer();
-                pointer.setTargetField(target);
-                pointer.setQueryField(query);
+                pointer.setTargetPointer(target);
+                pointer.setQueryPointer(query);
                 return pointer;
             }
         }
@@ -75,34 +75,33 @@ public class QueryExecutorCommandImpl implements QueryExecutorCommand {
         if(pointer == null){
             throw new InvalidRequestException("signature not found!");
         }
-        if(pointer.getTargetField() == null || pointer.getQueryField() == null){
+        if(pointer.getTargetPointer() == null || pointer.getQueryPointer() == null){
             throw new InvalidRequestException("Invalid Edition Path!");
         }
-        if(!pointer.getQueryField().get("_signature").equals(
-                pointer.getTargetField().get("_signature"))){
+        if(!pointer.getQueryPointer().get("_signature").equals(
+                pointer.getTargetPointer().get("_signature"))){
             throw new ConflictException("Edition Conflict!");
         }
 
         ProjectUpdateResponse response = new ProjectUpdateResponse();
         response.setStatusToSuccess();
 
-        if( queryExecutor.executeQuery(pointer.getTargetField(), pointer.getQueryField()) ){
+        if(queryExecutor.executeQuery(pointer.getTargetPointer(), pointer.getQueryPointer())){
             //generate signature baru setelah kontennya berhasil diupdate
             String newSignature = UUID.randomUUID().toString();
             response.setNewSignature(newSignature);
-            pointer.getTargetField().put("_signature", newSignature);
+            pointer.getTargetPointer().put("_signature", newSignature);
         }
         else{//tidak ada update
-            response.setNewSignature((String) pointer.getQueryField().get("_signature"));
+            response.setNewSignature((String) pointer.getQueryPointer().get("_signature"));
         }
-
+      /** karna pointer.getTargetPointer() me-return object yang didalam @target(bukan hasil clone),
+       * maka tidak perlu di menge-set hasil query kedalam @target
+       **/
         project = mapper.convertValue(target, ApiProject.class);
 
         apiRepository.save(project);
 
         return response;
-        /** karna pointer.getTargetField() me-return object yang didalam @target(bukan hasil clone),
-         * maka tidak perlu di menge-set hasil query kedalam @target
-         **/
     }
 }

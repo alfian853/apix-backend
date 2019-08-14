@@ -3,19 +3,18 @@ package com.future.apix.util.converter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.future.apix.entity.ApiProject;
-import com.future.apix.entity.Mappable;
 import com.future.apix.entity.apidetail.*;
 import com.future.apix.util.validator.BodyValidator;
 import com.future.apix.util.validator.SchemaValidator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
-import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.*;
 
 public class SwaggerToApixOasConverter {
 
-    private static ObjectMapper oMapper = new ObjectMapper();
+    @Autowired
+    ObjectMapper oMapper;
 
     private static SwaggerToApixOasConverter converter;
 
@@ -25,13 +24,12 @@ public class SwaggerToApixOasConverter {
         }
         return converter;
     }
-    private Map<String,String> refDefinitions = new HashMap<>();
 
     public void setMapper(ObjectMapper objectMapper){
         this.oMapper = objectMapper;
     }
 
-    private void replaceRefWithId(Map<String, Object> data){
+    private void replaceRefWithId(Map<String, Object> data, Map<String, String> refToIdMap){
         for(Object obj : data.entrySet()){
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>) obj;
             if((pair.getKey().equals("$ref") || pair.getKey().equals("ref"))
@@ -39,18 +37,20 @@ public class SwaggerToApixOasConverter {
 
                 String ref = (String) pair.getValue();
                 ref = ref.split("/",3)[2];
-                pair.setValue(this.refDefinitions.get(ref));
+                pair.setValue(refToIdMap.get(ref));
             }
             else if(pair.getValue() instanceof HashMap){
-                replaceRefWithId(this.toStrObjMap(pair.getValue()));
+                replaceRefWithId(this.toStrObjMap(pair.getValue()), refToIdMap);
             }
         }
     }
 
-    private void setApiPathVariable(ApiProject project, String section, String path, Map.Entry<String,Object> data) {
-        List<Map<String, Object>> pathVariables = (List<Map<String, Object>>) data.getValue();
+    private void setPathVariable(ApiProject project, String section, String path,
+        Map.Entry<String,Object> statusAndOperationEntry, Map<String, String> refToIdMap) {
+
+        List<Map<String, Object>> pathVariables = (List<Map<String, Object>>) statusAndOperationEntry.getValue();
         for (Map<String, Object> variable : pathVariables) {
-            this.replaceRefWithId(variable);
+            this.replaceRefWithId(variable, refToIdMap);
             Schema pathVariable = oMapper.convertValue(variable, Schema.class);
             project.getSections().get(section).getPaths().computeIfAbsent(path, k -> new Path())
                     .getPathVariables()
@@ -63,15 +63,14 @@ public class SwaggerToApixOasConverter {
     }
 
     /**
-     * return : data dari method api{post,get,put,delete}.
-     * contoh :
+     * melakukan mutasi pada object dengan hasil.
      * post : {
      *     "operatioId" : "createItemPOST",
      *     "description" : "",
      *     ............
      * }
-     * **/                                                      //path             method,methodData
-    private void setApiMethodData(ApiProject project,String section, String path, Map.Entry<String,Object> data){
+     * **/
+    private void setOperationData(ApiProject project,String section, String path, Map.Entry<String,Object> data, Map<String, String> refToIdMap){
 
         ApiMethodData methodData = new ApiMethodData();
         Map<String,Object> dataMap = toStrObjMap(data.getValue());
@@ -91,7 +90,7 @@ public class SwaggerToApixOasConverter {
 
             for (Object paramObj : parameters) {
                 Map<String, Object> parameter = toStrObjMap(paramObj);
-                this.replaceRefWithId(parameter);
+                this.replaceRefWithId(parameter, refToIdMap);
                 String input = (String) parameter.get("in");
                 if(input.equals("query")){
                     Schema query = oMapper.convertValue(parameter, Schema.class);
@@ -155,20 +154,21 @@ public class SwaggerToApixOasConverter {
 
         }
 
-        this.replaceRefWithId(toStrObjMap(dataMap.get("responses")));
+        this.replaceRefWithId(toStrObjMap(dataMap.get("responses")), refToIdMap);
         Map<String, OperationDetail> responses = oMapper.convertValue(
-                dataMap.get("responses"),
-                TypeFactory.defaultInstance().constructMapType(HashMap.class,String.class, OperationDetail.class)
+            dataMap.get("responses"),
+            TypeFactory.defaultInstance().constructMapType(HashMap.class,String.class, OperationDetail.class)
         );
         methodData.setResponses(responses);
 
         HttpMethod method = HttpMethod.valueOf(data.getKey().toUpperCase());
         if(
-                SchemaValidator.isValid(methodData.getRequest().getHeadersLazily()) &&
-                        SchemaValidator.isValid(methodData.getRequest().getQueryParamsLazily()) &&
-                        ((method == HttpMethod.GET) || (methodData.getRequest() == null ||
-                                BodyValidator.isValid(methodData.getRequest())))
-
+            SchemaValidator.isValid(methodData.getRequest().getHeadersLazily()) &&
+            SchemaValidator.isValid(methodData.getRequest().getQueryParamsLazily()) &&
+            (
+                (method == HttpMethod.GET) || (methodData.getRequest() == null ||
+                BodyValidator.isValid(methodData.getRequest()))
+            )
         ){
         }
         else{
@@ -181,31 +181,28 @@ public class SwaggerToApixOasConverter {
     }
 
     /**
-     * return : data dari link(semua http method dari link tersebut).
-     * contoh :
+     * melakukan mutasi pada object @ApiProject dengan hasil:
      * "/api" :{
      *     "post" : {object},
      *     "get" : {object}
      * }
      * **/
-    //                                                    Path,DataPath
-    private void setLinkData(ApiProject project, Map.Entry<String,Object> pathsData){
+    private void setPathData(ApiProject project, Map.Entry<String,Object> pathData, Map<String, String> refToIdMap){
 
-        Iterator iterator = toStrObjMap(pathsData.getValue()).entrySet().iterator();
+        Iterator iterator = toStrObjMap(pathData.getValue()).entrySet().iterator();
         String section=null;
 
         while(iterator.hasNext()) {
-            //httpMethod,operationData
-            Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-            if(section == null && !pair.getKey().equals("parameters")){
-                section = this.getSection(toStrObjMap(pair.getValue()));
+            Map.Entry<String,Object> statusAndOperationEntry = (Map.Entry) iterator.next();
+            if(section == null && !statusAndOperationEntry.getKey().equals("parameters")){
+                section = this.getSection(toStrObjMap(statusAndOperationEntry.getValue()));
             }
-            switch (pair.getKey()){
+            switch (statusAndOperationEntry.getKey()){
                 case "parameters":
-                    this.setApiPathVariable(project,section, pathsData.getKey(), pair);
+                    this.setPathVariable(project,section, pathData.getKey(), statusAndOperationEntry, refToIdMap);
                     break;
                 default:
-                    this.setApiMethodData(project, section, pathsData.getKey(), pair);
+                    this.setOperationData(project, section, pathData.getKey(), statusAndOperationEntry, refToIdMap);
             }
         }
 
@@ -230,32 +227,32 @@ public class SwaggerToApixOasConverter {
             Map<String,Object> definitionsJson = toStrObjMap(json.get("definitions"));
             Map<String,Object> newDefinitionsJson = new HashMap<>();
 
-            this.refDefinitions = new HashMap<>();
+            Map<String,String> refToIdMap = new HashMap<>();
             Iterator iterator = definitionsJson.entrySet().iterator();
 
+            //create new definitions with uuid as key also keep mapping data from definition name to unique uuid
             while (iterator.hasNext()){
-                Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-                Map<String,Object> isinya = toStrObjMap(pair.getValue());
-                isinya.put("name",pair.getKey());
+                Map.Entry<String,Object> nameAndDefinitionEntry = (Map.Entry) iterator.next();
+                Map<String,Object> definitionData = toStrObjMap(nameAndDefinitionEntry.getValue());
+                definitionData.put("name",nameAndDefinitionEntry.getKey());
                 String key = UUID.randomUUID().toString();
-                newDefinitionsJson.put(key, isinya);
-                this.refDefinitions.put(pair.getKey(), "#/definitions/"+key);
+                newDefinitionsJson.put(key, definitionData);
+                refToIdMap.put(nameAndDefinitionEntry.getKey(), "#/definitions/"+key);
             }
 
-            this.replaceRefWithId(newDefinitionsJson);
+            this.replaceRefWithId(newDefinitionsJson, refToIdMap);
 
             iterator = newDefinitionsJson.entrySet().iterator();
             Map<String, Definition> definitions = project.getDefinitions();
             while(iterator.hasNext()){
-                Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-//                Definition definition = oMapper.convertValue(pair.getValue(),Definition.class);
+                Map.Entry<String,Object> nameAndDefinitionEntry = (Map.Entry) iterator.next();
                 Definition definition = new Definition();
-                definition.setSchema(oMapper.convertValue(pair.getValue(), Schema.class));
+                definition.setSchema(oMapper.convertValue(nameAndDefinitionEntry.getValue(), Schema.class));
                 definition.setName(definition.getSchema().getName());
                 definition.getSchema().setName(null);
-                // validate content
+
                 if(SchemaValidator.isValid(definition.getSchema().getPropertiesLazily())){
-                    definitions.put(pair.getKey(), definition);
+                    definitions.put(nameAndDefinitionEntry.getKey(), definition);
                 }
                 else{
                     throw new RuntimeException("Json OAS is not valid!");
@@ -263,21 +260,17 @@ public class SwaggerToApixOasConverter {
             }
 
             /* Copy Paths Operation */
-            //     link, listOfMethod
             Map<String,Object> paths = toStrObjMap(json.get("paths"));
             iterator = paths.entrySet().iterator();
 
             while(iterator.hasNext()){
-                //       link,ListOfMethod
-                Map.Entry<String,Object> pair = (Map.Entry) iterator.next();
-
-                //           sectionName             link
-                this.setLinkData(project, pair);
+                Map.Entry<String,Object> pathAndOperationsPair = (Map.Entry) iterator.next();
+                this.setPathData(project, pathAndOperationsPair, refToIdMap);
 
             }
             /* End of Copy Paths Operation**/
 
-            /* Append Description of Sections from Tags */
+            /* Append description and name of sections from tags */
             List<Object> tags = (List<Object>) json.get("tags");
             if(tags != null){
                 for (Object tagObj : tags) {
@@ -312,7 +305,6 @@ public class SwaggerToApixOasConverter {
             }
             return project;
 
-//            return RequestResponse.success("Data Imported");
 
         } catch (Exception e) {
             e.printStackTrace();

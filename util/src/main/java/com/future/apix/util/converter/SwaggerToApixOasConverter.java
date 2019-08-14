@@ -287,6 +287,14 @@ public class SwaggerToApixOasConverter {
                     section.getInfo().setSignature(UUID.randomUUID().toString());
                 }
             }
+            else {
+                Map<String, ApiSection> sections = project.getSections();
+                for (Map.Entry<String, ApiSection> sectionEntry : sections.entrySet() ) {
+                    ApiSection section = sectionEntry.getValue();
+                    section.getInfo().setName(sectionEntry.getKey());
+                    section.getInfo().setSignature(UUID.randomUUID().toString());
+                }
+            }
             /* End of Append Tags */
 
 

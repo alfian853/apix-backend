@@ -37,6 +37,14 @@ public class GithubApiController {
         return githubService.getBranches(owner + "/" + repo);
     }
 
+    @GetMapping("/repos/{owner}/{repo}/git/trees/{branch}")
+    public List<String> getFiles(
+            @PathVariable("owner") String owner,
+            @PathVariable("repo") String repo,
+            @PathVariable("branch") String branch) throws IOException {
+        return githubService.getFiles(owner + "/" + repo, branch);
+    }
+
     @GetMapping("/repos/{owner}/{repo}/contents/{path:.+}")
     public GithubContentResponse getFileContent(
 //            https://stackoverflow.com/questions/30548822/spring-mvc-4-application-json-content-type-is-not-being-set-correctly

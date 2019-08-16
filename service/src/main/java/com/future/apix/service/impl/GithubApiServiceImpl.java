@@ -94,6 +94,16 @@ public class GithubApiServiceImpl implements GithubApiService {
     }
 
     @Override
+    public List<String> getFiles(String repoName, String branchName) throws IOException {
+        List<GHTreeEntry> treeEntries = gitHub.get().getRepository(repoName).getTree(branchName).getTree();
+        List<String> fileList = new ArrayList<>();
+        for (GHTreeEntry entry : treeEntries) {
+            fileList.add(entry.getPath());
+        }
+        return fileList;
+    }
+
+    @Override
     public GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException {
         if (ref == null || ref.length() <= 0) ref = "master";
         GHContent content = gitHub.get().getRepository(repoName).getFileContent(contentPath, ref);

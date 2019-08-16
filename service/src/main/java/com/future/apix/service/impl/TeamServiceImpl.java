@@ -80,14 +80,16 @@ public class TeamServiceImpl implements TeamService {
             newTeam.setAccess(request.getAccess());
             newTeam.setName(request.getTeamName());
             newTeam.getMembers().add(new Member(teamCreator.getUsername(), true));
-            request.getMembers().forEach(name -> {
-                User user = userRepository.findByUsername(name);
-                if (user != null && !user.getTeams().contains(newTeam.getName()))
-                    user.getTeams().add(newTeam.getName());
+            if (request.getMembers() != null) {
+                request.getMembers().forEach(name -> {
+                    User user = userRepository.findByUsername(name);
+                    if (user != null && !user.getTeams().contains(newTeam.getName()))
+                        user.getTeams().add(newTeam.getName());
 
-                newTeam.getMembers().add(new Member(name, request.getAccess().equals(TeamAccess.PUBLIC)));
-                userRepository.save(user);
-            });
+                    newTeam.getMembers().add(new Member(name, request.getAccess().equals(TeamAccess.PUBLIC)));
+                    userRepository.save(user);
+                });
+            }
 
             teamRepository.save(newTeam);
             return newTeam;

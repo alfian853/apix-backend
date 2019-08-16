@@ -18,6 +18,8 @@ public interface GithubApiService {
 
     List<String> getBranches(String repoName) throws IOException;
 
+    List<String> getFiles(String repoName, String branchName) throws IOException;
+
     GithubContentResponse getFileContent(String repoName, String contentPath, String ref) throws IOException;
 
     GithubCommitResponse updateFile(String repoName, String contentPath, GithubContentsRequest request) throws IOException;

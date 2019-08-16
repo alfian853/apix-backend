@@ -68,7 +68,6 @@ public class ProjectController {
             teamCreateRequest.setTeamName(teamName);
             teamCreateRequest.setCreator(user.getUsername());
             teamCreateRequest.setAccess(TeamAccess.PUBLIC);
-            teamCreateRequest.setMembers(Collections.singletonList(user.getUsername()));
             request.setTeam(this.teamService.createTeam(teamCreateRequest));
         }
         else{

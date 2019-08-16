@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(String username) {
         User user = Optional.ofNullable(userRepository.findByUsername(username))
-                .orElseThrow(() -> new InvalidAuthenticationException("User is not registered!"));
+                .orElseThrow(() -> new DataNotFoundException("User is not registered!"));
         return user;
     }
 

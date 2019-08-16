@@ -83,6 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public RequestResponse deleteUser(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("User does not exists!"));
@@ -97,7 +98,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUser(String username) {
         User user = Optional.ofNullable(userRepository.findByUsername(username))
-                .orElseThrow(() -> new InvalidAuthenticationException("User is not registered!"));
+                .orElseThrow(() -> new DataNotFoundException("User is not registered!"));
         return user;
     }
 

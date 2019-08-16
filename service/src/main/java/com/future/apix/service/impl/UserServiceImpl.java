@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public RequestResponse deleteUser(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("User does not exists!"));

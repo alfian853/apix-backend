@@ -105,6 +105,9 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                         project.getUpdatedAt()
                 );
 
+        File checkDirectory = new File(CODEGEN_RESULT_DIR);
+        if (!checkDirectory.exists()) checkDirectory.mkdir();
+
         if(notExistOrExpired){
             String baseName = swagger2.getOasFileName();
             File resultDir = new File(

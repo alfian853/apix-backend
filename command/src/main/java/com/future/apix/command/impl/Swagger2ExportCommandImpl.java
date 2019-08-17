@@ -115,6 +115,10 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                     + "." + request.getFormat().toString().toLowerCase();
             //if not generated yet
             if(swagger2.getOasFileName() != null){
+                // check if directory exists
+                File checkDirectory = new File(EXPORT_DIR);
+                if (!checkDirectory.exists()) checkDirectory.mkdir();
+
                 File testFile = new File(EXPORT_DIR + targetFilePath);
                 //if not the latest version
                 if(swagger2.getOasFileProjectUpdateDate().before(project.getUpdatedAt())){

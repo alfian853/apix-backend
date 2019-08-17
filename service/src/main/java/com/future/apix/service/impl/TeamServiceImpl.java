@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -96,6 +97,7 @@ public class TeamServiceImpl implements TeamService {
         throw new DuplicateEntryException("Team name is already exists!");
     }
 
+    @Transactional
     @Override
     public RequestResponse deleteTeam(String name) {
         Team existTeam = Optional.ofNullable(teamRepository.findByName(name))

@@ -223,17 +223,10 @@ public class TeamServiceTest {
 
     @Test
     public void deleteTeam_asProjectOwner() {
-        System.out.println(project);
-//        project.setTeams(Collections.singletonList("TeamTest"));
-//        project.setProjectOwner(TEAM);
         mockTeamAuth();
+        ApiProject project = new ApiProject();
         when(projectRepository.findByTeams(anyString())).thenReturn(Collections.singletonList(project));
-        doReturn(null).when(teamRepository).removeTeamFromProject(anyString(), anyString());
-//        try {
-//            teamService.deleteTeam("TeamTest");
-//        } catch (Exception e) {
-//            Assert.assertEquals("There are projects under your team as owner!", e.getMessage());
-//        }
+        when(projectRepository.findByTeams(anyString())).thenReturn(new LinkedList<>());
         RequestResponse response = teamService.deleteTeam("TeamTest");
         Assert.assertTrue(response.getSuccess());
     }

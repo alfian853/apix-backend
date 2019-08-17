@@ -59,10 +59,10 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
     @Autowired
     private ApiProjectConverter converter;
 
-    @Value("apix.export_oas.relative_url")
+    @Value("${apix.export_oas.relative_url}")
     private String EXPORT_URL;
 
-    @Value("apix.export_oas.directory")
+    @Value("${apix.export_oas.directory}")
     private String EXPORT_DIR;
 
     private static HashMap<String, QueueCommand<DownloadResponse, ExportRequest>> pools = new HashMap<>();

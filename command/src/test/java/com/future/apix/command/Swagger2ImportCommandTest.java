@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.command.impl.Swagger2ImportCommandImpl;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
+import com.future.apix.enumerate.FileFormat;
 import com.future.apix.exception.InvalidRequestException;
 import com.future.apix.repository.ProjectRepository;
 import com.future.apix.request.ProjectImportRequest;
@@ -38,12 +39,29 @@ public class Swagger2ImportCommandTest {
     private ObjectMapper mapper;
 
     @Test
-    public void importTest() {
+    public void importJsonTest() {
         MockMultipartFile multipartFile = new MockMultipartFile("filename.json", "filename.json",
                 "application/json", "".getBytes()
         );
 
         ProjectImportRequest request = new ProjectImportRequest(new Team(), multipartFile, FileFormat.JSON);
+
+        when(converter.convert(any())).thenReturn(new ApiProject());
+        when(apiRepository.save(any())).thenReturn(new ApiProject());
+
+        ApiProject result = command.execute(request);
+
+
+        verify(apiRepository, times(1)).save(any());
+    }
+
+    @Test
+    public void importYamlTest() {
+        MockMultipartFile multipartFile = new MockMultipartFile("filename.json", "filename.json",
+                "application/json", "".getBytes()
+        );
+
+        ProjectImportRequest request = new ProjectImportRequest(new Team(), multipartFile, FileFormat.YAML);
 
         when(converter.convert(any())).thenReturn(new ApiProject());
         when(apiRepository.save(any())).thenReturn(new ApiProject());
@@ -60,7 +78,7 @@ public class Swagger2ImportCommandTest {
                 "application/json", "".getBytes()
         );
 
-        ProjectImportRequest request = new ProjectImportRequest(new Team(), multipartFile);
+        ProjectImportRequest request = new ProjectImportRequest(new Team(), multipartFile, FileFormat.JSON);
 
         when(mapper.readValue(any(InputStream.class),eq(HashMap.class)))
                 .thenThrow(new IOException());

@@ -57,16 +57,16 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
         this.OAS_DIR = OAS_DIR;
     }
 
-    @Value("apix.codegen.relative_url")
+    @Value("${apix.codegen.relative_url}")
     private String CODEGEN_URL;
 
-    @Value("apix.codegen.directory")
+    @Value("${apix.codegen.directory}")
     private String CODEGEN_RESULT_DIR;
 
-    @Value("apix.codegen.swagger_cli_jar")
+    @Value("${apix.codegen.swagger_cli_jar}")
     private String CODEGEN_JAR;
 
-    @Value("apix.export_oas.directory")
+    @Value("${apix.export_oas.directory}")
     private String OAS_DIR;
 
     private List<File> fileList = new ArrayList<>();

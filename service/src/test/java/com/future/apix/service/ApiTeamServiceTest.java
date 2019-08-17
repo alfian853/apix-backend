@@ -96,7 +96,6 @@ public class ApiTeamServiceTest {
         ProjectAssignTeamRequest request = new ProjectAssignTeamRequest("grant", "TeamTest");
         when(apiRepository.findById(anyString())).thenReturn(Optional.of(project));
         mockAuth();
-        when(teamRepository.findByName(anyString())).thenReturn(null);
         try {
             mock.grantTeamAccess("123", request);
         } catch (DataNotFoundException e) {
@@ -107,7 +106,6 @@ public class ApiTeamServiceTest {
     @Test
     public void grantTeamAccess_projectNotFound() {
         ProjectAssignTeamRequest request = new ProjectAssignTeamRequest("grant", "TeamTest");
-        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(apiRepository.findById(anyString())).thenReturn(Optional.empty());
         try {
             mock.grantTeamAccess("123", request);
@@ -123,7 +121,6 @@ public class ApiTeamServiceTest {
         ProjectAssignTeamRequest request = new ProjectAssignTeamRequest("grant", "AdditionalTeam");
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(apiRepository.findById(anyString())).thenReturn(projectWithoutTeam);
-
         mockAuth();
 
         RequestResponse response = mock.grantTeamAccess("123", request);
@@ -137,7 +134,6 @@ public class ApiTeamServiceTest {
         project.getTeams().add("AdditionalTeam");
         Optional<ApiProject> projectWithTeam = Optional.of(project);
         ProjectAssignTeamRequest request = new ProjectAssignTeamRequest("ungrant", "AdditionalTeam");
-        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(apiRepository.findById(anyString())).thenReturn(projectWithTeam);
 
         mockAuth();
@@ -156,7 +152,7 @@ public class ApiTeamServiceTest {
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(apiRepository.findById(anyString())).thenReturn(projectWithTeam);
 
-        mockAuth();
+//        mockAuth();
 
        try {
            mock.grantTeamAccess("123", request);

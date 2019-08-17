@@ -83,14 +83,6 @@ public class TeamServiceTest {
             .members(Collections.singletonList(USER_USERNAME))
             .build();
 
-    private ApiProject project;
-
-    @Before
-    public void setUp() throws IOException, URISyntaxException {
-        URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
-        project = oMapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
-    }
-
     /*
         public List<Team> getTeams()
      */
@@ -224,20 +216,34 @@ public class TeamServiceTest {
     @Test
     public void deleteTeam_asProjectOwner() {
         mockTeamAuth();
+        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         ApiProject project = new ApiProject();
         when(projectRepository.findByTeams(anyString())).thenReturn(Collections.singletonList(project));
-        when(projectRepository.findByTeams(anyString())).thenReturn(new LinkedList<>());
-        RequestResponse response = teamService.deleteTeam("TeamTest");
-        Assert.assertTrue(response.getSuccess());
+        try {
+            teamService.deleteTeam("TeamTest");
+        } catch (InvalidRequestException e) {
+            Assert.assertEquals("There are projects under your team as owner!", e.getMessage());
+        }
+    }
+
+    @Test
+    public void deleteTeam_notCreator(){
+        mockTeamAuth();
+        Team team = Team.builder().id("not-id").name("not-team").creator("not-creator").build();
+        when(teamRepository.findByName(anyString())).thenReturn(team);
+        ApiProject project = new ApiProject();
+        when(projectRepository.findByTeams(anyString())).thenReturn(Collections.singletonList(project));
+        try {
+            teamService.deleteTeam("TeamTest");
+        } catch (InvalidRequestException e){
+            Assert.assertEquals("You are not allowed to delete this team!", e.getMessage());
+        }
     }
 
     @Test
     public void deleteTeam_success() {
         mockTeamAuth();
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
-        doReturn(null).when(teamRepository).removeTeamFromMember(anyString(), anyString());
-        doReturn(null).when(teamRepository).removeTeamFromProject(anyString(), anyString());
-
         RequestResponse response = teamService.deleteTeam("TeamTest");
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Team has been deleted!", response.getMessage());
@@ -253,8 +259,6 @@ public class TeamServiceTest {
         UserProfileResponse expected = new UserProfileResponse();
         expected.setStatusToSuccess(); expected.setMessage("User is authenticated");
         expected.setUsername("test"); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
-        when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
-        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
     }
     
@@ -469,15 +473,7 @@ public class TeamServiceTest {
 
     @Test
     public void removeMembersFromTeam_successMember() {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(USER);
-        UserProfileResponse expected = new UserProfileResponse();
-        expected.setStatusToSuccess(); expected.setMessage("User is authenticated");
-        expected.setUsername(USER_USERNAME); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
-        when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
+        mockTeamAuth();
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(userRepository.findByUsername(anyString())).thenReturn(USER);
 

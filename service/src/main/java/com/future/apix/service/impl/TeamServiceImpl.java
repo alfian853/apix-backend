@@ -13,7 +13,6 @@ import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.TeamCreateRequest;
-import com.future.apix.request.TeamGrantMemberRequest;
 import com.future.apix.request.TeamInviteRequest;
 import com.future.apix.response.RequestResponse;
 import com.future.apix.response.UserProfileResponse;
@@ -115,9 +114,9 @@ public class TeamServiceImpl implements TeamService {
                 teamRepository.removeTeamFromProject(name, project.getId());
             }
             // only delete where team as member, cannot delete where team as project owner
-            if (!projectRepository.findByTeams(name).isEmpty())
+            if (!projects.isEmpty()) {
                 throw new InvalidRequestException("There are projects under your team as owner!");
-
+            }
             teamRepository.deleteById(existTeam.getId());
             return RequestResponse.success("Team has been deleted!");
         }

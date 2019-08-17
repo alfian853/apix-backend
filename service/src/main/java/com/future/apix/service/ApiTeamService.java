@@ -9,5 +9,5 @@ public interface ApiTeamService {
     RequestResponse grantTeamAccess(String id, ProjectAssignTeamRequest request);
 
     // check if authorized user is projectOwner
-    boolean checkProjectOwner(String id);
+    boolean checkProjectOwner(String id, String teamCreatorName);
 }

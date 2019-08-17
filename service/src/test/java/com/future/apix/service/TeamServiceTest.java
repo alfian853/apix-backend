@@ -2,6 +2,7 @@ package com.future.apix.service;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
 import com.future.apix.entity.enumeration.TeamAccess;
@@ -20,8 +21,7 @@ import com.future.apix.response.UserProfileResponse;
 import com.future.apix.service.impl.TeamServiceImpl;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonValue;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -31,6 +31,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
@@ -71,6 +76,20 @@ public class TeamServiceTest {
             .creator(TEAM_CREATOR)
             .members(TEAM_MEMBER)
             .build();
+    private static final TeamCreateRequest request = TeamCreateRequest.builder()
+            .creator(TEAM_CREATOR)
+            .teamName(TEAM_NAME)
+            .access(TEAM_ACCESS)
+            .members(Collections.singletonList(USER_USERNAME))
+            .build();
+
+    private ApiProject project;
+
+    @Before
+    public void setUp() throws IOException, URISyntaxException {
+        URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
+        project = oMapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
+    }
 
     /*
         public List<Team> getTeams()
@@ -98,8 +117,6 @@ public class TeamServiceTest {
     @Test
     public void getMyTeam_success(){
         Authentication authentication = mock(Authentication.class);
-//        when(authentication.getPrincipal()).thenReturn(TEAM);
-
         UserProfileResponse expected = new UserProfileResponse();
         expected.setStatusToSuccess();
         expected.setUsername(USER_USERNAME); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
@@ -156,12 +173,6 @@ public class TeamServiceTest {
     @Test
     public void createTeam_teamAlreadyExists(){
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
-        TeamCreateRequest request = TeamCreateRequest.builder()
-            .creator(TEAM_CREATOR)
-            .teamName(TEAM_NAME)
-            .members(Collections.emptyList())
-            .access(TEAM_ACCESS)
-            .build();
         try {
             teamService.createTeam(request);
         } catch (DuplicateEntryException e) {
@@ -173,12 +184,6 @@ public class TeamServiceTest {
     public void createTeam_creatorNotFound(){
         when(teamRepository.findByName(anyString())).thenReturn(null);
         when(userRepository.findByUsername(anyString())).thenReturn(null);
-        TeamCreateRequest request = TeamCreateRequest.builder()
-            .creator(TEAM_CREATOR)
-            .teamName(TEAM_NAME)
-            .access(TEAM_ACCESS)
-            .members(Collections.singletonList(USER_USERNAME))
-            .build();
         try {
             teamService.createTeam(request);
         } catch (DataNotFoundException e) {
@@ -191,12 +196,6 @@ public class TeamServiceTest {
         when(teamRepository.findByName(anyString())).thenReturn(null);
         when(teamRepository.save(any(Team.class))).thenReturn(TEAM);
         when(userRepository.findByUsername(anyString())).thenReturn(USER);
-        TeamCreateRequest request = TeamCreateRequest.builder()
-            .creator(TEAM_CREATOR)
-            .teamName(TEAM_NAME)
-            .access(TEAM_ACCESS)
-            .members(Collections.singletonList(USER_USERNAME))
-            .build();
         Team response = teamService.createTeam(request);
         Assert.assertTrue(USER.getTeams().contains(TEAM_NAME));
         verify(teamRepository).save(any());
@@ -213,15 +212,7 @@ public class TeamServiceTest {
 
     @Test
     public void deleteTeam_NotCreatorOfTeam() {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(USER);
-        UserProfileResponse expected = new UserProfileResponse();
-        expected.setStatusToSuccess(); expected.setMessage("User is authenticated");
-        expected.setUsername("not username"); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
-        when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
+        mockTeamAuth();
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         try {
             teamService.deleteTeam(TEAM_NAME);
@@ -231,7 +222,36 @@ public class TeamServiceTest {
     }
 
     @Test
+    public void deleteTeam_asProjectOwner() {
+        System.out.println(project);
+//        project.setTeams(Collections.singletonList("TeamTest"));
+//        project.setProjectOwner(TEAM);
+        mockTeamAuth();
+        when(projectRepository.findByTeams(anyString())).thenReturn(Collections.singletonList(project));
+        doReturn(null).when(teamRepository).removeTeamFromProject(anyString(), anyString());
+//        try {
+//            teamService.deleteTeam("TeamTest");
+//        } catch (Exception e) {
+//            Assert.assertEquals("There are projects under your team as owner!", e.getMessage());
+//        }
+        RequestResponse response = teamService.deleteTeam("TeamTest");
+        Assert.assertTrue(response.getSuccess());
+    }
+
+    @Test
     public void deleteTeam_success() {
+        mockTeamAuth();
+        when(teamRepository.findByName(anyString())).thenReturn(TEAM);
+        doReturn(null).when(teamRepository).removeTeamFromMember(anyString(), anyString());
+        doReturn(null).when(teamRepository).removeTeamFromProject(anyString(), anyString());
+
+        RequestResponse response = teamService.deleteTeam("TeamTest");
+        Assert.assertTrue(response.getSuccess());
+        Assert.assertEquals("Team has been deleted!", response.getMessage());
+        verify(teamRepository, times(1)).deleteById(anyString());
+    }
+
+    private void mockTeamAuth() {
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -242,11 +262,7 @@ public class TeamServiceTest {
         expected.setUsername("test"); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
         when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
-
-        RequestResponse response = teamService.deleteTeam("TeamTest");
-        Assert.assertTrue(response.getSuccess());
-        Assert.assertEquals("Team has been deleted!", response.getMessage());
-        verify(teamRepository, times(1)).deleteById(anyString());
+        when(oMapper.convertValue(Mockito.any(), eq(UserProfileResponse.class))).thenReturn(expected);
     }
     
     /*

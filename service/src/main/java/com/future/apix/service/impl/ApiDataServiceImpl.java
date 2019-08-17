@@ -54,7 +54,7 @@ public class ApiDataServiceImpl implements ApiDataService {
     public RequestResponse deleteById(String id){
         ApiProject project = apiRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Project does not exists!"));
-        if (apiTeamService.checkProjectOwner(id)) {
+        if (apiTeamService.checkProjectOwner(id, project.getProjectOwner().getCreator())) {
             apiRepository.deleteById(id);
             return RequestResponse.success("Project has been deleted!");
         }

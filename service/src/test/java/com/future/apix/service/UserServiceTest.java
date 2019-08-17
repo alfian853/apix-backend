@@ -1,11 +1,15 @@
 package com.future.apix.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.entity.Team;
 import com.future.apix.entity.User;
+import com.future.apix.entity.enumeration.TeamAccess;
+import com.future.apix.entity.teamdetail.Member;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DuplicateEntryException;
 import com.future.apix.exception.InvalidAuthenticationException;
 import com.future.apix.exception.InvalidRequestException;
+import com.future.apix.repository.TeamRepository;
 import com.future.apix.repository.UserRepository;
 import com.future.apix.request.UserCreateRequest;
 import com.future.apix.response.RequestResponse;
@@ -41,13 +45,25 @@ public class UserServiceTest {
     private static final List<String> USER_TEAMS = new ArrayList<>(Arrays.asList("TeamTest"));
     private static final User USER = new User(USER_ID, USER_USERNAME, USER_PASSWORD, USER_ROLES, USER_TEAMS);
 
+    private static final List<Member> TEAM_MEMBER = new ArrayList<>(Arrays.asList(new Member(USER_USERNAME, true)));
+    private static final Team TEAM = Team.builder()
+            .id("team-id")
+            .name("team-name")
+            .access(TeamAccess.PUBLIC)
+            .creator(USER_USERNAME)
+            .members(TEAM_MEMBER)
+            .build();
+
     private Optional<User> userOpt;
 
     @Mock
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Mock
-    ObjectMapper oMapper;
+    private TeamRepository teamRepository;
+
+    @Mock
+    private ObjectMapper oMapper;
 
     @Before
     public void setUp(){
@@ -79,6 +95,7 @@ public class UserServiceTest {
     @Test
     public void deleteUser_success(){
         when(userRepository.findById(anyString())).thenReturn(userOpt);
+        when(teamRepository.findByMembersUsername(anyString())).thenReturn(Collections.singletonList(TEAM));
         RequestResponse response = serviceMock.deleteUser("test-id");
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("User has been deleted!", response.getMessage());
@@ -165,7 +182,7 @@ public class UserServiceTest {
     public void getUser_fail(){
         try {
             serviceMock.getUser(USER_USERNAME);
-        } catch (InvalidAuthenticationException e) {
+        } catch (DataNotFoundException e) {
             Assert.assertEquals("User is not registered!", e.getMessage());
         }
     }

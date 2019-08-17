@@ -108,6 +108,17 @@ public class GithubApiControllerTest {
     }
 
     @Test
+    public void getFiles() throws Exception {
+        when(apiService.getFiles(anyString(), anyString())).thenReturn(Arrays.asList("file0.txt", "file1.txt"));
+        mvc.perform(get("/github/api/repos/{owner}/{repo}/git/trees/{branch}", "owner", "repo", "branch"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0]", is("file0.txt")))
+                .andExpect(jsonPath("$[1]", is("file1.txt")));
+        verify(apiService, times(1)).getFiles(anyString(), anyString());
+    }
+
+    @Test
     public void getFileContent() throws Exception {
         GithubContentResponse res = new GithubContentResponse();
         res.setType("file"); res.setEncoding("base64"); res.setSize(123);

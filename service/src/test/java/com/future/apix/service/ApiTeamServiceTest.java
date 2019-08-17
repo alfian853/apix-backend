@@ -85,19 +85,6 @@ public class ApiTeamServiceTest {
     public void setUp() throws IOException, URISyntaxException {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
-
-        /*
-        ApiProject project1 = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
-        ApiProject project2 = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
-        ApiProject project3 = mapper.readValue(Files.readAllBytes(Paths.get(uri)), ApiProject.class);
-        project1.setProjectOwner(TEAM); project2.setProjectOwner(TEAM);
-        projectWithoutTeam = Optional.of(project1);
-        project2.getTeams().add("AdditionalTeam");
-        projectWithTeam = Optional.of(project2);
-        project3.setProjectOwner(TEAM_DIFFCREATOR);
-        projectDifferentCreator = Optional.of(project3);
-
-         */
     }
 
     /*
@@ -105,7 +92,10 @@ public class ApiTeamServiceTest {
      */
     @Test
     public void grantTeamAccess_teamNotFound() {
+        project.setProjectOwner(TEAM);
         ProjectAssignTeamRequest request = new ProjectAssignTeamRequest("grant", "TeamTest");
+        when(apiRepository.findById(anyString())).thenReturn(Optional.of(project));
+        mockAuth();
         when(teamRepository.findByName(anyString())).thenReturn(null);
         try {
             mock.grantTeamAccess("123", request);
@@ -134,15 +124,7 @@ public class ApiTeamServiceTest {
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(apiRepository.findById(anyString())).thenReturn(projectWithoutTeam);
 
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(USER);
-        UserProfileResponse expected = new UserProfileResponse();
-        expected.setStatusToSuccess(); expected.setMessage("User is authenticated");
-        expected.setUsername(USER_USERNAME); expected.setRoles(USER_ROLES); expected.setTeams(USER_TEAMS);
-        doReturn(expected).when(mapper).convertValue(any(), eq(UserProfileResponse.class));
+        mockAuth();
 
         RequestResponse response = mock.grantTeamAccess("123", request);
         Assert.assertTrue(response.getSuccess());
@@ -158,15 +140,7 @@ public class ApiTeamServiceTest {
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(apiRepository.findById(anyString())).thenReturn(projectWithTeam);
 
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(USER);
-        UserProfileResponse profile = new UserProfileResponse();
-        profile.setStatusToSuccess(); profile.setMessage("User is authenticated");
-        profile.setUsername(USER_USERNAME); profile.setRoles(USER_ROLES); profile.setTeams(USER_TEAMS);
-        doReturn(profile).when(mapper).convertValue(any(), eq(UserProfileResponse.class));
+        mockAuth();
 
         RequestResponse response = mock.grantTeamAccess("123", request);
         Assert.assertTrue(response.getSuccess());
@@ -182,15 +156,7 @@ public class ApiTeamServiceTest {
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(apiRepository.findById(anyString())).thenReturn(projectWithTeam);
 
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(USER);
-        UserProfileResponse profile = new UserProfileResponse();
-        profile.setStatusToSuccess(); profile.setMessage("User is authenticated");
-        profile.setUsername(USER_USERNAME); profile.setRoles(USER_ROLES); profile.setTeams(USER_TEAMS);
-        doReturn(profile).when(mapper).convertValue(any(), eq(UserProfileResponse.class));
+        mockAuth();
 
        try {
            mock.grantTeamAccess("123", request);
@@ -212,7 +178,16 @@ public class ApiTeamServiceTest {
         ProjectAssignTeamRequest request = new ProjectAssignTeamRequest("grant", "AdditionalTeam");
         when(teamRepository.findByName(anyString())).thenReturn(TEAM);
         when(apiRepository.findById(anyString())).thenReturn(projectDifferentCreator);
+        mockAuth();
 
+        try {
+            mock.grantTeamAccess("123", request);
+        } catch (InvalidRequestException e) {
+            Assert.assertEquals("You are unauthorized to grant team!", e.getMessage());
+        }
+    }
+
+    private void mockAuth(){
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -222,11 +197,5 @@ public class ApiTeamServiceTest {
         profile.setStatusToSuccess(); profile.setMessage("User is authenticated");
         profile.setUsername(USER_USERNAME); profile.setRoles(USER_ROLES); profile.setTeams(USER_TEAMS);
         doReturn(profile).when(mapper).convertValue(any(), eq(UserProfileResponse.class));
-
-        try {
-            mock.grantTeamAccess("123", request);
-        } catch (InvalidRequestException e) {
-            Assert.assertEquals("You are unauthorized to grant team!", e.getMessage());
-        }
     }
 }

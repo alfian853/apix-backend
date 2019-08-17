@@ -51,6 +51,9 @@ public class ApiDataServiceTest {
     @Mock
     TeamService teamService;
 
+    @Mock
+    ApiTeamService apiTeamService;
+
     private Optional<ApiProject> optionalApiProject;
     private ApiProject project;
 
@@ -130,10 +133,23 @@ public class ApiDataServiceTest {
 
     @Test
     public void deleteById_Found(){
-        when(apiRepository.findById(anyString())).thenReturn(optionalApiProject);
+        project.setProjectOwner(TEAM);
+        when(apiRepository.findById(anyString())).thenReturn(Optional.of(project));
+        when(apiTeamService.checkProjectOwner(anyString(), anyString())).thenReturn(true);
         RequestResponse response = apiService.deleteById("test-id");
         Assert.assertTrue(response.getSuccess());
         Assert.assertEquals("Project has been deleted!", response.getMessage());
+        verify(apiTeamService, times(1)).checkProjectOwner(anyString(), anyString());
+    }
+
+    @Test
+    public void deleteById_Unauthorized(){
+        when(apiRepository.findById(anyString())).thenReturn(optionalApiProject);
+        try {
+            apiService.deleteById("test-id");
+        } catch (Exception e) {
+            Assert.assertEquals("You are not authorized to delete this project!", e.getMessage());
+        }
     }
 
     @Test

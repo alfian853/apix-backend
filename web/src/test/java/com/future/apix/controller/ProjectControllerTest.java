@@ -26,9 +26,6 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
@@ -45,7 +42,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -141,7 +137,7 @@ public class ProjectControllerTest {
         MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
         mvc.perform(multipart("/projects/import")
             .file("file", jsonFile.getBytes())
-            .param("type", "oas-swagger2")
+            .param("format", "JSON")
             .param("team", "team")
             .param("isNewTeam", "true"))
             .andExpect(status().isOk())
@@ -156,7 +152,7 @@ public class ProjectControllerTest {
         MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
         mvc.perform(multipart("/projects/import")
             .file("file", jsonFile.getBytes())
-            .param("type", "oas-swagger2")
+            .param("format", "JSON")
             .param("team", "team")
             .param("isNewTeam", "false"))
             .andExpect(status().isOk())
@@ -171,28 +167,13 @@ public class ProjectControllerTest {
         MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
         mvc.perform(multipart("/projects/import")
             .file("file", jsonFile.getBytes())
-            .param("type", "oas-swagger2")
+            .param("format", "JSON")
             .param("team", "team")
             .param("isNewTeam", "false"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.success", is(false)))
             .andExpect(jsonPath("$.message", is("")));
     }
-
-    @Test
-    public void importFromFile_typeNotEqual() throws Exception {
-        MockMultipartFile jsonFile = new MockMultipartFile("json", "", "application/json", "{\"json\": \"someValue\"}".getBytes());
-        mvc.perform(multipart("/projects/import")
-            .file("file", jsonFile.getBytes())
-            .param("type", "not-oas")
-            .param("team", "team")
-            .param("isNewTeam", "false"))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.success", is(false)))
-            .andExpect(jsonPath("$.message", is("oas format is not supported")));
-        verify(commandExecutor, times(0)).executeCommand(any(),any());
-    }
-
 
     @Test
     @Ignore
@@ -203,7 +184,7 @@ public class ProjectControllerTest {
 
         mvc.perform(multipart("/projects/import")
             .file("file", jsonFile.getBytes())
-            .param("type", "not-oas")
+            .param("format", "JSON")
             .param("team", "team")
             .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
         )

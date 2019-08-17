@@ -31,11 +31,11 @@ public class ApiTeamServiceImpl implements ApiTeamService {
 
     @Override
     public RequestResponse grantTeamAccess(String id, ProjectAssignTeamRequest request) {
-        if (this.checkProjectOwner(id)) {
+        ApiProject apiProject = apiRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Api project does not exists!"));
+        if (this.checkProjectOwner(id, apiProject.getProjectOwner().getCreator())) {
             String assignType = request.getAssignType();
             String teamName = request.getTeamName();
-            ApiProject apiProject = apiRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Api project does not exists!"));
             if (assignType.equals("grant") && !apiProject.getTeams().contains(teamName)) {
                 apiProject.getTeams().add(teamName);
                 apiRepository.save(apiProject);
@@ -44,7 +44,7 @@ public class ApiTeamServiceImpl implements ApiTeamService {
             else if(assignType.equals("ungrant") && apiProject.getTeams().contains(teamName)){
                 apiProject.getTeams().remove(teamName);
                 apiRepository.save(apiProject);
-                return RequestResponse.success("Team has been removed to project!");
+                return RequestResponse.success("Team has been removed from project!");
             }
             else throw new InvalidRequestException("Team is already in the project!");
         }
@@ -54,12 +54,10 @@ public class ApiTeamServiceImpl implements ApiTeamService {
     }
 
     @Override
-    public boolean checkProjectOwner(String id) {
+    public boolean checkProjectOwner(String id, String teamCreatorName) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         UserProfileResponse profile = oMapper.convertValue(auth.getPrincipal(), UserProfileResponse.class);
-        ApiProject apiProject = apiRepository.findById(id)
-            .orElseThrow(() -> new DataNotFoundException("Api project does not exists!"));
-        if (profile.getUsername().equals(apiProject.getProjectOwner().getCreator())) {
+        if (profile.getUsername().equals(teamCreatorName)) {
             return true;
         }
         else return false;

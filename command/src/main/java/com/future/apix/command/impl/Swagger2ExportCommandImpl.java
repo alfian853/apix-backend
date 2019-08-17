@@ -1,22 +1,22 @@
 package com.future.apix.command.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.future.apix.command.Swagger2ExportCommand;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.command.model.ExportRequest;
 import com.future.apix.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.exception.DataNotFoundException;
 import com.future.apix.exception.DefaultRuntimeException;
-import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.OasSwagger2Repository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.util.JsonUtil;
 import com.future.apix.util.QueueCommand;
 import com.future.apix.util.converter.ApiProjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -59,7 +59,10 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
     @Autowired
     private ApiProjectConverter converter;
 
+    @Value("apix.export_oas.relative_url")
     private String EXPORT_URL;
+
+    @Value("apix.export_oas.directory")
     private String EXPORT_DIR;
 
     private static HashMap<String, QueueCommand<DownloadResponse, ExportRequest>> pools = new HashMap<>();
@@ -73,12 +76,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
     public void setEXPORT_DIR(String EXPORT_DIR) {
         this.EXPORT_DIR = EXPORT_DIR;
-    }
-
-    @Autowired
-    public Swagger2ExportCommandImpl(Environment env) {
-        this.EXPORT_URL = env.getProperty("apix.export_oas.relative_url");
-        this.EXPORT_DIR = env.getProperty("apix.export_oas.directory");
     }
 
     @Override
@@ -106,7 +103,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
                 .orElse(new ProjectOasSwagger2());
 
         DownloadResponse response = new DownloadResponse();
-        System.out.println("FORMAT: " + request.getFormat().toString());
 
         try{
             boolean fileExist = false;
@@ -133,7 +129,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
             // not the latest update and file is available
             if( expired || swagger2.getOasSwagger2() == null ){
-                System.out.println("NOT THE LATEST UPDATE!");
                 LinkedHashMap<String, Object> oasHashMap = converter.convertToOasSwagger2(project);
                 swagger2.setOasSwagger2(oasHashMap);
 
@@ -154,7 +149,6 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
             }
             // if file is deleted, but the project still exist
             else if(!fileExist){
-                System.out.println("FILE NOT EXISTS! jadi buat baru");
                 Map<String, Object> swaggerOas = swagger2.getOasSwagger2();
                 jsonUtil.remappingKeys(swagger2.getOasSwagger2(),maprefTor$ref);
                 writeFile(swagger2.getOasFileName(), request.getFormat(), swaggerOas);
@@ -175,13 +169,11 @@ public class Swagger2ExportCommandImpl implements Swagger2ExportCommand {
 
         if (format.toString().equals("JSON")) {
             File file = new File(EXPORT_DIR + newFileName + ".json");
-            System.out.println("WRITE FILE TO JSON");
             mapper.writerWithDefaultPrettyPrinter()
                 .writeValue(file, swagger);
         }
         else if (format.toString().equals("YAML")) {
             File file = new File(EXPORT_DIR + newFileName + ".yaml");
-            System.out.println("WRITE FILE TO YAML");
             yamlMapper.writerWithDefaultPrettyPrinter()
                 .writeValue(file, swagger);
         }

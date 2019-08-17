@@ -36,18 +36,14 @@ public class QueryActionExecutor {
         Object temp = target.get(key);
         target.remove(key);
         target.put((String) query.get("newKey"), temp);
-        System.out.println("rename success : "+query.toString());
     }
 
     protected void doInsert(Map<String, Object> target, Map<String, Object> query) {
         target.put((String) query.get("key"), query.get("value"));
-        System.out.println("insert success : "+query.toString());
     }
 
     protected void doDelete(Map<String, Object> target, Map<String, Object> query) {
         target.remove(query.get("key"));
-        System.out.println("delete success : "+query.toString());
     }
-
 
 }

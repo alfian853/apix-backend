@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.apix.command.impl.Swagger2CodegenCommandImpl;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
-import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.OasSwagger2Repository;
+import com.future.apix.repository.ProjectRepository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class Swagger2CodegenCommandTest {
     private ObjectMapper mapper = new ObjectMapper();
 
     @InjectMocks
-    private Swagger2CodegenCommandImpl command = new Swagger2CodegenCommandImpl();
+    private Swagger2CodegenCommandImpl command;
 
     @Mock
     ProjectRepository apiRepository;

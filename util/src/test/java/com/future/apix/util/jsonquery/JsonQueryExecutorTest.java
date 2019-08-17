@@ -1,6 +1,7 @@
 package com.future.apix.util.jsonquery;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.apix.entity.ApiProject;
 import com.future.apix.util.JsonUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class JsonQueryExecutorTest {
     });
 
     @Test
-    public void updateSuccess() throws URISyntaxException, IOException {
+    public void executeQueryToMapSuccess() throws URISyntaxException, IOException {
         URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
         Map project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), HashMap.class);
 
@@ -52,5 +53,21 @@ public class JsonQueryExecutorTest {
         queryExecutor.executeQuery(project, query);
 
         Assert.assertTrue(jsonUtil.isEqualObject(project, expected, this.ignoredField));
+    }
+
+    @Test
+    public void executeQueryToObjectSuccess() throws URISyntaxException, IOException {
+        URI uri = getClass().getClassLoader().getResource("apix-oas.json").toURI();
+        HashMap project = mapper.readValue(Files.readAllBytes(Paths.get(uri)), HashMap.class);
+
+        URI uriQuery = getClass().getClassLoader().getResource("update-testcase/success-query.json").toURI();
+        Map<String,Object> query = mapper.readValue(Files.readAllBytes(Paths.get(uriQuery)), HashMap.class);
+
+        URI uriResult = getClass().getClassLoader().getResource("apix-oas-update-result.json").toURI();
+        Map expected = mapper.readValue(Files.readAllBytes(Paths.get(uriResult)), HashMap.class);
+
+        Object updatedProject = queryExecutor.executeQuery((Object)project, query);
+
+        Assert.assertTrue(jsonUtil.isEqualObject(updatedProject, expected, this.ignoredField));
     }
 }

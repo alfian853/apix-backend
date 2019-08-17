@@ -5,6 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Objects;
+
 @RunWith(MockitoJUnitRunner.class)
 public class LazyObjectWrapperTest {
 
@@ -49,6 +51,25 @@ public class LazyObjectWrapperTest {
         }
     }
 
+    @Test
+    public void reInitObjectTest(){
+        LazyObjectWrapper<Integer> objectWrapper = new LazyObjectWrapper<>(new ObjectInitiator<Integer>() {
+            int counter = 0;
+            @Override
+            public Integer initObject() {
+                return counter++;
+            }
+
+            @Override
+            public void onInitFailed() {
+                throw new RuntimeException("init failed");
+            }
+        });
+
+        Assert.assertEquals((int)objectWrapper.get(), 0);
+        objectWrapper.reInitObject();
+        Assert.assertEquals((int)objectWrapper.get(), 1);
+    }
 
 
 

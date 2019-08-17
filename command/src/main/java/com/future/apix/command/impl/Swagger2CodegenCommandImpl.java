@@ -7,16 +7,19 @@ import com.future.apix.enumerate.FileFormat;
 import com.future.apix.entity.ApiProject;
 import com.future.apix.entity.ProjectOasSwagger2;
 import com.future.apix.exception.DataNotFoundException;
-import com.future.apix.repository.ProjectRepository;
 import com.future.apix.repository.OasSwagger2Repository;
+import com.future.apix.repository.ProjectRepository;
 import com.future.apix.response.DownloadResponse;
 import com.future.apix.util.QueueCommand;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,8 +41,6 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
 
     private static HashMap<String, QueueCommand<DownloadResponse, String>> pools = new HashMap<>();
 
-    private String CODEGEN_URL;
-
     public void setCODEGEN_URL(String CODEGEN_URL) {
         this.CODEGEN_URL = CODEGEN_URL;
     }
@@ -56,23 +57,19 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
         this.OAS_DIR = OAS_DIR;
     }
 
+    @Value("apix.codegen.relative_url")
+    private String CODEGEN_URL;
+
+    @Value("apix.codegen.directory")
     private String CODEGEN_RESULT_DIR;
+
+    @Value("apix.codegen.swagger_cli_jar")
     private String CODEGEN_JAR;
+
+    @Value("apix.export_oas.directory")
     private String OAS_DIR;
-//    private List<String> fileList = new ArrayList<String>();
+
     private List<File> fileList = new ArrayList<>();
-
-    public Swagger2CodegenCommandImpl(){
-
-    }
-
-    @Autowired
-    public Swagger2CodegenCommandImpl(Environment e) {
-        this.CODEGEN_URL = e.getProperty("apix.codegen.relative_url");
-        this.CODEGEN_RESULT_DIR = e.getProperty("apix.codegen.directory");
-        this.CODEGEN_JAR = e.getProperty("apix.codegen.swagger_cli_jar");
-        this.OAS_DIR = e.getProperty("apix.export_oas.directory");
-    }
 
     @Override
     public DownloadResponse execute(String projectId) {
@@ -134,23 +131,9 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
                 pb.redirectError(ProcessBuilder.Redirect.INHERIT);
                 pb.start().waitFor();
 
-                /*
-                pb = new ProcessBuilder(
-                        "zip","-r",baseName+".zip",
-                        baseName
-                );
-                pb.directory(new File(CODEGEN_RESULT_DIR));
-                pb.start().waitFor();
-                */
-
-//                http://www.avajava.com/tutorials/lessons/how-do-i-zip-a-directory-and-all-its-contents.html
-//                System.out.println("\nBaseName: " + baseName);
                 File directoryToZip = new File(CODEGEN_RESULT_DIR + baseName);
-//                System.out.println("--- GEtting references to all files in: " + directoryToZip.getCanonicalPath());
                 getAllFiles(directoryToZip, fileList);
-//                System.out.println("-- Creating zip file");
                 writeZipFile(directoryToZip, fileList);
-//                System.out.println("-- Done");
 
                 FileSystemUtils.deleteRecursively(new File(CODEGEN_RESULT_DIR +baseName));
 
@@ -172,28 +155,19 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
         return response;
     }
 
-//    http://www.avajava.com/tutorials/lessons/how-do-i-zip-a-directory-and-all-its-contents.html
     public static void getAllFiles(File dir, List<File> fileList1) {
-        try {
-            File[] files = dir.listFiles();
-            for (File file : files) {
-                fileList1.add(file);
-                if(file.isDirectory()){
-                    System.out.println("\ndirectory= " + file.getCanonicalPath());
-                    getAllFiles(file, fileList1);
-                } else {
-                    System.out.println("\t\tFile= " + file.getCanonicalPath());
-                }
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            fileList1.add(file);
+            if(file.isDirectory()){
+                getAllFiles(file, fileList1);
             }
-        } catch (IOException e){
-            e.printStackTrace();
         }
     }
 
     public static void writeZipFile(File directoryToZip, List<File> fileList1){
         try {
             FileOutputStream fos = new FileOutputStream(directoryToZip.getCanonicalPath() + ".zip");
-            System.out.println("Writing Zip File to: " + directoryToZip.getCanonicalPath());
             ZipOutputStream zos = new ZipOutputStream(fos);
             for (File file : fileList1) {
                 if(!file.isDirectory()) {
@@ -203,15 +177,13 @@ public class Swagger2CodegenCommandImpl implements Swagger2CodegenCommand {
             zos.close();
             fos.close();
         } catch (IOException e) {
-            e.printStackTrace();;
+            e.printStackTrace();
         }
     }
 
-    public static void addToZip(File directoryToZip, File file, ZipOutputStream zos) throws FileNotFoundException, IOException {
+    public static void addToZip(File directoryToZip, File file, ZipOutputStream zos) throws IOException {
         FileInputStream fis = new FileInputStream(file);
-        String zipFilePath = file.getCanonicalPath().substring(directoryToZip.getCanonicalPath().length() + 1,
-                file.getCanonicalPath().length());
-//        System.out.println("Writing " + zipFilePath + " to zip file! AVAJAVA");
+        String zipFilePath = file.getCanonicalPath().substring(directoryToZip.getCanonicalPath().length() + 1);
         ZipEntry zipEntry = new ZipEntry(zipFilePath);
         zos.putNextEntry(zipEntry);
 

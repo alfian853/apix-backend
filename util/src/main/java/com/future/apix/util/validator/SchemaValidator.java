@@ -2,13 +2,16 @@ package com.future.apix.util.validator;
 
 import com.future.apix.entity.apidetail.DataType;
 import com.future.apix.entity.apidetail.Schema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class SchemaValidator {
 
+    private static Logger logger = LoggerFactory.getLogger(SchemaValidator.class);
+    
     private static DataType getType(String s){
         try{
             return DataType.valueOf(s.toUpperCase());
@@ -42,8 +45,8 @@ public class SchemaValidator {
                     res = schema.getFormat() != null && NumberFormatValidator.isValid(schema.getFormat());
             }
             if(!res){
-                System.out.println("invalid integer");
-                System.out.println(schema);
+                logger.info("invalid integer");
+                logger.info(schema.toString());
             }
             return res;
         }
@@ -51,45 +54,33 @@ public class SchemaValidator {
             boolean res = formatIsNull || (!formatIsNull && NumberFormatValidator.isValid(schema.getFormat())
                     && propertiesIsEmpty && itemsIsEmpty && patternIsNull);
             if(!res){
-                System.out.println("invalid number");
-                System.out.println(schema);
+                logger.info("invalid number");
+                logger.info(schema.toString());
             }
             return res;
         }
         else if(type == DataType.ARRAY){
             boolean res = !itemsIsEmpty && (schema.getItems().getType() != null || schema.getItems().getRef() != null)
                     && formatIsNull && propertiesIsEmpty;
-//            System.out.println("itemIsEmpty:" + itemsIsEmpty);
-//            System.out.println("getType: " + schema.getItems().getType());
-//            System.out.println("getRef: " + schema.getItems().getRef());
-//            System.out.println("formatIsNull: " + formatIsNull);
-//            System.out.println("propertiesIsEmpty: " + propertiesIsEmpty);
-//            System.out.println("\n");
             if(!res){
-                System.out.println("invalid array");
-                System.out.println(schema);
+                logger.info("invalid array");
+                logger.info(schema.toString());
             }
             return res;
         }
         else if(type == DataType.OBJECT){
             boolean res = formatIsNull && itemsIsEmpty && isValid(schema.getProperties()) && defaultIsNull;
-//            System.out.println("itemIsEmpty:" + itemsIsEmpty);
-//            System.out.println("defaultIsNull: " + defaultIsNull);
-//            System.out.println("isValid: " + isValid(schema.getProperties()));
-//            System.out.println("formatIsNull: " + formatIsNull);
-//            System.out.println("propertiesIsEmpty: " + propertiesIsEmpty);
-//            System.out.println("\n");
             if(!res){
-                System.out.println("invalid object");
-                System.out.println(schema);
+                logger.info("invalid object");
+                logger.info(schema.toString());
             }
             return res;
         }
         else if(type == DataType.STRING){
             boolean res = itemsIsEmpty && propertiesIsEmpty;
             if(!res){
-                System.out.println("invalid string");
-                System.out.println(schema);
+                logger.info("invalid string");
+                logger.info(schema.toString());
             }
             return res;
         }
@@ -100,7 +91,6 @@ public class SchemaValidator {
     public static boolean isValid(HashMap<String,Schema> schemas){
         if(schemas == null)return true;
         for (Map.Entry<String,Schema> pair : schemas.entrySet()) {
-//            System.out.println(pair);
             if (!isValid(pair.getValue())) {
                 return false;
             }

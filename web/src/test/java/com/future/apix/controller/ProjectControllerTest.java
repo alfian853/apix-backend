@@ -197,9 +197,7 @@ public class ProjectControllerTest {
     @Test
     @Ignore
     public void importFromFile_uploadFileSizeExceeded() throws Exception {
-        //        byte[] bytes = new byte[1024 * 1024 * 10];
         URI uri = getClass().getClassLoader().getResource("stoplight.json").toURI();
-        System.out.println(uri);
         byte[] project = FileUtils.readFileToByteArray(new File(uri));
         MockMultipartFile jsonFile = new MockMultipartFile("json", "stoplight.json", "application/json", project);
 

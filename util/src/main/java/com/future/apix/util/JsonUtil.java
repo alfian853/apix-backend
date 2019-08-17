@@ -91,8 +91,8 @@ public class JsonUtil {
             Map<String, Object> map1;
             Map<String, Object> map2;
             if(obj1 instanceof Mappable){
-                map1 = (Map<String, Object>) obj1;
-                map2 = (Map<String, Object>) obj2;
+                map1 = mapper.convertValue(obj1, HashMap.class);
+                map2 = mapper.convertValue(obj2, HashMap.class);
             }
             else{
                 map1 = mapper.convertValue(obj1, HashMap.class);

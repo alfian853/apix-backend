@@ -14,7 +14,7 @@ public class LazyObjectWrapper<T> {
         return this.initiator.initObject();
     }
 
-    private void reInitObject(){
+    public void reInitObject(){
         this.instance = this.initObject();
     }
 

@@ -45,7 +45,6 @@ public class RestExceptionControllerAdviceTest {
         new HttpHeaders(),
         HttpStatus.BAD_REQUEST,
         null);
-    System.out.println(result.getStatusCodeValue());
     Assert.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
     Assert.assertEquals(400, result.getStatusCodeValue());
     Assert.assertNotNull(result);

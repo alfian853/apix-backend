@@ -9,27 +9,9 @@ import javax.validation.constraints.NotNull;
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GithubContentsRequest {
-//    https://developer.github.com/v3/repos/contents
-
-    /**
-     * Create a file required message, content
-     * Update a file required message, content, sha
-     * Delete a file required message, sha
-     */
-
     @NotEmpty(message = "Message cannot be empty")
     @NotNull(message = "Message cannot be null")
     private String message; // commit message
-
-//    @NotEmpty(message = "Content cannot be empty")
-//    @NotNull(message = "Content cannot be null")
-//    private String content;
-
-    @NotNull(message = "Sha is required based on file sha")
-    private String sha;
     private String projectId;
     private String branch;
-
-    private GithubCommitterRequest committer;
-    private GithubCommitterRequest author;
 }

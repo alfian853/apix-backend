@@ -162,8 +162,7 @@ public class GithubApiControllerTest {
         String message = "commit message";
         String sha = "sha";
         GithubContentsRequest req = new GithubContentsRequest();
-        req.setMessage(message); req.setSha(sha);
-        req.setProjectId("id"); req.setBranch("branch");
+        req.setMessage(message); req.setProjectId("id"); req.setBranch("branch");
         GithubCommitResponse res = new GithubCommitResponse();
         res.setSha(sha); res.setMessage(message);
 

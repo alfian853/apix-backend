@@ -182,7 +182,7 @@ public class GithubApiServiceTest {
         GithubContentsRequest request = new GithubContentsRequest();
         request.setMessage("commit message");
         request.setProjectId("123");
-        request.setSha("sha-123");
+//        request.setSha("sha-123");
         try {
             service.updateFile("owner/repo", "test.md", request);
         } catch (InvalidRequestException e) {
@@ -206,7 +206,7 @@ public class GithubApiServiceTest {
         doReturn(contentString).when(service).readFromFile(any());
 
         GithubContentsRequest request = new GithubContentsRequest();
-        request.setMessage("message"); request.setSha("sha"); request.setProjectId("123");
+        request.setMessage("message"); request.setProjectId("123");
         try {
             service.updateFile("owner/repo", "test.txt", request);
         } catch (InvalidRequestException e) {
@@ -231,7 +231,7 @@ public class GithubApiServiceTest {
         doReturn(differString).when(service).readFromFile(any());
 
         GithubContentsRequest request = new GithubContentsRequest();
-        request.setMessage("message"); request.setSha("sha"); request.setProjectId("123");
+        request.setMessage("message"); request.setProjectId("123");
         GHContentUpdateResponse updateResponse = mock(GHContentUpdateResponse.class);
         when(ghContent.update(anyString(), anyString(), anyString())).thenReturn(updateResponse);
         GHCommit commit = mock(GHCommit.class);
